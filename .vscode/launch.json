@@ -5,25 +5,47 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
-            "type": "coreclr",
+            "name": "Launch Chrome (AI Antonio's Intelligence)",
+            "type": "chrome",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/<target-framework>/<project-name.dll>",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopAtEntry": false,
-            "console": "internalConsole"
+            "url": "http://localhost:5501/index.html",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true,
+            "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
+            "runtimeArgs": [
+                "--auto-open-devtools-for-tabs"
+            ]
         },
-        
-        
-
         {
-            "name": "CMake: CMake Script",
-            "type": "cmake",
+            "name": "Launch Edge (AI Antonio's Intelligence)",
+            "type": "msedge",
             "request": "launch",
-            "cmakeDebugType": "script",
-            "scriptPath": "${file}"
+            "url": "http://localhost:5501/index.html",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true,
+            "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile"
+        },
+        {
+            "name": "Attach to Chrome",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true
+        },
+        {
+            "name": "Launch Firefox (AI Antonio's Intelligence)",
+            "type": "firefox",
+            "request": "launch",
+            "url": "http://localhost:5501/index.html",
+            "webRoot": "${workspaceFolder}",
+            "reAttach": true,
+            "pathMappings": [
+                {
+                    "url": "http://localhost:5501",
+                    "path": "${workspaceFolder}"
+                }
+            ]
         }
     ]
 }
