@@ -350,7 +350,7 @@
                             <button id="purchase-mp3-wav" class="bg-purple-600 hover:bg-purple-700">Buy Master MP3/WAV</button>
                             <button id="purchase-mp4" class="bg-pink-600 hover:bg-pink-700">Buy Master MP4 (Subscription)</button>
                         </div>
-                        <img id="raydiant-seal" src="GERTIFIED AI SBM SEAL.jpg" alt="AI Certified SBM Seal" class="w-24 h-24 mx-auto mt-4" />
+                        <img id="raydiant-seal" src="assets/sbm raydiant seal.PNG" alt="AI Certified SBM Seal" class="w-24 h-24 mx-auto mt-4" />
                     </div>
                 </div>
 
@@ -389,10 +389,17 @@
 
         setLogLevel('Debug');
 
-        // Global Firebase variables
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Global Firebase variables - using environment variables with fallbacks
+        const firebaseConfig = {
+            apiKey: import.meta.env?.VITE_FIREBASE_API_KEY || "your_firebase_api_key_here",
+            authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN || "your_project.firebaseapp.com",
+            projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID || "your_project_id",
+            storageBucket: import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET || "your_project.appspot.com",
+            messagingSenderId: import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+            appId: import.meta.env?.VITE_FIREBASE_APP_ID || "1:123456789:web:your_app_id"
+        };
+        const appId = import.meta.env?.VITE_APP_ID || 'ai-antonios-intelligence';
+        const initialAuthToken = import.meta.env?.VITE_INITIAL_AUTH_TOKEN || null;
         
         let db, auth;
         let userId;
@@ -436,28 +443,41 @@
                 document.getElementById('message-box').style.display = 'none';
             });
             
-            // Initialize Firebase on page load
-            if (Object.keys(firebaseConfig).length) {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                onAuthStateChanged(auth, async (user) => {
-                    if (!user) {
-                        try {
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
-                                await signInAnonymously(auth);
+            // Initialize Firebase on page load with error handling
+            try {
+                if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "your_firebase_api_key_here") {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    onAuthStateChanged(auth, async (user) => {
+                        if (!user) {
+                            try {
+                                if (initialAuthToken) {
+                                    await signInWithCustomToken(auth, initialAuthToken);
+                                } else {
+                                    await signInAnonymously(auth);
+                                }
+                            } catch (error) {
+                                console.error("Firebase Auth Error:", error);
+                                showMessage("Authentication service temporarily unavailable. Some features may be limited.");
                             }
-                        } catch (error) {
-                            console.error("Firebase Auth Error:", error);
                         }
-                    }
-                    userId = auth.currentUser?.uid || crypto.randomUUID();
-                    if(userIdDisplay) userIdDisplay.textContent = userId;
-                    setupRealtimeListeners();
-                });
+                        userId = auth.currentUser?.uid || crypto.randomUUID();
+                        if(userIdDisplay) userIdDisplay.textContent = userId;
+                        setupRealtimeListeners();
+                    });
+                } else {
+                    console.warn("Firebase configuration not found. Running in demo mode.");
+                    userId = crypto.randomUUID();
+                    if(userIdDisplay) userIdDisplay.textContent = userId + " (Demo Mode)";
+                    showMessage("Running in demo mode. Please configure Firebase for full functionality.");
+                }
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                userId = crypto.randomUUID();
+                if(userIdDisplay) userIdDisplay.textContent = userId + " (Offline Mode)";
+                showMessage("Connection service unavailable. Running in offline mode.");
             }
 
             function setupRealtimeListeners() {
@@ -565,13 +585,29 @@
             });
             
             async function callGeminiApi(prompt) {
+                // Check if Firebase is available for storing messages
+                if (!db) {
+                    showMessage("Chat service temporarily unavailable. Please refresh the page and try again.");
+                    return;
+                }
+
                 const chatCollection = collection(db, 'artifacts', appId, 'public', 'data', 'conversations');
                 try {
+                    const apiKey = import.meta.env?.VITE_GOOGLE_AI_API_KEY || "";
+                    
+                    if (!apiKey || apiKey === "your_google_ai_api_key_here") {
+                        await addDoc(chatCollection, {
+                            sender: 'ai',
+                            text: "🔧 AI services are being configured. In the meantime, I'm here to help you creatively! Keep flowing with your Pisces energy and drop those rhymes. Your intuition knows the way! 🌊✨",
+                            timestamp: serverTimestamp()
+                        });
+                        return;
+                    }
+
                     const payload = {
                         contents: [{ parts: [{ text: prompt }] }],
                     };
 
-                    const apiKey = "";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
                     let attempts = 0;
@@ -678,7 +714,7 @@
                         generationConfig: { responseModalities: ["AUDIO"] },
                         model: "gemini-2.5-flash-preview-tts"
                     };
-                    const apiKey = "";
+                    const apiKey = import.meta.env?.VITE_GOOGLE_AI_API_KEY || "";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
                     
                     const response = await fetch(apiUrl, {
@@ -771,7 +807,7 @@
 
                 try {
                     const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1 } };
-                    const apiKey = ""; 
+                    const apiKey = import.meta.env?.VITE_GOOGLE_AI_API_KEY || ""; 
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
                     
                     const response = await fetch(apiUrl, {
@@ -828,6 +864,12 @@ document.getElementById('beat-upload').addEventListener('change', (e) => {
 });
 // ...existing code...       // ** Camera and BadDGirl approval functionality **
             function startCamera() {
+                // Check for WebRTC support
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showMessage("Your browser doesn't support camera access. Please use a modern browser like Chrome, Firefox, or Edge.");
+                    return;
+                }
+
                 // Stop any existing stream before starting a new one
                 if (localStream) {
                     localStream.getTracks().forEach(track => track.stop());
@@ -839,18 +881,32 @@ document.getElementById('beat-upload').addEventListener('change', (e) => {
                         localStream = stream; // Store the stream
                         localVideo.srcObject = stream;
                         console.log("Camera stream started.");
+                        
+                        // Hide the permission prompt message
+                        const promptMessage = document.getElementById('prompt-message');
+                        if (promptMessage) {
+                            promptMessage.style.display = 'none';
+                        }
                     })
                     .catch(err => {
                         console.error("Error accessing the camera:", err);
                         let errorMessage = "Could not access your camera. Please check your browser permissions.";
                         if (err.name === 'NotAllowedError') {
-                            errorMessage = "Camera access was denied. Please allow camera access in your browser settings.";
+                            errorMessage = "Camera access was denied. Please allow camera access in your browser settings and refresh the page.";
                         } else if (err.name === 'NotFoundError') {
                             errorMessage = "No camera was found on your device.";
                         } else if (err.name === 'NotReadableError' || err.message.toLowerCase().includes('device in use')) {
                             errorMessage = "Your camera may be in use by another application or browser tab. Please close any other programs using the camera and refresh the page.";
+                        } else if (err.name === 'NotSupportedError') {
+                            errorMessage = "Camera access is not supported. Please ensure you're using HTTPS and a compatible browser.";
                         }
-                        showMessage(errorMessage);
+                        
+                        // Show error but don't block the UI
+                        const promptMessage = document.getElementById('prompt-message');
+                        if (promptMessage) {
+                            promptMessage.textContent = errorMessage;
+                            promptMessage.style.color = '#ff6b6b';
+                        }
                     });
             }
             
@@ -872,6 +928,12 @@ document.getElementById('beat-upload').addEventListener('change', (e) => {
             // ** Recording functionality **
             recordBtn.addEventListener('click', async () => {
                 try {
+                    // Check for MediaRecorder support
+                    if (!window.MediaRecorder) {
+                        showMessage("Audio recording is not supported in your browser. Please use Chrome, Firefox, or Edge.");
+                        return;
+                    }
+
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
