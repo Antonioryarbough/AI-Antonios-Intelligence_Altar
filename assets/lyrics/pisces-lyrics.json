@@ -1,0 +1,30 @@
+{
+  "sign": "pisces",
+  "characteristics": [
+    "intuitive",
+    "empathetic",
+    "creative",
+    "flowing",
+    "dreamy",
+    "emotional depth",
+    "spiritual",
+    "compassionate",
+    "artistic",
+    "imaginative"
+  ],
+  "compatibleSigns": ["cancer", "scorpio", "taurus", "capricorn"],
+  "lyrics": [
+    "Flow like water, dream like the ocean deep",
+    "Pisces vision, intuition never sleep",
+    "Empathy running through my veins so pure",
+    "Creative spirit, that's the only cure",
+    "Swimming through emotions, feeling every wave",
+    "Artistic soul, that's how we behave"
+  ],
+  "rhymePatterns": [
+    "AABB",
+    "ABAB",
+    "ABCB"
+  ],
+  "coachingStyle": "Encourage flow, emotional expression, and creative imagery. Focus on feelings and dreams."
+}

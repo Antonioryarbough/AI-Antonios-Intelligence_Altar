@@ -1,0 +1,27 @@
+{
+  "name": "ai-antonios-intelligence-dev",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node dev-server.js --appId=raydent-16571 --port=8000",
+    "build": "npm run build:css",
+    "build:css": "tailwindcss -c tailwind.config.js -i ./styles/tailwind.input.css -o ./styles/tailwind.generated.css --minify",
+    "dev:css": "tailwindcss -c tailwind.config.js -i ./styles/tailwind.input.css -o ./styles/tailwind.generated.css --watch",
+    "predeploy:check": "npm run build:css && npm run smoke:auto",
+    "smoke:start": "node dev-server.js --appId=raydent-16571 --port=8000",
+    "smoke:start:8080": "node dev-server.js --appId=raydent-16571 --port=8080",
+    "smoke:auto": "node scripts/smoke-auto.js",
+    "stripe:dev": "node stripe-server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "firebase": "^12.8.0",
+    "minimist": "^1.2.8",
+    "stripe": "^16.9.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.5.0",
+    "tailwindcss": "^3.4.17"
+  }
+}

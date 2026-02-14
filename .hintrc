@@ -1,0 +1,84 @@
+{
+  "extends": [
+    "development"
+  ]
+}<video controls width="250">
+  <source src="/shared-assets/videos/flower.webm" type="video/webm" />
+
+  <source src="/shared-assets/videos/flower.mp4" type="video/mp4" />
+
+  Download the
+  <a href="/shared-assets/videos/flower.webm">WEBM</a>
+  or
+  <a href="/shared-assets/videos/flower.mp4">MP4</a>
+  video.
+</video>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoElement = document.getElementById('video');
+            const recordBtn = document.getElementById('record-btn');
+            const stopRecordBtn = document.getElementById('stop-record-btn');
+            const downloadLink = document.getElementById('download-link');
+            const messageDiv = document.getElementById('message');
+
+            let mediaRecorder;
+            let recordedChunks = [];
+
+            // Function to display messages to the user
+            function showMessage(msg) {
+                messageDiv.textContent = msg;
+                setTimeout(() => { messageDiv.textContent = ''; }, 5000);
+            }
+
+            // ** Camera and BadDGirl approval functionality **
+            function startCamera() {
+                // Stop any existing stream before starting a new one
+                if (videoElement.srcObject) {
+                    videoElement.srcObject.getTracks().forEach(track => track.stop());
+                }
+
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        videoElement.srcObject = stream;
+                        videoElement.play();
+                        recordBtn.disabled = false;
+                        showMessage("Camera started. You can now record your video.");
+                    })
+                    .catch(err => {
+                        console.error("Error accessing camera: ", err);
+                        showMessage("Error accessing camera. Please ensure you have given permission.");
+                    });
+            }
+            
+            startCamera(); // Start the camera on page load
+            
+            // ** Recording functionality **
+            recordBtn.addEventListener('click', async () => {
+                try {
+                    const stream = videoElement.srcObject;
+                    if (!stream) {
+                        showMessage("No camera stream available.");
+                        return;
+                    }
+
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                        }
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                        const url = URL.createObjectURL(blob);
+                        downloadLink.href = url;
+                        downloadLink.download = 'recorded_video.webm';
+                        downloadLink.style.display = 'block';
+                        showMessage("Recording stopped. You can now download your video.");
+                    };
+
+                    mediaRecorder.start();
+                    recordBtn.textContent = 'Recording...';
+                    recordBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
