@@ -7,4 +7,4 @@ export default function Home() {
     </div>
   )
 }
-Add Next.js home page
+
