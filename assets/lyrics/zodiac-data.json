@@ -1,0 +1,30 @@
+{
+  "zodiacCompatibility": {
+    "aries": ["leo", "sagittarius", "gemini", "aquarius"],
+    "taurus": ["virgo", "capricorn", "cancer", "pisces"],
+    "gemini": ["libra", "aquarius", "aries", "leo"],
+    "cancer": ["scorpio", "pisces", "taurus", "virgo"],
+    "leo": ["aries", "sagittarius", "gemini", "libra"],
+    "virgo": ["taurus", "capricorn", "cancer", "scorpio"],
+    "libra": ["gemini", "aquarius", "leo", "sagittarius"],
+    "scorpio": ["cancer", "pisces", "virgo", "capricorn"],
+    "sagittarius": ["aries", "leo", "libra", "aquarius"],
+    "capricorn": ["taurus", "virgo", "scorpio", "pisces"],
+    "aquarius": ["gemini", "libra", "sagittarius", "aries"],
+    "pisces": ["cancer", "scorpio", "taurus", "capricorn"]
+  },
+  "signCharacteristics": {
+    "aries": ["bold", "energetic", "pioneering", "confident", "assertive"],
+    "taurus": ["grounded", "reliable", "sensual", "patient", "determined"],
+    "gemini": ["versatile", "communicative", "witty", "curious", "adaptable"],
+    "cancer": ["nurturing", "emotional", "protective", "intuitive", "loyal"],
+    "leo": ["charismatic", "creative", "dramatic", "generous", "confident"],
+    "virgo": ["analytical", "precise", "practical", "helpful", "modest"],
+    "libra": ["harmonious", "diplomatic", "balanced", "social", "fair"],
+    "scorpio": ["intense", "passionate", "mysterious", "transformative", "powerful"],
+    "sagittarius": ["adventurous", "philosophical", "optimistic", "free-spirited", "honest"],
+    "capricorn": ["ambitious", "disciplined", "structured", "responsible", "persistent"],
+    "aquarius": ["innovative", "independent", "humanitarian", "progressive", "unique"],
+    "pisces": ["intuitive", "empathetic", "creative", "flowing", "dreamy"]
+  }
+}

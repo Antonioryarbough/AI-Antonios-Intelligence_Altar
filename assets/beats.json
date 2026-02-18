@@ -1,0 +1,28 @@
+{
+  "beats": [
+    {
+      "name": "SBM BEAT 1",
+      "price": 100,
+      "buyUrl": "https://buy.stripe.com/cNibJ19xr6vQ5MAgQa7EQ0L",
+      "fileUrl": "/assets/SBM BEAT 1.mp4"
+    },
+    {
+      "name": "SBM BEAT 2",
+      "price": 100,
+      "buyUrl": "https://buy.stripe.com/cNibJ19xr6vQ5MAgQa7EQ0L",
+      "fileUrl": "/assets/SBM BEAT 2.mp4"
+    },
+    {
+      "name": "SBM BEAT 3",
+      "price": 100,
+      "buyUrl": "https://buy.stripe.com/cNibJ19xr6vQ5MAgQa7EQ0L",
+      "fileUrl": "/assets/SBM BEAT 3.mp4"
+    },
+    {
+      "name": "SBM BEAT 4",
+      "price": 100,
+      "buyUrl": "https://buy.stripe.com/cNibJ19xr6vQ5MAgQa7EQ0L",
+      "fileUrl": "/assets/SBM BEAT 4.mp4"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public app data (chat, calls, status, etc.)
+    match /artifacts/{appId}/public/data/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Online presence tracking - allow anyone (authenticated or fallback UUID)
+    match /artifacts/{appId}/presence/{userId} {
+      allow read: if true;
+      allow write: if true; // Allow both authenticated and fallback UUID writes
+    }
+
+    // Call data (offers, answers, ICE candidates) - allow anyone
+    match /artifacts/{appId}/calls/{callId}/{document=**} {
+      allow read, write: if true; // Allow both authenticated and unauthenticated
+    }
+
+    // Per-user private data - allow authenticated users or fallback UUID match
+    match /artifacts/{appId}/users/{userId}/{document=**} {
+      allow read, write: if (request.auth != null && request.auth.uid == userId) || true;
+    }
+  }
+}

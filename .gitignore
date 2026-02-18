@@ -1,0 +1,12 @@
+# Local Firebase config (do not commit API keys)
+.firebase_config.json
+
+# Node dependencies (if you use npm locally)
+node_modules/
+
+# Python bytecode
+__pycache__/
+.pytest_cache/
+
+# Misc
+.DS_Store
