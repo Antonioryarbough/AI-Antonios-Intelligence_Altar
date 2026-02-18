@@ -1,0 +1,29 @@
+[
+  {
+    "id": "rose-audition-1",
+    "title": "Rose Ceremony",
+    "price": 20,
+    "videoUrl": "https://your-onedrive-link/rose-audition.mp4",
+    "background": "roses",
+    "creator": "Guest Artist",
+    "tier": "Gold"
+  },
+  {
+    "id": "explosion-audition-1",
+    "title": "Explosion Entrance",
+    "price": 30,
+    "videoUrl": "https://your-onedrive-link/explosion-audition.mp4",
+    "background": "explosion",
+    "creator": "Guest Artist",
+    "tier": "Black Label"
+  },
+  {
+    "id": "car-driveby-1",
+    "title": "Luxury Drive-By",
+    "price": 40,
+    "videoUrl": "https://your-onedrive-link/car-driveby.mp4",
+    "background": "car",
+    "creator": "Guest Artist",
+    "tier": "Black Label"
+  }
+]
