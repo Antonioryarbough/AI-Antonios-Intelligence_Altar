@@ -2,6 +2,66 @@
 
 import { useEffect, useState } from 'react';
 
+export default function GiftStore({ onClose }) {
+  return (
+    <div style={styles.panel}>
+      <div style={styles.header}>
+        <h3 style={styles.title}>Choose a Gift</h3>
+        <button style={styles.close} onClick={onClose}>×</button>
+      </div>
+
+      <div style={styles.grid}>
+        {/* your gift items go here */}
+      </div>
+    </div>
+  );
+}
+
+const styles = {
+  panel: {
+    position: "absolute",
+    top: "20px",
+    left: "20px",
+    width: "260px",
+    height: "70vh",
+    background: "rgba(0,0,0,0.65)",
+    backdropFilter: "blur(8px)",
+    borderRadius: "12px",
+    padding: "16px",
+    color: "white",
+    zIndex: 9999,
+    display: "flex",
+    flexDirection: "column",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "12px",
+  },
+  title: {
+    margin: 0,
+    fontSize: "18px",
+    fontWeight: "600",
+  },
+  close: {
+    background: "transparent",
+    border: "none",
+    color: "white",
+    fontSize: "20px",
+    cursor: "pointer",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "12px",
+    overflowY: "auto",
+  },
+};
+'use client';
+
+import { useEffect, useState } from 'react';
+
 export default function GiftStore({ isOpen, onClose, onSendGift }) {
   const [gifts, setGifts] = useState([]);
   const [loading, setLoading] = useState(false);
