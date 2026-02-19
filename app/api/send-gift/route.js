@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getFirebaseAdminAuth } from '../_firebaseAdmin';
 import stripe from '../_stripe';
-import gifts from '../../data/gifts.json';
 
 export async function POST(req) {
   // Get and verify Firebase ID token from Authorization header
@@ -22,14 +21,14 @@ export async function POST(req) {
   const body = await req.json();
   const { giftId, toUserId } = body;
 
-  // Find the gift price
+  // Dynamically import gifts.json to avoid static import issues
+  const { default: gifts } = await import('../../data/gifts.json');
   const gift = gifts.find(g => g.id === giftId);
   if (!gift) {
     return NextResponse.json({ error: 'Gift not found' }, { status: 400 });
   }
 
   // Check Stripe balance for user
-  // (Assume you store Stripe customerId in Firebase user record, or map realUserId to Stripe customer)
   let customerId;
   try {
     const userRecord = await getFirebaseAdminAuth().getUser(realUserId);
@@ -65,6 +64,5 @@ export async function POST(req) {
 
   // Log with verified user ID
   console.log('Gift sent:', { giftId, fromUserId: realUserId, toUserId });
-
   return NextResponse.json({ success: true, fromUserId: realUserId });
 }
