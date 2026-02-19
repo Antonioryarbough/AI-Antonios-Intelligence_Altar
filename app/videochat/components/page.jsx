@@ -16,11 +16,11 @@ import {
   attachGiftChannelListener,
   sendGiftEvent,
   setupGiftChannel
-} from './webrtc-gifts';
-import { getAppId, getFirestoreDb } from './firebase';
-import GiftButton from './components/GiftButton';
-import GiftStore from './components/GiftStore';
-import GiftPlayer from './components/GiftPlayer';
+} from '../webrtc-gifts';
+import { getAppId, getFirestoreDb } from '../firebase';
+import GiftButton from './GiftButton';
+import GiftStore from './GiftStore';
+import GiftPlayer from './GiftPlayer';
 
 const rtcConfig = {
   iceServers: [
