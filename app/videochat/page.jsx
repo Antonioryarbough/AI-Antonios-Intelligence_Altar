@@ -334,12 +334,12 @@ export default function VideoChatPage() {
       return;
     }
 
+    // Remove fromUserId from body, since backend uses auth
     await fetch('/api/send-gift', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         giftId: gift.id,
-        fromUserId: 'demo-sender',
         toUserId: 'demo-recipient'
       })
     });
