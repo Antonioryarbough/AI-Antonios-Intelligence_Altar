@@ -1,6 +1,9 @@
 // Sender side: create the DataChannel
-export function setupGiftChannel(peerConnection) {
+export function setupGiftChannel(peerConnection, onChannelReady) {
   const giftChannel = peerConnection.createDataChannel("gifts");
+  if (onChannelReady) {
+    giftChannel.onopen = () => onChannelReady(giftChannel);
+  }
   return giftChannel;
 }
 
@@ -19,14 +22,17 @@ export function sendGiftEvent(giftChannel, gift) {
 }
 
 // Receiver side: listen for gift events
-export function attachGiftChannelListener(peerConnection, onGiftReceived) {
+export function attachGiftChannelListener(peerConnection, { onGiftReceived, onChannelReady }) {
   peerConnection.ondatachannel = (event) => {
     if (event.channel.label === "gifts") {
-      event.channel.onmessage = (msg) => {
+      const channel = event.channel;
+      if (onChannelReady) onChannelReady(channel);
+
+      channel.onmessage = (msg) => {
         try {
           const data = JSON.parse(msg.data);
           if (data.type === "GIFT") {
-            onGiftReceived(data);
+            onGiftReceived?.(data);
           }
         } catch (err) {
           console.error("Invalid gift message", err);
