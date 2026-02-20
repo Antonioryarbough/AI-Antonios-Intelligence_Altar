@@ -1,0 +1,7 @@
+{
+  "/_not-found": "app/_not-found.js",
+  "/api/send-gift/route": "app/api/send-gift/route.js",
+  "/api/rap/route": "app/api/rap/route.js",
+  "/videochat/components/page": "app/videochat/components/page.js",
+  "/videochat/page": "app/videochat/page.js"
+}
