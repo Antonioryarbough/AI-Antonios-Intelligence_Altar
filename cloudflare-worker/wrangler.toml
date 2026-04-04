@@ -1,0 +1,10 @@
+name = "stripe-firestore-unlock"
+main = "worker.js"
+compatibility_date = "2025-11-27"
+account_id = "e6c8cfc1411431ef0d7ba9c5a69e1ee9"
+workers_dev = true
+
+[vars]
+# Non-sensitive app variables can go here if desired
+# APP_ID can be set as a secret instead; leaving here commented for clarity
+# APP_ID = "your-app-id"
