@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "AI Enterprise Studio - A fully functional multimedia collaboration platform",
   "scripts": {
-    "deploy": "firebase deploy",
+    "deploy": "firebase deploy --only hosting",
+    "deploy:hosting": "firebase deploy --only hosting",
     "serve": "firebase serve",
     "init": "firebase init",
     "dev:css": "npx tailwindcss -i ./src/tailwind.css -o ./public/styles.css --watch",
