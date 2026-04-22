@@ -5,6 +5,10 @@
   "scripts": {
     "deploy": "firebase deploy --only hosting",
     "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:studio": "firebase deploy --only hosting --project studio",
+    "deploy:lobby": "firebase deploy --only hosting --project lobby",
+    "deploy:mainstage": "firebase deploy --only hosting --project mainstage",
+    "deploy:all": "npm run deploy:studio && npm run deploy:lobby && npm run deploy:mainstage",
     "serve": "firebase serve",
     "init": "firebase init",
     "dev:css": "npx tailwindcss -i ./src/tailwind.css -o ./public/styles.css --watch",
