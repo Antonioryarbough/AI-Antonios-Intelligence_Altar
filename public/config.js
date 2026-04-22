@@ -1,12 +1,12 @@
-// Firebase Configuration — studio-2fb13 (BabyRay 4.0 Studio)
+// Firebase Configuration — studio-9757662699-74931 (Main Stage)
 const firebaseConfig = {
-  apiKey: "AIzaSyB0Y2l5fHvzoUkSJFWrd4ADb-6rRAT47Sw",
-  authDomain: "studio-2fb13.firebaseapp.com",
-  projectId: "studio-2fb13",
-  storageBucket: "studio-2fb13.appspot.com",
-  messagingSenderId: "367389228492",
-  appId: "1:367389228492:web:bc6f2aa62446f7dd957169",
-  measurementId: "G-GQVYKH4J36"
+  apiKey: "AIzaSyBDJ4ygYAzmZLyP4o13uUhPBF3xk9Xk2Y0",
+  authDomain: "studio-9757662699-74931.firebaseapp.com",
+  projectId: "studio-9757662699-74931",
+  storageBucket: "studio-9757662699-74931.firebasestorage.app",
+  messagingSenderId: "508114864761",
+  appId: "1:508114864761:web:048454479ce47e139de2a8",
+  measurementId: "G-33WVFTCKG8"
 };
 
 const appId = 'ai-enterprise-studio';
