@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Baby Ray Studio Lobby (Local)</title>
+</head>
+<body>
+  <script>
+    // Keep one source of truth for the local lobby app while exposing a stable /lobby/index.html path.
+    const target = "../lobby.html" + window.location.search + window.location.hash;
+    window.location.replace(target);
+  </script>
+  <noscript>
+    <p>This page requires JavaScript. Open ../lobby.html directly if redirect does not run.</p>
+  </noscript>
+</body>
+</html>
