@@ -190,6 +190,8 @@
                     border-bottom: 2px solid transparent;
                     cursor: pointer;
                     transition: all 0.2s;
+                    flex: 1;
+                    text-align: center;
                 }
 
         .tab-btn:hover {
@@ -433,13 +435,13 @@
     <!-- Sidebar (RIGHT 40%) - Contains all tabs and chat -->
     <main class="sidebar" style="padding-top: 0;">
         <!-- Tab Navigation (inside sidebar at top) -->
-        <div id="floating-tabs" class="flex justify-center bg-black/80 backdrop-blur-sm py-3 px-2 border-b border-gray-700 sticky top-0 z-20 overflow-x-auto">
-            <div class="flex flex-nowrap justify-center gap-1 min-w-0">
-                <button class="tab-btn active bg-purple-600 hover:bg-purple-700 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="studio">Studio</button>
-                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="community">Community</button>
-                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="marketplace">Gift</button>
-                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="profile">Profile</button>
-                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="zodiac-council">Council</button>
+        <div id="floating-tabs" class="bg-black/80 backdrop-blur-sm py-2 px-2 border-b border-gray-700 sticky top-0 z-20 overflow-x-auto">
+            <div class="flex w-full gap-0">
+                <button class="tab-btn active" data-tab="studio">Studio</button>
+                <button class="tab-btn" data-tab="community">Community</button>
+                <button class="tab-btn" data-tab="marketplace">Gift</button>
+                <button class="tab-btn" data-tab="profile">Profile</button>
+                <button class="tab-btn" data-tab="zodiac-council">Council</button>
             </div>
         </div>
         <div id="studio-content">
