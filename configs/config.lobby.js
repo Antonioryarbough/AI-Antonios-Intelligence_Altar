@@ -1,12 +1,12 @@
-// Firebase Configuration — studio-9757662699-74931 (Main Stage)
+// Firebase Configuration — raydent-16571 (Lobby)
 const firebaseConfig = {
-  apiKey: "AIzaSyBDJ4ygYAzmZLyP4o13uUhPBF3xk9Xk2Y0",
-  authDomain: "studio-9757662699-74931.firebaseapp.com",
-  projectId: "studio-9757662699-74931",
-  storageBucket: "studio-9757662699-74931.firebasestorage.app",
-  messagingSenderId: "508114864761",
-  appId: "1:508114864761:web:048454479ce47e139de2a8",
-  measurementId: "G-33WVFTCKG8"
+  apiKey: "AIzaSyA9Rl785wVd6NVgdNqU_5lsy36dHYnLMlE",
+  authDomain: "raydent-16571.firebaseapp.com",
+  projectId: "raydent-16571",
+  storageBucket: "raydent-16571.firebasestorage.app",
+  messagingSenderId: "904932609815",
+  appId: "1:904932609815:web:21147268961e89870a3152",
+  measurementId: "G-42YE0D1F68"
 };
 
 const appId = 'ai-enterprise-studio';
