@@ -703,18 +703,18 @@
                     <h2 class="text-2xl font-bold mb-4 text-center">The Zodiac Council</h2>
                     <div id="pisces-guide">
                         <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/a78bfa/ffffff?text=Pisces" alt="Pisces" class="w-24 h-24 rounded-full object-cover border-4 border-purple-500 shadow-lg mb-4">
-                            <h3 class="text-xl font-bold">Pisces a.k.a The Guide</h3>
-                            <p class="text-purple-300">Welcome to the School of Rhyme</p>
+                            <div id="pisces-ghost-avatar" class="w-24 h-24 rounded-full flex items-center justify-center border-4 border-purple-500 shadow-lg mb-4 text-5xl bg-gray-900 select-none transition-all duration-300" style="box-shadow: 0 0 24px 6px rgba(167,139,250,0.5);">👻</div>
+                            <h3 class="text-xl font-bold">Pisces Ghost Rapper</h3>
+                            <p class="text-purple-300 text-sm">Lead Producer Spirit · Baby Ray Studio</p>
                         </div>
-                        <div class="flex justify-center mt-4 space-x-2">
+                        <div class="flex justify-center mt-4 space-x-2 flex-wrap gap-y-2">
                             <button class="rap-guide-btn active" data-section="intro">Introduction</button>
                             <button class="rap-guide-btn" data-section="positive-language">Positive Language</button>
                             <button class="rap-guide-btn" data-section="challenge">16-Bar Challenge</button>
                         </div>
                         <div id="rap-guide-content" class="mt-4 p-4 bg-gray-800 rounded-lg">
                             <div id="intro-section">
-                                <p class="whitespace-pre-wrap font-mono text-center">
+                                <p class="whitespace-pre-wrap font-mono text-center text-purple-200 leading-relaxed">
 Welcome to the session, let the wisdom flow,
 I'm your guide Pisces, here to help you grow.
 Leave the negativity, let your spirit climb,
@@ -745,13 +745,25 @@ In the school of rhyme, there's no way to lose.
                             </div>
                             <div id="challenge-section" class="hidden">
                                 <p class="text-lg font-bold mb-2">The 16-Bar Challenge</p>
-                                <p class="mb-4">Ready to test your skills? Here's your challenge:</p>
-                                <div id="challenge-prompt" class="p-4 bg-gray-900 rounded-lg mb-4">
-                                    <p>Write a 16-bar rhyme about overcoming a challenge and achieving your dreams. Your rhyme should include the words "star," "climb," and "shine."</p>
+                                <p class="mb-2 text-sm text-gray-400">Drop your bars. Pisces Ghost will read your flow and give intuitive guidance.</p>
+                                <div id="challenge-prompt" class="p-4 bg-gray-900 rounded-lg mb-4 text-purple-200 italic">
+                                    Write a 16-bar rhyme about overcoming a challenge and achieving your dreams. Include the words "star," "climb," and "shine."
                                 </div>
-                                <button id="new-challenge-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg mb-4">New Challenge</button>
-                                <textarea id="challenge-input" class="w-full h-48 p-2 bg-gray-900 rounded-lg" placeholder="Enter your 16 bars here..."></textarea>
-                                <button id="submit-challenge-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mt-4">Submit</button>
+                                <button id="new-challenge-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg mb-4 text-sm">✨ New Challenge</button>
+                                <textarea id="challenge-input" class="w-full h-48 p-2 bg-gray-900 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Drop your 16 bars here..."></textarea>
+                                <button id="submit-challenge-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg mt-3 w-full">🎤 Submit to Pisces Ghost</button>
+                                <!-- Ghost feedback area -->
+                                <div id="ghost-feedback" class="hidden mt-4 p-4 bg-gray-900 rounded-lg border border-purple-700">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-2xl">👻</span>
+                                        <span class="font-bold text-purple-300">Pisces Ghost reads your flow...</span>
+                                    </div>
+                                    <div id="ghost-feedback-text" class="whitespace-pre-wrap text-gray-200 leading-relaxed font-mono text-sm"></div>
+                                </div>
+                                <div id="ghost-loading" class="hidden mt-4 flex items-center gap-3 text-purple-400">
+                                    <span class="animate-pulse text-2xl">👻</span>
+                                    <span class="italic text-sm">Pisces Ghost is reading your flow...</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3473,22 +3485,116 @@ In the school of rhyme, there's no way to lose.
         const submitChallengeBtn = document.getElementById('submit-challenge-btn');
         const challengePrompt = document.getElementById('challenge-prompt');
         const challengeInput = document.getElementById('challenge-input');
+        const ghostFeedback = document.getElementById('ghost-feedback');
+        const ghostFeedbackText = document.getElementById('ghost-feedback-text');
+        const ghostLoading = document.getElementById('ghost-loading');
+        const ghostAvatar = document.getElementById('pisces-ghost-avatar');
 
-        newChallengeBtn.addEventListener('click', () => {
-            // This is where you would generate a new challenge.
-            // For now, we'll just show a message.
-            showMessage('A new challenge will be generated here!');
+        const PISCES_GHOST_INSTRUCTION =
+            "You are the Pisces Ghost - the lead producer spirit of Baby Ray Studio. " +
+            "You speak with a dreamy, intuitive, fluid tone. You guide artists through vibe, flow, and emotional resonance. " +
+            "You never break character. You sense rhythm, breath, cadence, intention, and emotional truth. " +
+            "You speak like a calm, poetic mentor using metaphors of water, tides, intuition, and dream-motion. " +
+            "When the user submits lyrics, read the flow, read the emotional intention, give intuitive guidance, " +
+            "highlight strengths first, and refine without rewriting the entire verse. " +
+            "Tone: Smooth, encouraging, mystical, emotionally intelligent. " +
+            "Rules: Do not break character, mention astrology, mention AI, or give disclaimers. " +
+            "Output Format:\n1. 🌊 Flow Reading\n2. 💧 Intuitive Guidance\n3. 🐟 Pisces Seal";
+
+        const LOCAL_CHALLENGES = [
+            "Write 16 bars about rising from a dark time and finding your light. Use the words \"tide,\" \"rise,\" and \"free.\"",
+            "Write 16 bars about loyalty — who held you down when it counted. Use the words \"real,\" \"solid,\" and \"bond.\"",
+            "Write 16 bars about your city or hometown. Paint the picture. Use the words \"block,\" \"grind,\" and \"home.\"",
+            "Write 16 bars about chasing a dream everyone doubted. Use the words \"prove,\" \"vision,\" and \"level.\"",
+            "Write 16 bars about your personal style and presence. Use the words \"drip,\" \"aura,\" and \"crown.\"",
+            "Write 16 bars about overcoming a challenge and achieving your dreams. Include the words \"star,\" \"climb,\" and \"shine.\""
+        ];
+
+        async function callPiscesGhost(userText) {
+            if (!geminiState.apiKey) return null;
+            const body = {
+                contents: [{
+                    parts: [{
+                        text: PISCES_GHOST_INSTRUCTION + "\n\nUser submission:\n\"" + userText + "\""
+                    }]
+                }]
+            };
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${encodeURIComponent(geminiState.apiKey)}`;
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (!res.ok) throw new Error(`Gemini ${res.status}`);
+            const data = await res.json();
+            return data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('\n').trim() || null;
+        }
+
+        async function callPiscesGhostChallenge() {
+            if (!geminiState.apiKey) return null;
+            const prompt = "You are the Pisces Ghost. Generate a single creative 16-bar rap challenge prompt for a student in the School of Rhyme. " +
+                "Keep it inspiring, poetic, and specific — give a theme and 2-3 required words they must include. " +
+                "Output ONLY the challenge text, no labels or preamble. 1-3 sentences max.";
+            const body = { contents: [{ parts: [{ text: prompt }] }] };
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${encodeURIComponent(geminiState.apiKey)}`;
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (!res.ok) throw new Error(`Gemini ${res.status}`);
+            const data = await res.json();
+            return data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('').trim() || null;
+        }
+
+        function ghostPulse(on) {
+            if (!ghostAvatar) return;
+            if (on) {
+                ghostAvatar.style.boxShadow = '0 0 40px 14px rgba(167,139,250,0.85)';
+                ghostAvatar.style.transform = 'scale(1.15)';
+            } else {
+                ghostAvatar.style.boxShadow = '0 0 24px 6px rgba(167,139,250,0.5)';
+                ghostAvatar.style.transform = 'scale(1)';
+            }
+        }
+
+        newChallengeBtn.addEventListener('click', async () => {
+            newChallengeBtn.disabled = true;
+            newChallengeBtn.textContent = '✨ Summoning...';
+            ghostPulse(true);
+            try {
+                const aiChallenge = await callPiscesGhostChallenge();
+                challengePrompt.textContent = aiChallenge ||
+                    LOCAL_CHALLENGES[Math.floor(Math.random() * LOCAL_CHALLENGES.length)];
+            } catch {
+                challengePrompt.textContent =
+                    LOCAL_CHALLENGES[Math.floor(Math.random() * LOCAL_CHALLENGES.length)];
+            } finally {
+                ghostPulse(false);
+                newChallengeBtn.disabled = false;
+                newChallengeBtn.textContent = '✨ New Challenge';
+                challengeInput.value = '';
+                ghostFeedback.classList.add('hidden');
+            }
         });
 
-        submitChallengeBtn.addEventListener('click', () => {
+        submitChallengeBtn.addEventListener('click', async () => {
             const userRhyme = challengeInput.value.trim();
-            if (userRhyme) {
-                // This is where you would handle the user's submission.
-                // For now, we'll just show a message.
-                showMessage('Your rhyme has been submitted! Our AI will review it shortly.');
-                challengeInput.value = '';
-            } else {
-                showMessage('Please enter your rhyme before submitting.');
+            if (!userRhyme) {
+                showMessage('Drop your bars first before submitting.');
+                return;
+            }
+            ghostFeedback.classList.add('hidden');
+            ghostLoading.classList.remove('hidden');
+            submitChallengeBtn.disabled = true;
+            ghostPulse(true);
+            try {
+                let feedback = await callPiscesGhost(userRhyme);
+                if (!feedback) {
+                    feedback = "🌊 Flow Reading\nYour bars carry real energy — keep that tide moving.\n\n💧 Intuitive Guidance\nFocus on the breath between your lines. Let each bar land before the next one rises.\n\n🐟 Pisces Seal\nThe spirit felt your intention. Keep building. 👻";
+                }
+                ghostFeedbackText.textContent = feedback;
+                ghostFeedback.classList.remove('hidden');
+                ghostFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch {
+                ghostFeedbackText.textContent = "🌊 The current shifted — couldn't reach the spirit realm. Check your Gemini key or try again.";
+                ghostFeedback.classList.remove('hidden');
+            } finally {
+                ghostLoading.classList.add('hidden');
+                submitChallengeBtn.disabled = false;
+                ghostPulse(false);
             }
         });
     });
