@@ -12,6 +12,8 @@
     "deploy:lobby": "npm run build:lobby && FIREBASE_JSON=firebase.lobby.json firebase deploy --only hosting --project lobby",
     "deploy:mainstage": "npm run build:mainstage && FIREBASE_JSON=firebase.mainstage.json firebase deploy --only hosting --project mainstage",
     "deploy:all": "npm run deploy:studio && npm run deploy:lobby && npm run deploy:mainstage",
+    "deploy": "firebase deploy --only hosting",
+    "deploy:hosting": "firebase deploy --only hosting",
     "serve": "firebase serve",
     "init": "firebase init",
     "dev:css": "npx tailwindcss -i ./src/tailwind.css -o ./public/styles.css --watch",
