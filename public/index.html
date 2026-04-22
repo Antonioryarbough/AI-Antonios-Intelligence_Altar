@@ -19,252 +19,80 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css"/>
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
+        :root {
+            --sidebar-width: 40%;
+        }
+
         html, body {
             height: 100%;
             margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-            background: #181825;
-            color: white;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
-        /* Scrollbar Styling */
+
+        /* Ensure scrollbars are visible and usable */
         * {
             scrollbar-width: thin;
             scrollbar-color: rgba(167, 139, 250, 0.8) rgba(15, 23, 42, 0.6);
         }
-        *::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+
+        .sidebar,
+        #tab-content-area,
+        #main-video-page {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(167, 139, 250, 0.9) rgba(15, 23, 42, 0.7);
         }
+
+        *::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
         *::-webkit-scrollbar-track {
             background: rgba(15, 23, 42, 0.6);
         }
+
         *::-webkit-scrollbar-thumb {
             background: rgba(167, 139, 250, 0.8);
             border-radius: 9999px;
-        }
-        .main-layout {
-            display: flex;
-            flex-direction: row;
-            width: 100vw;
-            height: 100vh;
-        }
-        #video-background {
-            flex: 1 1 0;
-            min-width: 0;
-            height: 100vh;
-            background: #111827;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-        }
-        #video-background video {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        #localVideo {
-            z-index: 1;
-        }
-        #remoteVideo {
-            z-index: 2;
-            display: none; /* Hidden until connected */
-        }
-        .sidebar {
-            width: 400px;
-            min-width: 320px;
-            max-width: 100vw;
-            height: 100vh;
-            background: linear-gradient(135deg, #181825 80%, #a78bfa 100%);
-            box-shadow: -8px 0 32px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            z-index: 2;
-            overflow-y: auto;
-            border-left: 1px solid #312e81;
-        }
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 320px;
-            }
-        }
-        @media (max-width: 768px) {
-            .main-layout {
-                flex-direction: column;
-            }
-            #video-background {
-                height: 40vh;
-            }
-            .sidebar {
-                width: 100vw;
-                height: 60vh;
-                min-width: 0;
-                border-left: none;
-                border-top: 1px solid #312e81;
-            }
-        }
-        /* Overlay chat on video */
-        .chat-overlay {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            pointer-events: none;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 6px;
-        }
-        .chat-overlay-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            pointer-events: auto;
-        }
-        .chat-overlay-line {
-            color: rgba(255,255,255,0.9);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            font-size: 0.9rem;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 4px 8px;
-            border-radius: 4px;
-            backdrop-filter: blur(2px);
-            align-self: flex-start;
-        }
-        .chat-overlay-input-container {
-            pointer-events: auto;
-            display: flex;
-            gap: 8px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px;
-            border-radius: 8px;
-            backdrop-filter: blur(4px);
-        }
-        /* Tabs */
-        .tab-btn {
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            color: #fff;
-            background-color: #7c3aed; /* purple-600 */
-        }
-        /* Card styling reuse */
-        .card {
-            background-color: #1f2937; /* gray-800 */
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        /* Animation overlay */
-        #tip-animation-overlay {
-            pointer-events: none;
-        }
-        .auth-tab.active {
-            border-bottom: 2px solid #a78bfa;
-            color: #a78bfa;
-        }
-    </style>
-</head>
-<body>
-    <!-- Auth Container -->
-    ...existing code from user-provided HTML...
-            min-width: 0;
-            height: 100vh;
-            background: #111827;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
+            border: 2px solid rgba(15, 23, 42, 0.6);
         }
 
-        #video-background video {
-            width: 90%;
-            max-width: 900px;
-            max-height: 90vh;
-            border-radius: 1.5rem;
-            background: #222;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-        }
-
-        .sidebar {
-            width: 400px;
-            min-width: 320px;
-            max-width: 100vw;
-            height: 100vh;
-            background: linear-gradient(135deg, #181825 80%, #a78bfa 100%);
-            box-shadow: -8px 0 32px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            z-index: 2;
-            overflow-y: auto;
-            border-left: 1px solid #312e81;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 320px;
-            }
-        }
-        @media (max-width: 768px) {
-            .main-layout {
-                flex-direction: column;
-            }
-            #video-background {
-                height: 50vh;
-            }
-            .sidebar {
-                width: 100vw;
-                height: 50vh;
-                min-width: 0;
-                border-left: none;
-                border-top: 1px solid #312e81;
-            }
-        }
-
-        #sidebar-toggle {
+        #main-video-page {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            border: 2px solid rgba(255,255,255,0.3);
-            color: white;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            transition: all 0.2s;
+            left: 0;
+            top: 0;
+            width: 60%;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.95);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0;
         }
-        #sidebar-toggle:hover {
-            background: rgba(0,0,0,0.8);
-            border-color: rgba(255,255,255,0.6);
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.7);
+
+        #call-section {
+            margin: 0;
+            border-radius: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: auto;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            width: 40%;
+            background: rgba(10, 10, 30, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         #studio-content {
@@ -332,11 +160,24 @@
             .card {
                 padding: 0.75rem;
             }
-            #video-background video {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
+            .avatar {
+                width: 100px;
+                height: 100px;
             }
+        }
+
+        /* Video call inline styles */
+        #call-videos {
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #localVideoDisplay, #remoteVideoDisplay {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         /* Tab Styles */
@@ -429,48 +270,6 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: pre-wrap;
-        }
-
-        /* Overlay chat on video */
-        .chat-overlay {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 6px;
-            padding: 12px;
-            background: transparent;
-        }
-        .chat-overlay-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            max-height: 100%;
-            overflow: hidden;
-        }
-        .chat-overlay-line {
-            color: rgba(255,255,255,0.75);
-            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
-            font-size: 0.85rem;
-            line-height: 1.2;
-            background: transparent !important;
-            padding: 0 !important;
-            margin: 0;
-        }
-        .chat-overlay-line .sender {
-            font-weight: 600;
-            font-size: 0.7rem;
-            opacity: 0.7;
-        }
-        .chat-overlay-line .body {
-            font-weight: 400;
-            opacity: 0.8;
-        }
-        .chat-overlay-input {
-            background: transparent;
         }
 
         /* Floating tabs width */
@@ -594,103 +393,390 @@
         </div>
     </div>
 
-    <!-- Custom Gift Modal -->
-    <div id="custom-gift-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
-        <div class="bg-gray-800 border border-gray-600 rounded-lg p-6 w-[90%] max-w-md max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-white">🎁 Custom Beat Gifts</h3>
-                <button id="close-custom-gift-modal" class="text-gray-400 hover:text-white">✕</button>
-            </div>
-            
-            <div class="text-sm text-gray-300 mb-4">
-                <p>Send exclusive MP4 beat videos with your custom music! Deducted from your balance.</p>
-            </div>
-            
-            <div id="custom-gifts-list" class="space-y-3">
-                <!-- Dynamic custom gifts will be populated here -->
-                <div class="custom-gift-item p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer transition-all" data-gift-id="custom-1" data-cost="25">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-pink-600 rounded flex items-center justify-center">
-                            <span class="text-white">🎵</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-white">Trap Queen Beat</p>
-                            <p class="text-xs text-gray-400">Exclusive animated beat video • $25</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="custom-gift-item p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer transition-all" data-gift-id="custom-2" data-cost="30">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-purple-600 rounded flex items-center justify-center">
-                            <span class="text-white">🎶</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-white">BadGirl Anthem</p>
-                            <p class="text-xs text-gray-400">Premium beat showcase • $30</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="custom-gift-item p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer transition-all" data-gift-id="custom-3" data-cost="35">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-yellow-600 rounded flex items-center justify-center">
-                            <span class="text-white">🔥</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-white">Money Moves</p>
-                            <p class="text-xs text-gray-400">Fire beat with visuals • $35</p>
-                        </div>
-                    </div>
+
+
+    <!-- Main Video Page (LEFT 60%) -->
+    <div id="main-video-page">
+        <div id="call-section" class="p-4">
+            <!-- Header with controls inline -->
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-2xl font-bold">📞 Video Call</h2>
+                <div class="flex gap-2">
+                    <button id="enable-camera-btn" class="bg-purple-600 hover:bg-purple-700 text-xs py-1 px-3 rounded">📹 Camera</button>
+                    <button id="start-call-btn" class="bg-green-600 hover:bg-green-700 text-xs py-1 px-3 rounded">📞 Call</button>
+                    <button id="hangup-call-btn" class="bg-red-600 hover:bg-red-700 text-xs py-1 px-3 rounded hidden">❌ Hang Up</button>
+                    <button id="retry-peer-btn" class="bg-blue-600 hover:bg-blue-700 text-xs py-1 px-3 rounded">🔄 Retry</button>
                 </div>
             </div>
             
-            <div class="mt-4 p-3 bg-gray-900 rounded-lg">
-                <p class="text-sm text-gray-300">Your Balance: <span id="user-balance" class="text-green-400 font-bold">$150</span></p>
+            <!-- Peer ID display -->
+            <div class="mb-2 p-2 bg-gray-800/50 rounded">
+                <div id="peer-id-display" class="text-xs">
+                    <span class="text-yellow-300">Your ID:</span> 
+                    <span id="my-peer-id" class="text-white font-mono ml-1">Connecting...</span>
+                </div>
+            </div>
+            
+            <!-- Call input and status -->
+            <input type="text" id="remote-peer-id-input" placeholder="Enter Peer ID to call" class="w-full text-xs p-2 rounded bg-gray-800 mb-2">
+            <p id="call-status" class="text-xs text-gray-400 mb-2">Initializing...</p>
+            
+            <!-- Video Display (starts at top, fills available space) -->
+            <div id="call-videos" class="relative bg-black overflow-hidden" style="height: calc(100vh - 185px);">
+                <video id="localVideoDisplay" autoplay muted style="position: absolute; width: 100%; height: 100%; object-fit: cover;"></video>
+                <video id="remoteVideoDisplay" autoplay style="position: absolute; width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+                <p id="video-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-400 bg-black text-sm">📹 Enable camera to see video</p>
             </div>
         </div>
     </div>
 
-    <!-- Main Layout: Video Left, Sidebar Right -->
-    <div class="main-layout">
-        <!-- Video Area (Left) -->
-        <div id="video-background" style="position:relative;">
-            <video id="localVideo" autoplay playsinline muted></video>
-            <video id="remoteVideo" autoplay playsinline></video>
-            <!-- Chat overlay (restored) -->
-            <div class="chat-overlay" id="chat-overlay">
-                <div class="chat-overlay-list" id="chat-overlay-list"></div>
+    <!-- Sidebar (RIGHT 40%) - Contains all tabs and chat -->
+    <main class="sidebar" style="padding-top: 0;">
+        <!-- Tab Navigation (inside sidebar at top) -->
+        <div id="floating-tabs" class="flex justify-center bg-black/80 backdrop-blur-sm py-3 px-16 border-b border-gray-700 sticky top-0 z-20 overflow-hidden">
+            <div class="flex flex-nowrap justify-center gap-1">
+                <button class="tab-btn active bg-purple-600 hover:bg-purple-700 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="studio">Studio</button>
+                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="community">Community</button>
+                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="marketplace">Gift</button>
+                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="profile">Profile</button>
+                <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-2 py-1 text-xs" data-tab="zodiac-council">Council</button>
             </div>
-            <!-- MP4 tip animation overlay -->
-            <div id="tip-animation-overlay" style="position:absolute;inset:0;pointer-events:none;z-index:10;display:flex;align-items:center;justify-content:center;"></div>
         </div>
-        <!-- Sidebar (Right) -->
-        <aside class="sidebar">
-            <!-- Tab Navigation (inside sidebar at top) -->
-            <div id="floating-tabs" class="flex justify-start bg-black/80 backdrop-blur-sm py-2 px-3 border-b border-gray-700 sticky top-0 z-20">
-                <div class="flex flex-nowrap gap-1">
-                    <button class="tab-btn active bg-purple-600 hover:bg-purple-700 rounded whitespace-nowrap px-3 py-1 text-xs" data-tab="studio">Studio</button>
-                    <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-3 py-1 text-xs" data-tab="community">Community</button>
-                    <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-3 py-1 text-xs" data-tab="marketplace">Gift</button>
-                    <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-3 py-1 text-xs" data-tab="profile">Profile</button>
-                    <button class="tab-btn bg-gray-700 hover:bg-gray-600 rounded whitespace-nowrap px-3 py-1 text-xs" data-tab="zodiac-council">Council</button>
+        <div id="studio-content">
+            <!-- Tab Content Scrollable Area -->
+            <div id="tab-content-area">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h1 class="text-2xl font-bold text-purple-300">AI Enterprise Studio</h1>
+                    <p class="text-sm text-gray-400">Create music, connect with AI artists, and join a community of creators.</p>
                 </div>
-            </div>
-            <div id="studio-content">
-                <!-- Tab Content Scrollable Area -->
-                <div id="tab-content-area">
-                    <!-- Header -->
-                    <div class="text-center mb-4">
-                        <h1 class="text-2xl font-bold text-purple-300">AI Enterprise Studio</h1>
-                        <p class="text-sm text-gray-400">Create music, connect with AI artists, and join a community of creators.</p>
+
+                <!-- Tab Navigation moved to floating overlay -->
+
+                <!-- Studio Tab -->
+            <div id="studio-tab" class="tab-content">
+                <!-- Studio Section -->
+                <div id="studio-inner-section">
+                    <div class="card">
+                        <h2 class="text-2xl font-bold mb-4">🎬 AI Studio</h2>
+                        <div class="mt-4">
+                            <p id="beat-name" class="text-sm text-gray-400 mb-2">Now Playing: Not Loaded</p>
+                            <video id="customPlayer" class="video-js vjs-default-skin w-full rounded-xl" controls preload="auto" data-setup='{}'></video>
+                        </div>
                     </div>
-                    <!-- All tab content (Studio, Community, Marketplace, Profile, Zodiac Council) goes here, as before -->
-                    <!-- ... (Insert all tab content blocks here, as in your previous sidebar) ... -->
+
+                    <!-- Record & Master -->
+                    <div class="card">
+                        <h2 class="text-2xl font-bold mb-4">🎤 Record & Master</h2>
+                        
+                        <div class="flex space-x-2 mt-4">
+                            <button id="record-btn" class="flex-1 bg-red-600 hover:bg-red-700">⏺ Record</button>
+                            <button id="stop-record-btn" class="flex-1 bg-gray-500 hover:bg-gray-600" disabled>⏹ Stop</button>
+                        </div>
+                        
+                        <div id="recording-playback" class="hidden mt-4">
+                            <h3 class="text-md font-bold mb-2">Your Recording</h3>
+                            <audio id="recording-player" controls class="w-full"></audio>
+                            <a id="save-recording-btn" class="mt-2 block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-center" download="my-recording.webm">💾 Save Recording</a>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label for="beat-upload" class="block text-sm font-medium mb-2">Upload Beat/Video</label>
+                            <input type="file" id="beat-upload" accept="audio/*,video/mp4" class="w-full text-sm text-gray-400">
+                        </div>
+                    </div>
+
+                    <!-- Chat Section (part of Studio tab) -->
+                    <div class="card">
+                        <h2 class="text-2xl font-bold mb-4 text-yellow-400">💬 The Ray D. Ent. War (Chat)</h2>
+                        <div class="chat-container mb-4" id="messages-display"></div>
+                        <form id="chat-form" class="flex space-x-2">
+                            <input type="text" id="chat-input" placeholder="Rhyme..." class="flex-grow p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700">
+                            <button id="generate-rhyme-btn" type="button" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg">✨</button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Send</button>
+                        </form>
+                        <div class="mt-3">
+                            <label for="gemini-api-key" class="text-xs text-gray-400 block mb-1">Gemini API Key (stored locally)</label>
+                            <div class="flex space-x-2">
+                                <input type="password" id="gemini-api-key" placeholder="Paste key..." class="flex-grow p-2 rounded-lg bg-gray-800 text-sm text-gray-200">
+                                <button id="save-gemini-key-btn" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-3 py-2 rounded-lg">Save</button>
+                                <button id="clear-gemini-key-btn" type="button" class="bg-gray-700 hover:bg-gray-800 text-white text-sm font-semibold px-3 py-2 rounded-lg">Clear</button>
+                            </div>
+                            <p id="gemini-key-status" class="text-xs text-gray-500 mt-1">Not set; falling back to local rhymes.</p>
+                        </div>
+                        <div class="mt-3 border-t border-gray-700 pt-3">
+                            <label class="text-xs text-gray-400 block mb-2">🔊 Voice Settings (English only)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label for="tts-speed" class="text-xs text-gray-500">Speed: <span id="speed-value">1.2x</span></label>
+                                    <input type="range" id="tts-speed" min="0.5" max="2.0" step="0.1" value="1.2" class="w-full">
+                                </div>
+                                <div>
+                                    <label for="tts-pitch" class="text-xs text-gray-500">Pitch: <span id="pitch-value">1.0</span></label>
+                                    <input type="range" id="tts-pitch" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full">
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <label for="tts-voice" class="text-xs text-gray-500">Voice:</label>
+                                <select id="tts-voice" class="w-full p-2 rounded bg-gray-800 text-sm text-gray-200 mt-1"></select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </aside>
-    </div>
-        <!-- ...existing code... -->
+
+            <!-- Tab Display Area (for non-Studio tabs) -->
+            <div id="tab-display-content" class="hidden"></div>
+
+            <!-- Community Tab -->
+            <div id="community-tab" class="tab-content hidden">
+                <!-- Characters -->
+                <div class="card">
+                     <h2 class="text-2xl font-bold mb-4 text-center">🎭 BadDGirls</h2>
+                    <div class="flex items-start justify-center gap-3 mb-4">
+                        <div class="flex flex-col items-center relative" data-character="gooddgirl">
+                            <img id="good-d-girl-avatar" class="w-20 h-20 rounded-full object-cover border-4 border-pink-500 shadow-lg" src="https://placehold.co/150x150/7c3aed/ffffff?text=GoodDGirl" alt="GoodDGirl">
+                            <p class="mt-1 text-sm font-bold" id="gooddgirl-name-display">GoodDGirl</p>
+                            <p class="text-xs text-gray-400">The First Lady</p>
+                            <button class="edit-character-btn">✏️</button>
+                            <div class="graduation-badge hidden"></div>
+                        </div>
+                        <div class="flex flex-col items-center relative" data-character="producer">
+                            <img id="producer-avatar" class="w-20 h-20 rounded-full object-cover border-4 border-yellow-600 shadow-lg" src="https://placehold.co/150x150/a67c00/ffffff?text=Producer" alt="Producer">
+                            <p class="mt-1 text-sm font-bold" id="producer-name-display">Producer</p>
+                            <p class="text-xs text-gray-400">The Producer</p>
+                            <button class="edit-character-btn">✏️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Studio Directory -->
+                <div id="directory-section" class="card">
+                    <h2 class="text-2xl font-bold mb-4 text-center">🌐 Studio Directory</h2>
+                    <div id="directory-list" class="grid grid-cols-3 gap-4 text-center">
+                        <p class="col-span-3 text-gray-400">Loading directory...</p>
+                    </div>
+                </div>
+
+                <!-- Zodiac Council -->
+                <div id="zodiac-section" class="card">
+                    <h2 class="text-2xl font-bold mb-2 text-center">♈ The Zodiac Council</h2>
+                    <p class="text-sm text-center text-gray-400 mb-4">The Zodiac Council are AI personas that give you rap battle feedback based on their sign's personality. Find your sign in the Profile tab to get personalized responses!</p>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-4 text-center">
+                        <!-- Zodiac signs will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketplace Tab -->
+            <div id="marketplace-tab" class="tab-content hidden">
+                <!-- Gift Shop Section -->
+                <div id="gift-shop-section" class="card bg-gradient-to-br from-pink-900 via-purple-900 to-pink-900">
+                    <div class="text-center mb-4">
+                        <h2 class="text-3xl font-bold mb-2">💝 Gift Shop</h2>
+                        <p class="text-sm text-pink-300">Send magical moments to other creators.</p>
+                    </div>
+                    <div id="gift-gallery" class="grid grid-cols-2 gap-4 mb-4">
+                        <button data-gift-id="rose-bouquet" data-price-id="price_1SaVauIcMSxwbtZNVqS9LiUS" data-stripe-url="https://buy.stripe.com/dRm14ndNHbQagre1Vg7EQ0M" class="buy-gift-btn bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transform transition hover:scale-105 flex flex-col items-center">
+                            <span class="text-2xl mb-1">🌹</span>
+                            <span class="text-sm">Rose Bouquet ($5)</span>
+                        </button>
+                        <button data-gift-id="heart-fireworks" data-price-id="price_1SaVhjIcMSxwbtZNfX0ZFsn3" data-stripe-url="https://buy.stripe.com/14A00j24Z8DY0sg8jE7EQ0O" class="buy-gift-btn bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transform transition hover:scale-105 flex flex-col items-center">
+                            <span class="text-2xl mb-1">💖</span>
+                            <span class="text-sm">Heart Fireworks ($10)</span>
+                        </button>
+                        <button data-gift-id="champagne-toast" data-price-id="price_1SaVf4IcMSxwbtZNb3ZWjInV" data-stripe-url="https://buy.stripe.com/8x2fZh4d79I2caYfM67EQ0N" class="buy-gift-btn bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transform transition hover:scale-105 flex flex-col items-center">
+                            <span class="text-2xl mb-1">🥂</span>
+                            <span class="text-sm">Champagne Toast ($15)</span>
+                        </button>
+                        <button data-gift-id="shooting-star" data-price-id="price_1SaVttIcMSxwbtZNVRxQBqNm" data-stripe-url="https://buy.stripe.com/eVqeVd10V4nI7UIbvQ7EQ0P" class="buy-gift-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transform transition hover:scale-105 flex flex-col items-center">
+                            <span class="text-2xl mb-1">🌠</span>
+                            <span class="text-sm">Shooting Star ($20)</span>
+                        </button>
+                    </div>
+                     <p class="my-4 text-sm text-gray-300">Purchase the final master for distribution:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <button id="purchase-mp3-wav" data-gift-id="mp3-wav-master" data-price-id="price_1SY6s6IcMSxwbtZNRPkRgivJ" data-stripe-url="https://buy.stripe.com/cNi9ATeRL2fA5MA2Zk7EQ0J" class="buy-gift-btn bg-purple-600 hover:bg-purple-700">Buy Master MP3/WAV ($100)</button>
+                        <button id="purchase-mp4" data-gift-id="mp4-master" data-stripe-url="https://buy.stripe.com/14A9AT4d707s8YM9nI7EQ0K" class="buy-gift-btn bg-pink-600 hover:bg-pink-700">Buy Master MP4 ($200)</button>
+                        <button id="purchase-exclusive-mv" data-gift-id="exclusive-mv" data-stripe-url="https://buy.stripe.com/cNibJ19xr6vQ5MAgQa7EQ0L" class="buy-gift-btn bg-indigo-600 hover:bg-indigo-700 col-span-1 sm:col-span-2">🎬 Buy Exclusive Music Video ($50)</button>
+                    </div>
+                </div>
+
+                <!-- Gift Management -->
+                <div id="gift-management-section" class="card">
+                    <h2 class="text-2xl font-bold mb-4 text-center">🎁 My Gifts & Records</h2>
+                    <div class="border-t border-pink-700 pt-4">
+                        <h3 class="font-bold text-lg mb-2 text-pink-200">💼 My Unlocked Gifts</h3>
+                        <div id="unlocked-gifts-display" class="flex flex-wrap gap-2 mb-3">
+                            <span class="text-sm text-gray-500">No gifts unlocked yet.</span>
+                        </div>
+                        <select id="gift-recipient-selector" class="mb-2 w-full" aria-label="Select Recipient">
+                            <option value="">-- Select Recipient --</option>
+                        </select>
+                        <select id="gift-selector" class="mb-2 w-full" disabled aria-label="Select Gift to Send">
+                            <option value="">-- Select Gift to Send --</option>
+                        </select>
+                        <button id="send-selected-gift-btn" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg w-full" disabled>💝 Send Gift</button>
+                    </div>
+                    <div class="border-t border-gray-700 mt-4 pt-4">
+                         <div class="flex gap-2 mb-4">
+                            <button id="view-sent-gifts-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-sm">📤 Sent</button>
+                            <button id="view-received-gifts-btn" class="flex-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-3 rounded-lg text-sm">📥 Received</button>
+                            <button id="view-monthly-stats-btn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-lg text-sm">📊 Stats</button>
+                        </div>
+                        <div id="gift-history-display" class="max-h-60 overflow-y-auto space-y-2">
+                            <p class="text-gray-400 text-center py-8">Select a view to see gift history</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Beat Purchase -->
+                <div id="beat-purchase-section" class="card">
+                    <h2 class="text-2xl font-bold mb-4">🎵 Beats for Sale</h2>
+                    <div class="bg-purple-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-xl">Raydiant Release</h3>
+                        <p class="text-gray-300">"Respect And Honesty" - A drill beat with a childlike storybook rap.</p>
+                        <button id="purchase-beat-btn" data-gift-id="raydiant-beat" data-price-id="price_1R3K8FIcMSxwbtZN4J7iExK4" data-stripe-url="https://buy.stripe.com/fZedQQ7m8bXUefS00u" class="buy-gift-btn mt-4 bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-lg">
+                            Purchase ($1.99)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile-tab" class="tab-content hidden">
+                <div class="card">
+                    <h2 class="text-2xl font-bold mb-4 text-center">👤 My Profile</h2>
+                    <div class="flex flex-col items-center relative" data-character="user">
+                        <img id="user-avatar" class="w-24 h-24 rounded-full object-cover border-4 border-purple-500 shadow-lg" src="https://placehold.co/150x150/5a4b8a/ffffff?text=You" alt="Your Avatar">
+                        <p class="mt-2 text-lg font-bold" id="user-name-display">You <span id="admin-indicator" class="hidden text-yellow-500">🔧</span></p>
+                        <p class="text-md text-purple-400" id="zodiac-sign-display"></p>
+                        <button id="edit-profile-btn" class="edit-character-btn mt-2 text-xs bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-full">✏️ Edit Profile</button>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="find-sign-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">Find Your Zodiac Sign</button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Your User ID: <span id="user-id-display-secondary" class="font-mono text-xs"></span></p>
+                </div>
+
+                <!-- Account Management Section -->
+                <div id="account-section" class="card">
+                    <h2 class="text-2xl font-bold mb-4">🔐 Account</h2>
+                    <div id="account-status" class="mb-4 p-3 rounded-lg bg-gray-800">
+                        <p class="text-sm"><strong>Status:</strong> <span id="account-type" class="text-purple-400">Loading...</span></p>
+                        <p class="text-sm"><strong>Email:</strong> <span id="account-email" class="text-gray-300">—</span></p>
+                    </div>
+                    
+                    <!-- Upgrade UI (shown for anonymous users) -->
+                    <div id="upgrade-section" class="hidden">
+                        <p class="text-yellow-400 text-sm mb-3">⚠️ You're using a guest account. Purchases won't be saved if you clear cookies or use another device.</p>
+                        <button id="upgrade-email-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg mb-2">🔒 Link Email & Password</button>
+                        <button id="upgrade-google-btn" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-2 px-4 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                            Link Google Account
+                        </button>
+                    </div>
+
+                    <!-- Sign Out (shown for permanent users) -->
+                    <div id="signout-section" class="hidden">
+                        <p class="text-green-400 text-sm mb-3">✅ Your account is permanent. Purchases are saved across devices.</p>
+                        <button id="signout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Sign Out</button>
+                    </div>
+                </div>
+
+                <!-- Help & Info Section -->
+                <div id="help-section" class="card">
+                    <h2 class="text-2xl font-bold mb-4">ℹ️ Help & Info</h2>
+                    <div class="space-y-2 text-sm text-gray-300">
+                        <p><strong class="text-purple-400">Studio:</strong> Record audio, upload beats, and video call other users.</p>
+                        <p><strong class="text-purple-400">Community:</strong> See who's online in the Directory and interact with the AI Zodiac Council.</p>
+                        <p><strong class="text-purple-400">Gift/Shop:</strong> Buy and send virtual gifts to support other creators.</p>
+                        <p><strong class="text-purple-400">Profile:</strong> Customize your look and find your Zodiac sign.</p>
+                    </div>
+                    <button id="start-tour-btn" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">🚀 Start Tour</button>
+                </div>
+            </div>
+
+            <!-- Zodiac Council Tab -->
+            <div id="zodiac-council-tab" class="tab-content hidden">
+                <div class="card">
+                    <h2 class="text-2xl font-bold mb-4 text-center">The Zodiac Council</h2>
+                    <div id="pisces-guide">
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/a78bfa/ffffff?text=Pisces" alt="Pisces" class="w-24 h-24 rounded-full object-cover border-4 border-purple-500 shadow-lg mb-4">
+                            <h3 class="text-xl font-bold">Pisces a.k.a The Guide</h3>
+                            <p class="text-purple-300">Welcome to the School of Rhyme</p>
+                        </div>
+                        <div class="flex justify-center mt-4 space-x-2">
+                            <button class="rap-guide-btn active" data-section="intro">Introduction</button>
+                            <button class="rap-guide-btn" data-section="positive-language">Positive Language</button>
+                            <button class="rap-guide-btn" data-section="challenge">16-Bar Challenge</button>
+                        </div>
+                        <div id="rap-guide-content" class="mt-4 p-4 bg-gray-800 rounded-lg">
+                            <div id="intro-section">
+                                <p class="whitespace-pre-wrap font-mono text-center">
+Welcome to the session, let the wisdom flow,
+I'm your guide Pisces, here to help you grow.
+Leave the negativity, let your spirit climb,
+Together we'll master the art of the rhyme.
+
+Drop a line with meaning, let your truth align,
+In this creative ocean, your star will shine.
+Respect is the key, the foundational art,
+Connect with your words, and speak from the heart.
+
+No need for harsh words, no need to degrade,
+We're building a community, a lyrical brigade.
+So bring your best bars, your passion, your soul,
+And watch as your story begins to unfold.
+
+Let's make every verse a positive decree,
+I'm here to support you, just follow my lead.
+Let's make magic with the words that we choose,
+In the school of rhyme, there's no way to lose.
+                                </p>
+                            </div>
+                            <div id="positive-language-section" class="hidden">
+                                <p class="text-lg font-bold mb-2">The Art of Positive Language</p>
+                                <p class="mb-4">In the School of Rhyme, we believe that there are no "bad words," only bad uses of words. We can reclaim words that are often used negatively and use them in their original, powerful context. This is about elevating the conversation and showing respect for the power of language.</p>
+                                <p class="font-bold">Example:</p>
+                                <p class="font-mono bg-gray-900 p-2 rounded">"My dogs stay woofin', the bitches feeding the pups."</p>
+                                <p class="mt-2">In this line, "bitches" is used in its original context to refer to female dogs. It's a statement of fact, not an insult. This is how we can use language to build up, not tear down.</p>
+                            </div>
+                            <div id="challenge-section" class="hidden">
+                                <p class="text-lg font-bold mb-2">The 16-Bar Challenge</p>
+                                <p class="mb-4">Ready to test your skills? Here's your challenge:</p>
+                                <div id="challenge-prompt" class="p-4 bg-gray-900 rounded-lg mb-4">
+                                    <p>Write a 16-bar rhyme about overcoming a challenge and achieving your dreams. Your rhyme should include the words "star," "climb," and "shine."</p>
+                                </div>
+                                <button id="new-challenge-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg mb-4">New Challenge</button>
+                                <textarea id="challenge-input" class="w-full h-48 p-2 bg-gray-900 rounded-lg" placeholder="Enter your 16 bars here..."></textarea>
+                                <button id="submit-challenge-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mt-4">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- OLD CONTENT TO BE REMOVED OR REORGANIZED -->
+            <div class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <p id="prompt-message" class="text-xl font-bold">Welcome to the Studio</p>
+                    <div class="flex items-center gap-2">
+                        <div class="bg-yellow-600 bg-opacity-30 px-3 py-1 rounded-lg border border-yellow-500">
+                            <span class="text-yellow-300 font-bold">💰 <span id="gift-balance">4</span></span>
+                        </div>
+                        <button id="play-last-gift-btn" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-3 rounded-lg text-sm w-auto whitespace-nowrap">▶️ Play Last Gift</button>
+                        <button id="share-invite-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm w-auto whitespace-nowrap">
+                            🔗 Share App
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- END OLD CONTENT -->
+        </div>
+    </main>
 
     <!-- Birthday Modal -->
     <div id="birthday-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
@@ -954,27 +1040,6 @@
             return `${personality.emoji} ${personality.name} drops in:\n\n${randomRhyme}`;
         }
 
-        // Positive-language sanitizer: rewrites reclaimed words into respectful context
-        const positiveLanguageRewrites = [
-            { pattern: /\bbitches\b/gi, replacement: 'female dogs (bitches) — respect to women' },
-            { pattern: /\bbitch\b/gi, replacement: 'female dog (bitch) — respect to women' },
-            { pattern: /\bhoes\b/gi, replacement: 'hard workers (hoes) — respect to women' },
-            { pattern: /\bhoe\b/gi, replacement: 'hard worker (hoe) — respect to women' }
-        ];
-
-        function sanitizeRhyme(text) {
-            if (!text) return text;
-            let cleaned = text;
-            positiveLanguageRewrites.forEach(({ pattern, replacement }) => {
-                cleaned = cleaned.replace(pattern, replacement);
-            });
-            return cleaned;
-        }
-
-        function rhymeWasChanged(originalText, cleanedText) {
-            return originalText && cleanedText && originalText !== cleanedText;
-        }
-
         // Utility functions
         function normalizeImageUrl(url) {
             if (!url) return '';
@@ -1030,23 +1095,24 @@
                 newMessages.forEach(message => {
                     const msgDiv = document.createElement('div');
                     
-                    let alignment = 'self-start text-left';
+                    let alignment = 'self-start';
+                    let bgColor = 'bg-gray-700';
                     let senderNameText = message.userName || 'Anonymous';
 
                     if (message.userId === userId) {
-                        alignment = 'self-end text-right';
+                        alignment = 'self-end';
+                        bgColor = 'bg-purple-900';
                         senderNameText = "You";
                     }
 
-                    msgDiv.className = `chat-message chat-overlay-line ${alignment}`;
-                    msgDiv.style.maxWidth = '90%';
+                    msgDiv.className = `chat-message ${bgColor} text-white p-2 rounded mb-2 ${alignment}`;
+                    msgDiv.style.maxWidth = '80%';
 
                     const senderName = document.createElement('div');
-                    senderName.className = 'sender';
+                    senderName.className = 'font-bold';
                     senderName.textContent = senderNameText;
                     
                     const messageText = document.createElement('div');
-                    messageText.className = 'body';
                     messageText.textContent = message.text;
 
                     msgDiv.appendChild(senderName);
@@ -2109,23 +2175,12 @@
                     if (text && userId && db) {
                         try {
                             const messagesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-                            const cleanedText = sanitizeRhyme(text);
                             await addDoc(messagesCollection, {
-                                text: cleanedText,
+                                text: text,
                                 userId: userId,
                                 userName: elements.userNameDisplay.textContent,
                                 timestamp: serverTimestamp()
                             });
-
-                            // If we rewrote anything, post a guardian note with the positive rewrite
-                            if (rhymeWasChanged(text, cleanedText)) {
-                                await addDoc(messagesCollection, {
-                                    text: `🔎 Positive rewrite:\n${cleanedText}`,
-                                    userId: 'guardian',
-                                    userName: 'Rhyme Guardian',
-                                    timestamp: serverTimestamp()
-                                });
-                            }
                             elements.chatInput.value = '';
                         } catch (error) {
                             console.error('Error sending message:', error);
@@ -2158,18 +2213,8 @@
             wireGiftButtons();
             wireDirectoryParticipants();
 
-            // EVENT DELEGATION FOR BEAT PREVIEW BUTTONS
+            // EVENT DELEGATION FOR GIFT BUTTONS - Survives DOM cloning
             document.addEventListener('click', async (e) => {
-                const previewBtn = e.target.closest('.preview-beat-btn');
-                if (previewBtn) {
-                    e.stopPropagation();
-                    const beatId = previewBtn.getAttribute('data-beat-id');
-                    const beatUrl = previewBtn.getAttribute('data-beat-url');
-                    console.log('🎵 Beat preview clicked:', { beatId, beatUrl });
-                    await playBeatPreview(beatId, beatUrl);
-                    return;
-                }
-
                 const btn = e.target.closest('.buy-gift-btn');
                 if (!btn) return;
 
@@ -2307,12 +2352,6 @@
                     elements.giftSelector.disabled = false;
                     elements.giftSelector.innerHTML = '<option value="">-- Select Gift to Send --</option>' + 
                         unlockedGifts.map(id => `<option value="${id}">${giftNames[id] || id}</option>`).join('');
-                }
-                
-                // Sync quick selector on camera view
-                const quickGiftSelector = document.getElementById('quick-gift-selector');
-                if (quickGiftSelector && quickGiftSelector.classList.contains('hidden')) {
-                    quickGiftSelector.innerHTML = elements.giftSelector.innerHTML;
                 }
             }
 
@@ -3292,44 +3331,7 @@
                 });
             }
 
-            // Play beat preview with fade-out animation
-            async function playBeatPreview(beatId, videoUrl) {
-                const overlay = document.getElementById('gift-animation-overlay');
-                const videoEl = document.getElementById('gift-animation-video');
-                const imageEl = document.getElementById('gift-animation-image');
-                const senderNameEl = document.getElementById('gift-sender-name');
-
-                senderNameEl.textContent = 'Beat Preview';
-                videoEl.style.display = 'none';
-                imageEl.style.display = 'none';
-
-                if (!videoUrl) {
-                    showMessage('Add your OneDrive beat preview URL to data-beat-url attribute!');
-                    return;
-                }
-
-                videoEl.src = videoUrl;
-                videoEl.style.display = 'block';
-                videoEl.style.opacity = '1';
-                overlay.classList.remove('hidden');
-                
-                videoEl.play();
-
-                // Auto-fade and close when video ends
-                videoEl.onended = () => {
-                    videoEl.style.transition = 'opacity 1s ease-out';
-                    videoEl.style.opacity = '0';
-                    setTimeout(() => {
-                        overlay.classList.add('hidden');
-                        videoEl.pause();
-                        videoEl.src = '';
-                        videoEl.style.transition = '';
-                        videoEl.style.opacity = '1';
-                    }, 1000);
-                };
-            }
-
-            // Legacy gift animation (for received gifts)
+            // Play gift animation
             async function playGiftAnimation(gift) {
                 const overlay = document.getElementById('gift-animation-overlay');
                 const videoEl = document.getElementById('gift-animation-video');
@@ -3489,267 +3491,6 @@
                 showMessage('Please enter your rhyme before submitting.');
             }
         });
-
-        // Quick send gift on camera functionality
-        const quickSendBtn = document.getElementById('quick-send-gift-btn');
-        const quickGiftSelector = document.getElementById('quick-gift-selector');
-        const quickRecipientSelector = document.getElementById('quick-recipient-selector');
-        const confirmQuickSendBtn = document.getElementById('confirm-quick-send-btn');
-        const cancelQuickSendBtn = document.getElementById('cancel-quick-send-btn');
-
-        // Sync quick selectors with main selectors
-        function syncQuickSelectors() {
-            const mainGiftSelector = document.getElementById('gift-selector');
-            const mainRecipientSelector = document.getElementById('gift-recipient-selector');
-            
-            if (mainGiftSelector && quickGiftSelector) {
-                quickGiftSelector.innerHTML = mainGiftSelector.innerHTML;
-            }
-            if (mainRecipientSelector && quickRecipientSelector) {
-                quickRecipientSelector.innerHTML = mainRecipientSelector.innerHTML;
-            }
-        }
-
-        quickSendBtn.addEventListener('click', () => {
-            syncQuickSelectors();
-            quickSendBtn.classList.add('hidden');
-            quickGiftSelector.classList.remove('hidden');
-            quickRecipientSelector.classList.remove('hidden');
-            confirmQuickSendBtn.classList.remove('hidden');
-            cancelQuickSendBtn.classList.remove('hidden');
-        });
-
-        cancelQuickSendBtn.addEventListener('click', () => {
-            quickSendBtn.classList.remove('hidden');
-            quickGiftSelector.classList.add('hidden');
-            quickRecipientSelector.classList.add('hidden');
-            confirmQuickSendBtn.classList.add('hidden');
-            cancelQuickSendBtn.classList.add('hidden');
-            quickGiftSelector.value = '';
-            quickRecipientSelector.value = '';
-        });
-
-        confirmQuickSendBtn.addEventListener('click', async () => {
-            const recipient = quickRecipientSelector.value;
-            const giftId = quickGiftSelector.value;
-            
-            if (!recipient || !giftId) {
-                showMessage('Please select both gift and recipient');
-                return;
-            }
-
-            // Use existing send gift logic
-            const recipientName = quickRecipientSelector.selectedOptions[0]?.textContent || 'Someone';
-            
-            try {
-                const giftsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'sent_gifts');
-                await addDoc(giftsCollection, {
-                    recipientId: recipient,
-                    recipientName: recipientName,
-                    giftId: giftId,
-                    senderId: userId,
-                    senderName: userName,
-                    timestamp: serverTimestamp(),
-                    status: 'sent'
-                });
-                
-                // Lock gift after send
-                const userGiftsDoc = doc(db, 'artifacts', appId, 'users', userId, 'gifts', 'unlocked');
-                await setDoc(userGiftsDoc, {
-                    [giftId]: false,
-                    lastUpdated: serverTimestamp()
-                }, { merge: true });
-                
-                showMessage(`🎁 Gift sent to ${recipientName}!`);
-                
-                // Reset UI
-                cancelQuickSendBtn.click();
-            } catch (error) {
-                console.error('Failed to send gift:', error);
-                showMessage('Failed to send gift. Please try again.');
-            }
-        });
-
-        // Sidebar toggle
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                sidebar.classList.toggle('open');
-            });
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.sidebar') && !e.target.closest('#sidebar-toggle')) {
-                    sidebar.classList.remove('open');
-                }
-            });
-        }
-
-        // EVENT DELEGATION: Zodiac card clicks to show personality in chat
-        document.addEventListener('click', (e) => {
-            const zodiacCard = e.target.closest('[data-sign]');
-            if (!zodiacCard) return;
-
-            const signId = zodiacCard.dataset.sign;
-            const rapResponse = sanitizeRhyme(getZodiacRapResponse(signId));
-            
-            if (rapResponse && db && userId) {
-                // Post AI zodiac response to chat
-                const messagesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-                addDoc(messagesCollection, {
-                    text: rapResponse,
-                    userId: 'zodiac-' + signId,
-                    userName: zodiacPersonalities[signId].name + ' ' + zodiacPersonalities[signId].emoji,
-                    timestamp: serverTimestamp()
-                }).then(() => {
-                    console.log(`✅ ${zodiacPersonalities[signId].name} dropped bars in chat!`);
-                    showMessage(`${zodiacPersonalities[signId].emoji} ${zodiacPersonalities[signId].name} just dropped bars in the Studio chat!`);
-                }).catch(err => {
-                    console.error('Error posting zodiac response:', err);
-                });
-            }
-        });
-
-        // Custom Gift Modal & Tip Button Handlers
-        let userBalance = 150; // Starting balance (would be loaded from user data in production)
-
-        // Helper to add message to overlay chat
-        function addMessageToOverlay(userName, message, isTip = false) {
-            const chatMessages = document.getElementById('chat-messages');
-            if (!chatMessages) return;
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `text-white text-sm ${isTip ? 'font-bold' : ''}`;
-            messageDiv.style.textShadow = '0 2px 6px rgba(0,0,0,0.9)';
-            messageDiv.innerHTML = `<span class="${isTip ? 'text-yellow-400' : 'text-pink-400'}">${userName}:</span> ${message}`;
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Remove old messages if too many (keep last 8)
-            while (chatMessages.children.length > 8) {
-                chatMessages.removeChild(chatMessages.firstChild);
-            }
-        }
-
-        // Custom Gift Modal
-        const customGiftBtn = document.getElementById('custom-gift-btn');
-        const customGiftModal = document.getElementById('custom-gift-modal');
-        const closeCustomGiftModal = document.getElementById('close-custom-gift-modal');
-        const customGiftItems = document.querySelectorAll('.custom-gift-item');
-
-        if (customGiftBtn) {
-            customGiftBtn.addEventListener('click', () => {
-                customGiftModal.classList.remove('hidden');
-                document.getElementById('user-balance').textContent = `$${userBalance}`;
-            });
-        }
-
-        if (closeCustomGiftModal) {
-            closeCustomGiftModal.addEventListener('click', () => {
-                customGiftModal.classList.add('hidden');
-            });
-        }
-
-        // Handle custom gift selection
-        customGiftItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const cost = parseInt(item.dataset.cost);
-                const giftId = item.dataset.giftId;
-                const giftName = item.querySelector('p.font-bold').textContent;
-                
-                if (userBalance >= cost) {
-                    userBalance -= cost;
-                    document.getElementById('user-balance').textContent = `$${userBalance}`;
-                    
-                    showMessage(`🎁 Sent "${giftName}" for $${cost}!`);
-                    addMessageToOverlay('You', `🎵 Sent ${giftName} beat video! 🎵`, true);
-                    
-                    // Close modal
-                    customGiftModal.classList.add('hidden');
-                    
-                    console.log(`Playing custom gift: ${giftId}`);
-                } else {
-                    showMessage(`Insufficient balance! Need $${cost}, you have $${userBalance}`);
-                }
-            });
-        });
-
-        // Tip Buttons Handler
-        document.addEventListener('click', (e) => {
-            const tipBtn = e.target.closest('.tip-btn');
-            if (!tipBtn) return;
-
-            const amount = parseInt(tipBtn.dataset.tipAmount);
-            if (userBalance >= amount) {
-                userBalance -= amount;
-                addMessageToOverlay('You', `💵 Tipped $${amount}! 💵`, true);
-                showMessage(`Sent $${amount} tip!`);
-                console.log(`Tip sent: $${amount}, remaining balance: $${userBalance}`);
-            } else {
-                showMessage(`Insufficient balance! Need $${amount}, you have $${userBalance}`);
-            }
-        });
-
-        // Overlay Chat Send Handler
-        const overlayChatInput = document.getElementById('overlay-chat-input');
-        const sendOverlayChatBtn = document.getElementById('send-overlay-chat');
-
-        function sendOverlayMessage() {
-            const message = overlayChatInput.value.trim();
-            if (message) {
-                addMessageToOverlay('You', message, false);
-                overlayChatInput.value = '';
-                
-                // Send to Firebase
-                if (userId && db) {
-                    try {
-                        const messagesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-                        addDoc(messagesCollection, {
-                            text: message,
-                            userId: userId,
-                            userName: document.getElementById('user-name-display')?.textContent || 'You',
-                            timestamp: serverTimestamp()
-                        });
-                    } catch (error) {
-                        console.error('Chat send error:', error);
-                    }
-                }
-            }
-        }
-
-        if (sendOverlayChatBtn) {
-            sendOverlayChatBtn.addEventListener('click', sendOverlayMessage);
-        }
-
-        if (overlayChatInput) {
-            overlayChatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    sendOverlayMessage();
-                }
-            });
-        }
-
-        // Listen for incoming chat messages to display in overlay
-        if (db) {
-            const messagesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-            const messagesQuery = query(messagesCollection, orderBy('timestamp', 'desc'), limitToLast(10));
-
-            onSnapshot(messagesQuery, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
-                        const msg = change.doc.data();
-                        const senderName = msg.userId === userId ? 'You' : (msg.userName || 'Anonymous');
-                        const messageText = msg.text || '';
-                        
-                        // Add to overlay (skip if it's our own message we just sent)
-                        if (change.doc.metadata.hasPendingWrites) return;
-                        addMessageToOverlay(senderName, messageText, false);
-                    }
-                });
-            });
-        }
     });
     </script>
 </body>
