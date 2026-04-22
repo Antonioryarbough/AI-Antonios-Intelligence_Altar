@@ -630,6 +630,50 @@
                     </div>
                 </div>
 
+                <!-- Asset Uploader -->
+                <div id="asset-uploader-section" class="card">
+                    <h2 class="text-2xl font-bold mb-1">☁️ Asset Uploader</h2>
+                    <p class="text-xs text-gray-400 mb-4">Upload images, GIFs, MP4s, or audio to Firebase Storage. Paste OneDrive, Imgur, Dropbox, or Google Drive links and they auto-convert too.</p>
+
+                    <!-- Drag & Drop Zone -->
+                    <div id="asset-drop-zone" class="border-2 border-dashed border-purple-500 rounded-xl p-6 text-center cursor-pointer hover:border-purple-300 transition-colors mb-4"
+                         ondragover="event.preventDefault(); this.classList.add('border-purple-300','bg-purple-900','bg-opacity-30');"
+                         ondragleave="this.classList.remove('border-purple-300','bg-purple-900','bg-opacity-30');"
+                         ondrop="event.preventDefault(); this.classList.remove('border-purple-300','bg-purple-900','bg-opacity-30'); handleAssetDrop(event);">
+                        <div class="text-4xl mb-2">📁</div>
+                        <p class="text-purple-300 font-semibold">Drag & drop files here</p>
+                        <p class="text-xs text-gray-400 mt-1">Images · GIFs · MP4 · MP3 · WAV</p>
+                        <label class="mt-3 inline-block cursor-pointer bg-purple-700 hover:bg-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-lg">
+                            Browse Files
+                            <input type="file" id="asset-file-input" class="hidden" multiple accept="image/*,video/mp4,audio/*,.gif">
+                        </label>
+                    </div>
+
+                    <!-- Folder selector -->
+                    <div class="mb-3">
+                        <label class="text-xs text-gray-400 block mb-1">Upload to folder</label>
+                        <select id="asset-folder-select" class="w-full bg-gray-800 text-white p-2 rounded-lg text-sm">
+                            <option value="gifts">gifts/ (gift animations)</option>
+                            <option value="profiles">profiles/ (avatars)</option>
+                            <option value="beats">beats/ (audio)</option>
+                            <option value="assets">assets/ (general)</option>
+                        </select>
+                    </div>
+
+                    <!-- URL normalizer -->
+                    <div class="mb-3">
+                        <label class="text-xs text-gray-400 block mb-1">Or paste a OneDrive / Imgur / Dropbox / Google Drive link</label>
+                        <div class="flex gap-2">
+                            <input type="url" id="asset-url-input" placeholder="Paste link here..." class="flex-grow p-2 rounded-lg bg-gray-800 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <button id="asset-url-copy-btn" class="bg-purple-700 hover:bg-purple-600 text-white text-sm font-semibold px-3 py-2 rounded-lg whitespace-nowrap">Convert & Copy</button>
+                        </div>
+                        <p id="asset-url-result" class="text-xs text-green-400 mt-1 hidden break-all"></p>
+                    </div>
+
+                    <!-- Upload progress -->
+                    <div id="asset-upload-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
+                </div>
+
                 <!-- Beat Purchase -->
                 <div id="beat-purchase-section" class="card">
                     <h2 class="text-2xl font-bold mb-4">🎵 Beats for Sale</h2>
@@ -852,7 +896,7 @@ In the school of rhyme, there's no way to lose.
                     <div>
                         <label for="image-input" class="text-xs text-gray-400 mb-1 block">Paste URL</label>
                         <input type="url" id="image-input" placeholder="https://imgur.com/abc123 (we auto-fix)" class="w-full">
-                        <p class="text-xs text-gray-400 mt-1">Tip: You can paste Imgur/Dropbox/GitHub links.</p>
+                        <p class="text-xs text-gray-400 mt-1">Tip: You can paste OneDrive, Imgur, Dropbox, or Google Drive links — auto-converted.</p>
                     </div>
                 </div>
                 <div id="admin-zodiac-assignment" class="hidden mt-4">
@@ -1064,7 +1108,7 @@ In the school of rhyme, there's no way to lose.
             
             // Dropbox
             if (url.includes('dropbox.com')) {
-                return url.replace('dl=0', 'raw=1');
+                return url.replace('dl=0', 'raw=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com');
             }
             
             // GitHub
@@ -1076,6 +1120,13 @@ In the school of rhyme, there's no way to lose.
             if (url.includes('drive.google.com') && url.includes('/file/d/')) {
                 const id = url.split('/file/d/')[1].split('/')[0];
                 return `https://drive.google.com/uc?export=view&id=${id}`;
+            }
+
+            // OneDrive / SharePoint — append ?download=1 for direct access
+            if (url.includes('1drv.ms') || url.includes('onedrive.live.com') || url.includes('sharepoint.com')) {
+                if (url.includes('download=1')) return url;
+                const sep = url.includes('?') ? '&' : '?';
+                return url + sep + 'download=1';
             }
 
             return url;
@@ -3597,6 +3648,88 @@ In the school of rhyme, there's no way to lose.
                 ghostPulse(false);
             }
         });
+
+        // ── Asset Uploader ──────────────────────────────────────────────
+        const assetFileInput = document.getElementById('asset-file-input');
+        const assetFolderSelect = document.getElementById('asset-folder-select');
+        const assetUploadList = document.getElementById('asset-upload-list');
+        const assetUrlInput = document.getElementById('asset-url-input');
+        const assetUrlCopyBtn = document.getElementById('asset-url-copy-btn');
+        const assetUrlResult = document.getElementById('asset-url-result');
+
+        function createUploadRow(filename) {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-2 text-sm';
+            row.innerHTML = `
+                <span class="flex-grow truncate text-gray-200">${filename}</span>
+                <span class="status text-xs text-yellow-400 whitespace-nowrap">Uploading...</span>
+                <button class="copy-btn hidden text-xs bg-purple-700 hover:bg-purple-600 text-white px-2 py-1 rounded">Copy URL</button>`;
+            assetUploadList.prepend(row);
+            return row;
+        }
+
+        async function uploadAssetFile(file) {
+            if (!storage) { showMessage('Firebase Storage not ready. Try again in a moment.'); return; }
+            const folder = assetFolderSelect ? assetFolderSelect.value : 'assets';
+            const path = `${folder}/${Date.now()}_${file.name}`;
+            const row = createUploadRow(file.name);
+            const statusEl = row.querySelector('.status');
+            const copyBtn = row.querySelector('.copy-btn');
+            try {
+                const storageRef = ref(storage, path);
+                await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(storageRef);
+                statusEl.textContent = '✅ Done';
+                statusEl.className = 'status text-xs text-green-400 whitespace-nowrap';
+                copyBtn.classList.remove('hidden');
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(downloadURL);
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => copyBtn.textContent = 'Copy URL', 1500);
+                });
+            } catch (err) {
+                statusEl.textContent = '❌ Failed';
+                statusEl.className = 'status text-xs text-red-400 whitespace-nowrap';
+                console.error('[AssetUploader]', err);
+                if (err.code === 'storage/unauthorized') {
+                    showMessage('⚠️ Storage access denied. Enable Firebase Storage and set rules.');
+                }
+            }
+        }
+
+        function handleAssetDrop(e) {
+            const files = Array.from(e.dataTransfer.files);
+            files.forEach(uploadAssetFile);
+        }
+
+        if (assetFileInput) {
+            assetFileInput.addEventListener('change', () => {
+                Array.from(assetFileInput.files).forEach(uploadAssetFile);
+                assetFileInput.value = '';
+            });
+        }
+
+        const assetDropZone = document.getElementById('asset-drop-zone');
+        if (assetDropZone) {
+            assetDropZone.addEventListener('click', (e) => {
+                if (!e.target.closest('label')) assetFileInput && assetFileInput.click();
+            });
+        }
+
+        if (assetUrlCopyBtn) {
+            assetUrlCopyBtn.addEventListener('click', () => {
+                const raw = assetUrlInput.value.trim();
+                if (!raw) { showMessage('Paste a URL first.'); return; }
+                const converted = normalizeImageUrl(raw);
+                assetUrlResult.textContent = converted;
+                assetUrlResult.classList.remove('hidden');
+                navigator.clipboard.writeText(converted).then(() => {
+                    assetUrlCopyBtn.textContent = '✅ Copied!';
+                    setTimeout(() => assetUrlCopyBtn.textContent = 'Convert & Copy', 1800);
+                });
+            });
+        }
+        // ── End Asset Uploader ──────────────────────────────────────────
     });
     </script>
 </body>
