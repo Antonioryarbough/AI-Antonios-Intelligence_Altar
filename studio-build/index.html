@@ -27,7 +27,14 @@
         .tab-pane { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* hide scrollbars but keep scrollability */
+        @keyframes splashFadeOut { from { opacity:1; } to { opacity:0; pointer-events:none; } }
+        #intro-splash.fading { animation: splashFadeOut 1s ease forwards; }
+        /* Gift video overlay fade */
+        #gift-video-overlay { animation: none; }
+        #gift-video-overlay.show { animation: giftFadeIn 0.4s ease forwards; }
+        #gift-video-overlay.hide { animation: giftFadeOut 0.5s ease forwards; }
+        @keyframes giftFadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+        @keyframes giftFadeOut { from { opacity:1; } to { opacity:0; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -221,6 +228,14 @@
 </head>
 <body class="bg-[#1a120b] h-screen w-screen overflow-hidden">
 
+    <!-- ===== SBM INTRO SPLASH ===== -->
+    <div id="intro-splash" class="fixed inset-0 z-[500] bg-black flex items-center justify-center cursor-pointer" onclick="closeSplash()">
+        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+        <div class="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none">
+            <p class="text-white/60 text-xs animate-pulse">Tap anywhere to skip</p>
+        </div>
+    </div>
+
     <!-- Auth Container -->
     <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center bg-[#1a120b] bg-opacity-95">
         <div class="bg-[#3e2723] p-8 rounded-xl shadow-2xl border-2 border-[#ffd700] max-w-md w-full text-center">
@@ -287,35 +302,28 @@
 
                     <!-- Gift shop column -->
                     <div class="flex flex-col w-28 h-full pointer-events-auto">
-                        <p class="text-[9px] text-white/50 uppercase tracking-widest mb-1 text-center font-bold">🛍 Send Gift</p>
+                        <p id="gift-performer-label" class="text-[9px] text-white/60 uppercase tracking-widest mb-1 text-center font-bold">🎁 Send Gift</p>
                         <div class="flex-1 overflow-y-auto space-y-1 no-scrollbar">
                             <!-- Rose -->
-                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                            <button class="overlay-gift-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
                                 data-link="https://buy.stripe.com/dRm14ndNHbQagre1Vg7EQ0M" data-id="rose" data-name="Rose" data-cost="5">
                                 <span class="text-base">🌹</span><span>Rose $5</span>
                             </button>
                             <!-- Heart -->
-                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                            <button class="overlay-gift-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
                                 data-link="https://buy.stripe.com/14A00j24Z8DY0sg8jE7EQ0O" data-id="heart" data-name="Heart" data-cost="10">
                                 <span class="text-base">💖</span><span>Heart $10</span>
                             </button>
                             <!-- Toast -->
-                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                            <button class="overlay-gift-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
                                 data-link="https://buy.stripe.com/8x2fZh4d79I2caYfM67EQ0N" data-id="champagne" data-name="Toast" data-cost="15">
                                 <span class="text-base">🥂</span><span>Toast $15</span>
                             </button>
                             <!-- Star -->
-                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                            <button class="overlay-gift-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
                                 data-link="https://buy.stripe.com/eVqeVd10V4nI7UIbvQ7EQ0P" data-id="star" data-name="Star" data-cost="20">
                                 <span class="text-base">🌠</span><span>Star $20</span>
                             </button>
-                        </div>
-                        <!-- Send to performer -->
-                        <div class="mt-1">
-                            <select id="wallet-recipient-overlay" class="w-full text-[9px] bg-black/40 text-white border border-white/20 rounded px-1 py-0.5 mb-1">
-                                <option value="">-- Send to --</option>
-                            </select>
-                            <button id="confirm-send-overlay" class="w-full bg-[#ffd700]/70 hover:bg-[#ffd700] text-[#3e2723] text-[9px] font-bold py-1 rounded">Send 🎁</button>
                         </div>
                     </div>
 
@@ -332,13 +340,14 @@
     <!-- Sidebar - Gold Background -->
     <aside class="sidebar bg-[#ffd700] text-[#3e2723] border-l-4 border-[#3e2723]">
         <!-- Tabs -->
-        <div class="flex overflow-x-auto bg-[#fcd34d] border-b border-[#3e2723] p-2 gap-2 sticky top-0 z-10 no-scrollbar">
+        <div class="flex flex-wrap bg-[#fcd34d] border-b border-[#3e2723] p-2 gap-1.5 sticky top-0 z-10">
             <button class="tab-btn active px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow bg-[#3e2723] text-[#ffd700]" data-tab="cameras">Cameras</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="studio">Studio</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="community">Community</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="marketplace">Shop</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="profile">Profile</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="council">Council</button>
+            <button class="tab-btn bg-[#3e2723] text-[#ffd700] hover:bg-[#4e342e] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow border border-[#ffd700]" data-tab="admin">🔐 Admin</button>
         </div>
 
         <div id="tab-content" class="p-4 overflow-y-auto flex-1">
@@ -347,7 +356,10 @@
             <div id="cameras-tab" class="tab-pane">
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
                     <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">📹 Producer (Me)</h3>
-                    <video id="producerVideo" autoplay muted playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
+                    <div class="relative">
+                        <video id="producerVideo" autoplay muted playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1.5 py-0.5 font-bold truncate rounded-b" id="producer-name-label">Me</div>
+                    </div>
                 </div>
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
                     <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">🎥 Public Cameras</h3>
@@ -439,7 +451,85 @@
                     </div>
                 </div>
                 
-                 <!-- Billing Info Store -->
+                <!-- ===== BEATS FOR SALE ===== -->
+                <div class="card bg-[#1a1a1a] border border-[#ffd700] p-3 rounded shadow mt-4">
+                    <h2 class="text-xl font-bold mb-1 text-[#ffd700]">🎧 Beats for Sale</h2>
+                    <p class="text-[10px] text-[#bcaaa4] mb-3">WAV only · Instant download after payment</p>
+
+                    <!-- Studio Time Subscription -->
+                    <div class="mb-4 bg-gradient-to-r from-[#ffd700]/10 to-[#ff6b00]/10 border border-[#ffd700] rounded-xl p-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[#ffd700] text-sm font-black">🎙️ Studio Time – $200/mo</p>
+                                <p class="text-white text-xs mt-0.5">Unlock the recorder + free access to all beats</p>
+                                <p class="text-[#bcaaa4] text-[10px] mt-0.5">Monthly subscription · Cancel anytime</p>
+                            </div>
+                            <a href="https://buy.stripe.com/bIY3ccbCo0fc0p2cMX" target="_blank" class="beat-buy-btn bg-gradient-to-r from-[#ffd700] to-[#ff6b00] text-black text-[11px] font-black px-4 py-2 rounded-xl hover:opacity-90 transition whitespace-nowrap">Subscribe</a>
+                        </div>
+                    </div>
+
+                    <!-- Black Label $100 — Beats 1–16 -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-black border border-[#ffd700] text-[#ffd700] text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest">⬛ Black Label</span>
+                            <span class="text-[#ffd700] text-xs font-bold">$500 · WAV</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 1</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 2</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 3</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 4</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 5</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 6</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 7</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 8</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 9</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 10</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 11 – 143 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 12 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 13 – RnB Vibe 130 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 14 – 145.56 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 15 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">Beat 16 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                        </div>
+                    </div>
+
+                    <!-- White Label $200 — Beats 17–22 -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-white border border-[#bcaaa4] text-black text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest">⬜ White Label</span>
+                            <span class="text-white text-xs font-bold">$200 · WAV</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 17</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/dR65kk6i46DAfjW9AM" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 18</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/00g5kkfSE5zwc7KbIV" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $200</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 19</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/8wM3cc21Od1YfjWcN0" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $200</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 20</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/00gfYYaykd1Y4FibIX" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 21</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/28ofYY8qc2nk8Vy28q" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 22</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/6oEcMM21O1jgfjW8wP" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                        </div>
+                    </div>
+
+                    <!-- Special / Exclusive -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-gradient-to-r from-[#ffd700] to-[#ff6b00] text-black text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest">🔥 Special</span>
+                            <span class="text-[#ffd700] text-xs font-bold">Exclusive Rights · WAV</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/50 rounded-lg px-3 py-2">
+                                <div><p class="text-white text-xs font-bold">Drill Beat – Exclusive Rights</p><p class="text-[#ffd700] text-[10px]">Special · WAV Instant Download</p></div>
+                                <a href="#stripe-beat-drill" target="_blank" class="beat-buy-btn bg-gradient-to-r from-[#ffd700] to-[#ff6b00] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:opacity-90 transition">Inquire</a>
+                            </div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/50 rounded-lg px-3 py-2">
+                                <div><p class="text-white text-xs font-bold">Kids Song – Respect And Honesty</p><p class="text-[#ffd700] text-[10px]">Special · WAV Instant Download</p></div>
+                                <a href="https://buy.stripe.com/28odQQ49W7HEgo028x" target="_blank" class="beat-buy-btn bg-gradient-to-r from-[#ffd700] to-[#ff6b00] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:opacity-90 transition">Buy</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-[9px] text-[#8d6e63] mt-3 text-center">⚠️ WAV files delivered via email after payment. No refunds on digital goods.</p>
+                </div>
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-4 mt-4">
                     <h3 class="text-sm font-bold text-[#3e2723] mb-2">💳 Billing Information</h3>
                     <div id="billing-form" class="space-y-2">
@@ -457,7 +547,7 @@
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#3e2723] to-transparent"></div>
                     <img id="profile-avatar" src="https://placehold.co/100x100/ffd700/3e2723?text=User" class="w-24 h-24 rounded-full mx-auto border-4 border-[#3e2723] mb-3 object-cover shadow-xl p-1 bg-[#ffd700]" alt="User profile avatar" title="Profile avatar">
                     <h2 id="profile-name" class="text-xl font-bold text-[#3e2723]">Guest User</h2>
-                    <p id="profile-id" class="text-xs text-[#5d4037] font-mono mb-4 bg-[#ffd700]/20 inline-block px-2 py-1 rounded">ID: ...</p>
+                    <p id="profile-id" class="text-xs text-[#5d4037] font-bold mb-4 bg-[#ffd700]/20 inline-block px-2 py-1 rounded">@Artist</p>
 
                     <!-- Profile Edit Form -->
                     <div id="profile-edit-form" class="text-left space-y-3 border border-[#3e2723] rounded p-3 bg-[#fdf6e3] mb-4">
@@ -526,6 +616,134 @@
                 </div>
             </div>
 
+            <!-- Admin Tab -->
+            <div id="admin-tab" class="tab-pane hidden">
+
+                <!-- PIN Lock Screen -->
+                <div id="admin-lock" class="card bg-[#1a1a1a] border border-[#ffd700] p-6 rounded shadow text-center">
+                    <div class="text-5xl mb-3">🔐</div>
+                    <h2 class="text-xl font-bold text-[#ffd700] mb-1">Admin Access</h2>
+                    <p class="text-[#bcaaa4] text-xs mb-4">SBM Record Label · Authorized Personnel Only</p>
+                    <input type="password" id="admin-pin-input" maxlength="6" placeholder="Enter PIN" class="w-full text-center text-lg tracking-[0.5em] font-bold bg-black border border-[#ffd700] text-[#ffd700] rounded-lg py-2 mb-3 focus:outline-none">
+                    <button id="admin-pin-btn" class="w-full bg-[#ffd700] text-black font-black py-2 rounded-lg hover:bg-[#ffca28] transition">Unlock</button>
+                    <p id="admin-pin-error" class="text-red-400 text-xs mt-2 hidden">Incorrect PIN</p>
+                </div>
+
+                <!-- Admin Dashboard (hidden until PIN correct) -->
+                <div id="admin-dashboard" class="hidden space-y-4">
+
+                    <!-- Header + Balance -->
+                    <div class="card bg-gradient-to-br from-[#1a1a1a] to-[#2a1a00] border border-[#ffd700] p-4 rounded shadow">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h2 class="text-lg font-black text-[#ffd700]">⬛ SBM Record Label</h2>
+                                <p class="text-[#bcaaa4] text-[10px] uppercase tracking-widest">Admin Dashboard</p>
+                            </div>
+                            <button id="admin-lock-btn" class="text-[10px] text-[#8d6e63] hover:text-[#ffd700] border border-[#3e2723] px-2 py-1 rounded">🔒 Lock</button>
+                        </div>
+                        <div class="bg-black/60 border border-[#ffd700]/40 rounded-xl p-4 text-center">
+                            <p class="text-[10px] text-[#bcaaa4] uppercase tracking-widest mb-1">Promotion Budget</p>
+                            <p id="admin-balance" class="text-4xl font-black text-[#ffd700]">$100,000.00</p>
+                            <p class="text-[10px] text-[#8d6e63] mt-1">Record Label Operating Funds</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-3">
+                            <div class="bg-black/40 border border-[#ffd700]/20 rounded-lg p-2 text-center">
+                                <p id="admin-gifts-total" class="text-lg font-black text-[#ffd700]">$0</p>
+                                <p class="text-[9px] text-[#bcaaa4]">Gift Revenue</p>
+                            </div>
+                            <div class="bg-black/40 border border-[#ffd700]/20 rounded-lg p-2 text-center">
+                                <p id="admin-beats-total" class="text-lg font-black text-[#ffd700]">$0</p>
+                                <p class="text-[9px] text-[#bcaaa4]">Beat Sales</p>
+                            </div>
+                            <div class="bg-black/40 border border-[#ffd700]/20 rounded-lg p-2 text-center">
+                                <p id="admin-payroll-total" class="text-lg font-black text-[#ffd700]">$0</p>
+                                <p class="text-[9px] text-[#bcaaa4]">Payroll Out</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gifts Management -->
+                    <div class="card bg-[#1a1a1a] border border-[#ffd700]/40 p-3 rounded shadow">
+                        <h3 class="text-sm font-black text-[#ffd700] mb-2">🎁 Gift Transactions</h3>
+                        <div id="admin-gifts-list" class="space-y-1 max-h-40 overflow-y-auto no-scrollbar text-[10px] text-[#bcaaa4]">
+                            <p class="text-center text-[#5d4037]">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Beats Management -->
+                    <div class="card bg-[#1a1a1a] border border-[#ffd700]/40 p-3 rounded shadow">
+                        <h3 class="text-sm font-black text-[#ffd700] mb-2">🎧 Beat Sales Log</h3>
+                        <div id="admin-beats-list" class="space-y-1 max-h-40 overflow-y-auto no-scrollbar">
+                            <p class="text-[10px] text-[#5d4037] text-center">No beat sales recorded yet.</p>
+                        </div>
+                        <button id="admin-log-beat-btn" class="mt-2 w-full bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">+ Log Beat Sale Manually</button>
+                        <div id="admin-beat-form" class="hidden mt-2 space-y-1">
+                            <input id="admin-beat-name" type="text" placeholder="Beat name" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <input id="admin-beat-buyer" type="text" placeholder="Buyer name / email" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <input id="admin-beat-amount" type="number" placeholder="Amount $" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <button id="admin-beat-save" class="w-full bg-green-700 text-white text-xs font-bold py-1 rounded hover:bg-green-600">Save Sale</button>
+                        </div>
+                    </div>
+
+                    <!-- Recordings -->
+                    <div class="card bg-[#1a1a1a] border border-[#ffd700]/40 p-3 rounded shadow">
+                        <h3 class="text-sm font-black text-[#ffd700] mb-2">🎙️ Recordings</h3>
+                        <div id="admin-recordings-list" class="space-y-1 max-h-40 overflow-y-auto no-scrollbar">
+                            <p class="text-[10px] text-[#5d4037] text-center">No recordings logged yet.</p>
+                        </div>
+                        <button id="admin-log-recording-btn" class="mt-2 w-full bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">+ Log Recording</button>
+                        <div id="admin-recording-form" class="hidden mt-2 space-y-1">
+                            <input id="admin-rec-title" type="text" placeholder="Track / session title" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <input id="admin-rec-artist" type="text" placeholder="Artist name" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <select id="admin-rec-status" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white" title="Recording status">
+                                <option value="recorded">Recorded</option>
+                                <option value="mixing">Mixing</option>
+                                <option value="mastered">Mastered</option>
+                                <option value="released">Released</option>
+                            </select>
+                            <button id="admin-rec-save" class="w-full bg-green-700 text-white text-xs font-bold py-1 rounded hover:bg-green-600">Save</button>
+                        </div>
+                    </div>
+
+                    <!-- Payroll -->
+                    <div class="card bg-[#1a1a1a] border border-[#ffd700]/40 p-3 rounded shadow">
+                        <h3 class="text-sm font-black text-[#ffd700] mb-2">💸 Payroll</h3>
+                        <div id="admin-payroll-list" class="space-y-1 max-h-40 overflow-y-auto no-scrollbar">
+                            <p class="text-[10px] text-[#5d4037] text-center">No payroll entries yet.</p>
+                        </div>
+                        <button id="admin-log-payroll-btn" class="mt-2 w-full bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">+ Add Payroll Entry</button>
+                        <div id="admin-payroll-form" class="hidden mt-2 space-y-1">
+                            <input id="admin-pay-name" type="text" placeholder="Artist / employee name" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <input id="admin-pay-role" type="text" placeholder="Role (Producer, Engineer…)" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <input id="admin-pay-amount" type="number" placeholder="Amount $" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <button id="admin-pay-save" class="w-full bg-green-700 text-white text-xs font-bold py-1 rounded hover:bg-green-600">Pay Out</button>
+                        </div>
+                    </div>
+
+                    <!-- Recruiting -->
+                    <div class="card bg-[#1a1a1a] border border-[#ffd700]/40 p-3 rounded shadow">
+                        <h3 class="text-sm font-black text-[#ffd700] mb-2">🎤 Recruiting</h3>
+                        <div id="admin-recruits-list" class="space-y-1 max-h-40 overflow-y-auto no-scrollbar">
+                            <p class="text-[10px] text-[#5d4037] text-center">No recruits added yet.</p>
+                        </div>
+                        <button id="admin-log-recruit-btn" class="mt-2 w-full bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">+ Add Recruit</button>
+                        <div id="admin-recruit-form" class="hidden mt-2 space-y-1">
+                            <input id="admin-rec-name" type="text" placeholder="Artist name" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <input id="admin-rec-genre" type="text" placeholder="Genre / style" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <input id="admin-rec-contact" type="text" placeholder="Contact / social" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white">
+                            <select id="admin-rec-stage" class="w-full text-xs p-1.5 rounded bg-black border border-[#ffd700]/40 text-white" title="Recruit stage">
+                                <option value="prospect">Prospect</option>
+                                <option value="auditioned">Auditioned</option>
+                                <option value="signed">Signed</option>
+                                <option value="passed">Passed</option>
+                            </select>
+                            <button id="admin-recruit-save" class="w-full bg-green-700 text-white text-xs font-bold py-1 rounded hover:bg-green-600">Save Recruit</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </aside>
 
@@ -550,7 +768,72 @@
         </div>
     </div>
 
+    <!-- Profile Gate Modal — shown when user tries to go live without a complete profile -->
+    <div id="profile-gate-modal" class="fixed inset-0 z-[200] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-[#3e2723] border-2 border-[#ffd700] rounded-2xl p-7 max-w-sm w-full text-center shadow-2xl">
+            <div class="text-5xl mb-3">🎤</div>
+            <h2 class="text-2xl font-bold text-[#ffd700] mb-1">Going Live?</h2>
+            <p class="text-[#bcaaa4] text-sm mb-5">Set up your artist profile so everyone knows who's on screen.</p>
+
+            <!-- Google one-click -->
+            <button id="gate-google-btn" class="w-full bg-white text-gray-800 font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition mb-4">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
+                Sign in with Google (fills name &amp; photo automatically)
+            </button>
+
+            <div class="flex items-center text-[#d4af37] text-xs mb-4 gap-2">
+                <hr class="flex-1 border-[#5d4037]"><span>OR enter manually</span><hr class="flex-1 border-[#5d4037]">
+            </div>
+
+            <!-- Manual fields -->
+            <div class="space-y-3 text-left mb-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-[#fcd34d] uppercase mb-1">Artist Name <span class="text-red-400">*</span></label>
+                    <input id="gate-name-input" type="text" placeholder="Your stage name…" maxlength="40"
+                        class="w-full text-sm p-2.5 rounded-lg bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-[#fcd34d] uppercase mb-1">Profile Photo URL <span class="text-red-400">*</span></label>
+                    <input id="gate-avatar-input" type="url" placeholder="https://i.imgur.com/…"
+                        class="w-full text-sm p-2.5 rounded-lg bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
+                    <p class="text-[9px] text-[#8d6e63] mt-1">Direct image link (Imgur, etc.). Required to go live.</p>
+                </div>
+            </div>
+
+            <p id="gate-error" class="text-red-400 text-xs mb-3 hidden"></p>
+
+            <div class="flex gap-2">
+                <button id="gate-cancel-btn" class="flex-1 bg-[#5d4037] text-[#bcaaa4] font-bold py-2 rounded-lg text-sm hover:bg-[#4e342e]">Cancel</button>
+                <button id="gate-save-btn" class="flex-1 bg-[#ffd700] text-[#3e2723] font-bold py-2 rounded-lg text-sm hover:bg-[#ffca28] transition">💾 Save &amp; Go Live</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gift Video Overlay — plays over the big screen when a gift is sent/received -->
+    <div id="gift-video-overlay" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/70 pointer-events-none">
+        <div class="relative max-w-lg w-full mx-4">
+            <video id="gift-video-player" class="w-full rounded-2xl shadow-2xl border-4 border-[#ffd700]" autoplay muted playsinline></video>
+            <div id="gift-video-label" class="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-bold drop-shadow-lg"></div>
+        </div>
+    </div>
+
     <script type="module">
+        // --- INTRO SPLASH ---
+        (function() {
+            const splash = document.getElementById('intro-splash');
+            const vid    = document.getElementById('intro-video');
+            vid.src = 'gifts/preview video for SBM mafia(gift).mp4';
+            function closeSplash() {
+                splash.classList.add('fading');
+                setTimeout(() => splash.remove(), 1000);
+            }
+            window.closeSplash = closeSplash;
+            vid.onended = closeSplash;
+            vid.onerror = closeSplash;
+            // Auto-close after 30s max as safety fallback
+            setTimeout(closeSplash, 30000);
+        })();
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, linkWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initializeFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -574,6 +857,7 @@
         let localStream = null;
         let peer = null;
         let currentCall = null; // Store active call for screen sharing
+        let activePerformerUid = null; // UID of whoever is on the big screen
         let openAIKey = localStorage.getItem('openai_key') || localStorage.getItem('gemini_key') || '';
         let pendingPurchase = null; // Stores gift info while waiting for confirmation
         let selectedGiftToSend = null;
@@ -1074,6 +1358,45 @@ End with one short elegant line that feels like a signature approval, insight, o
             stage.classList.toggle('performing', isPerforming);
         }
 
+        // --- GIFT VIDEOS — only files with (gift) in the name, cycled per gift type ---
+        const GIFT_VIDEOS = {
+            rose:      ['gifts/BabyRaysLEANA(gift).mp4', 'gifts/FirstLadyGhost(gift).mp4', 'gifts/AntonioRYarboughinstudio(gift).mp4'],
+            heart:     ['gifts/MultiBabyRays(gift).mp4', 'gifts/Da_Cru_Soldier_Bangah(gift).mp4', 'gifts/AIAntonioBOSS(gift).mp4'],
+            champagne: ['gifts/BabyRayinRedCar(gift).mp4', 'gifts/PoliceHelicopterCHASE(Gift).mp4'],
+            star:      ['gifts/KingAntonio(gift).mp4', 'gifts/BabyRayon bike(gift).mp4', 'gifts/preview video for SBM mafia(gift).mp4']
+        };
+        const _giftVideoIdx = { rose: 0, heart: 0, champagne: 0, star: 0 };
+
+        function playGiftVideo(giftId, senderName, giftName) {
+            const list = GIFT_VIDEOS[giftId] || Object.values(GIFT_VIDEOS).flat();
+            const idx  = (_giftVideoIdx[giftId] || 0) % list.length;
+            _giftVideoIdx[giftId] = idx + 1;
+            const src  = list[idx];
+            const overlay = document.getElementById('gift-video-overlay');
+            const player  = document.getElementById('gift-video-player');
+            const label   = document.getElementById('gift-video-label');
+
+            label.textContent = `🎁 ${senderName} sent a ${giftName || giftId}!`;
+            player.src = src;
+            overlay.classList.remove('hidden', 'hide');
+            overlay.classList.add('show');
+            player.play().catch(() => {});
+
+            function closeOverlay() {
+                overlay.classList.remove('show');
+                overlay.classList.add('hide');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('hide');
+                    player.src = '';
+                }, 500);
+            }
+            player.onended = closeOverlay;
+            // Safety fallback: close after 15s if video stalls
+            const fallback = setTimeout(closeOverlay, 15000);
+            player.onended = () => { clearTimeout(fallback); closeOverlay(); };
+        }
+
         // --- AUTH ---
         const authContainer = document.getElementById('auth-container');
         let chatUnsub = null;
@@ -1092,8 +1415,18 @@ End with one short elegant line that feels like a signature approval, insight, o
             if (user) {
                 userId = user.uid;
                 authContainer.classList.add('hidden');
-                document.getElementById('profile-id').textContent = `ID: ${userId.slice(0,8)}...`;
+                document.getElementById('profile-id').textContent = `@${getProfileDisplayName(user)}`;
                 document.getElementById('profile-name').textContent = getProfileDisplayName(user);
+                document.getElementById('producer-name-label').textContent = getProfileDisplayName(user);
+
+                // If Google user, auto-populate avatar from Google photo if not already set
+                if (user.photoURL) {
+                    const currentAvatar = document.getElementById('profile-avatar').src;
+                    if (currentAvatar.includes('placehold.co')) {
+                        document.getElementById('profile-avatar').src = user.photoURL;
+                    }
+                }
+
                 await loadProfile(); // load saved name/avatar from Firestore
                 updatePresence();
                 initPeer();
@@ -1110,8 +1443,7 @@ End with one short elegant line that feels like a signature approval, insight, o
             }
         });
 
-        // Auto sign-in anonymously so the app works without manual login
-        signInAnonymously(auth).catch(e => console.warn('Auto sign-in:', e.message));
+        // NOTE: No auto-anonymous sign-in — users must choose how to sign in
 
         // Auth Buttons
         document.getElementById('guest-btn').onclick = () => signInAnonymously(auth).catch(e => alert(e.message));
@@ -1157,7 +1489,136 @@ End with one short elegant line that feels like a signature approval, insight, o
 
         updateCouncilMentorUI();
 
-        // --- BILLING & INVENTORY ---
+        // --- ADMIN PANEL ---
+        const ADMIN_PIN = '4321'; // Change this to your preferred PIN
+        const ADMIN_DB  = (path) => ['artifacts', 'studio-2fb13', 'public', 'data', 'admin', ...path.split('/')];
+
+        function adminRow(fields, deleteId, collection) {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between bg-black/40 border border-[#ffd700]/10 rounded px-2 py-1 text-[10px] text-white gap-1';
+            div.innerHTML = `<span class="flex-1">${fields}</span><button data-id="${deleteId}" data-col="${collection}" class="admin-del-btn text-red-400 hover:text-red-300 ml-1">✕</button>`;
+            return div;
+        }
+
+        async function loadAdminData() {
+            // Gifts from Firestore
+            const giftsSnap = await getDocs(query(collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'sent_gifts'), orderBy('timestamp', 'desc'), limit(50)));
+            const giftsList = document.getElementById('admin-gifts-list');
+            giftsList.innerHTML = '';
+            let giftTotal = 0;
+            const GIFT_PRICES = { rose: 5, heart: 10, champagne: 15, star: 20 };
+            giftsSnap.forEach(d => {
+                const g = d.data();
+                const amt = GIFT_PRICES[g.giftId] || 0;
+                giftTotal += amt;
+                const ts = g.timestamp?.toDate ? g.timestamp.toDate().toLocaleDateString() : '';
+                giftsList.appendChild(adminRow(`${ts} · <b>${g.senderName || '?'}</b> → ${g.giftName} ($${amt})`, d.id, 'sent_gifts'));
+            });
+            if (!giftsSnap.size) giftsList.innerHTML = '<p class="text-center text-[#5d4037]">No gifts yet.</p>';
+            document.getElementById('admin-gifts-total').textContent = '$' + giftTotal;
+
+            // Beats, Recordings, Payroll, Recruits from local admin collection
+            const adminCols = [
+                { id: 'beats',      listId: 'admin-beats-list',      totalId: 'admin-beats-total', amtField: 'amount', renderFn: d => `${d.date || ''} · <b>${d.beat}</b> → ${d.buyer} ($${d.amount})` },
+                { id: 'recordings', listId: 'admin-recordings-list',  totalId: null,                amtField: null,      renderFn: d => `<b>${d.title}</b> · ${d.artist} [${d.status}]` },
+                { id: 'payroll',    listId: 'admin-payroll-list',     totalId: 'admin-payroll-total', amtField: 'amount', renderFn: d => `${d.date || ''} · <b>${d.name}</b> (${d.role}) -$${d.amount}` },
+                { id: 'recruits',   listId: 'admin-recruits-list',    totalId: null,                amtField: null,      renderFn: d => `<b>${d.name}</b> · ${d.genre} · ${d.stage} · ${d.contact}` },
+            ];
+            for (const col of adminCols) {
+                const snap = await getDocs(collection(db, ...ADMIN_DB(col.id)));
+                const listEl = document.getElementById(col.listId);
+                listEl.innerHTML = '';
+                let total = 0;
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (col.amtField) total += Number(data[col.amtField] || 0);
+                    listEl.appendChild(adminRow(col.renderFn(data), d.id, col.id));
+                });
+                if (!snap.size) listEl.innerHTML = `<p class="text-[10px] text-[#5d4037] text-center">No entries yet.</p>`;
+                if (col.totalId) document.getElementById(col.totalId).textContent = '$' + total;
+            }
+
+            // Update balance
+            const payrollTotal = Number(document.getElementById('admin-payroll-total').textContent.replace('$','') || 0);
+            document.getElementById('admin-balance').textContent = '$' + (100000 - payrollTotal).toLocaleString('en-US', {minimumFractionDigits: 2});
+        }
+
+        document.getElementById('admin-pin-btn').onclick = () => {
+            const pin = document.getElementById('admin-pin-input').value;
+            if (pin === ADMIN_PIN) {
+                document.getElementById('admin-lock').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.getElementById('admin-pin-error').classList.add('hidden');
+                loadAdminData();
+            } else {
+                document.getElementById('admin-pin-error').classList.remove('hidden');
+                document.getElementById('admin-pin-input').value = '';
+            }
+        };
+        document.getElementById('admin-pin-input').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('admin-pin-btn').click(); });
+
+        document.getElementById('admin-lock-btn').onclick = () => {
+            document.getElementById('admin-lock').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('admin-pin-input').value = '';
+        };
+
+        // Toggle forms
+        ['beat','recording','payroll','recruit'].forEach(type => {
+            const map = { beat: 'log-beat', recording: 'log-recording', payroll: 'log-payroll', recruit: 'log-recruit' };
+            document.getElementById(`admin-${map[type]}-btn`).onclick = () => {
+                document.getElementById(`admin-${type}-form`).classList.toggle('hidden');
+            };
+        });
+
+        // Save beat sale
+        document.getElementById('admin-beat-save').onclick = async () => {
+            const data = { beat: document.getElementById('admin-beat-name').value, buyer: document.getElementById('admin-beat-buyer').value, amount: document.getElementById('admin-beat-amount').value, date: new Date().toLocaleDateString() };
+            if (!data.beat || !data.amount) return;
+            await addDoc(collection(db, ...ADMIN_DB('beats')), { ...data, timestamp: serverTimestamp() });
+            document.getElementById('admin-beat-form').classList.add('hidden');
+            loadAdminData();
+        };
+
+        // Save recording
+        document.getElementById('admin-rec-save').onclick = async () => {
+            const data = { title: document.getElementById('admin-rec-title').value, artist: document.getElementById('admin-rec-artist').value, status: document.getElementById('admin-rec-status').value };
+            if (!data.title) return;
+            await addDoc(collection(db, ...ADMIN_DB('recordings')), { ...data, timestamp: serverTimestamp() });
+            document.getElementById('admin-recording-form').classList.add('hidden');
+            loadAdminData();
+        };
+
+        // Save payroll
+        document.getElementById('admin-pay-save').onclick = async () => {
+            const data = { name: document.getElementById('admin-pay-name').value, role: document.getElementById('admin-pay-role').value, amount: document.getElementById('admin-pay-amount').value, date: new Date().toLocaleDateString() };
+            if (!data.name || !data.amount) return;
+            await addDoc(collection(db, ...ADMIN_DB('payroll')), { ...data, timestamp: serverTimestamp() });
+            document.getElementById('admin-payroll-form').classList.add('hidden');
+            loadAdminData();
+        };
+
+        // Save recruit
+        document.getElementById('admin-recruit-save').onclick = async () => {
+            const data = { name: document.getElementById('admin-rec-name').value, genre: document.getElementById('admin-rec-genre').value, contact: document.getElementById('admin-rec-contact').value, stage: document.getElementById('admin-rec-stage').value };
+            if (!data.name) return;
+            await addDoc(collection(db, ...ADMIN_DB('recruits')), { ...data, timestamp: serverTimestamp() });
+            document.getElementById('admin-recruit-form').classList.add('hidden');
+            loadAdminData();
+        };
+
+        // Delete rows
+        document.addEventListener('click', async e => {
+            if (!e.target.classList.contains('admin-del-btn')) return;
+            const id  = e.target.dataset.id;
+            const col = e.target.dataset.col;
+            if (!confirm('Delete this entry?')) return;
+            const colRef = col === 'sent_gifts'
+                ? collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'sent_gifts')
+                : collection(db, ...ADMIN_DB(col));
+            await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(m => m.deleteDoc(m.doc(colRef, id)));
+            loadAdminData();
+        });
         document.getElementById('save-billing-btn').onclick = async () => {
             if(!userId) return;
             const info = {
@@ -1317,12 +1778,116 @@ End with one short elegant line that feels like a signature approval, insight, o
         document.getElementById('confirm-send-btn').onclick = async () => {
             await doSendGift(document.getElementById('wallet-recipient-select').value);
         };
-        document.getElementById('confirm-send-overlay').onclick = async () => {
-            await doSendGift(document.getElementById('wallet-recipient-overlay').value);
-        };
+
+        // Overlay gift buttons — send instantly to whoever is on the big screen
+        document.querySelectorAll('.overlay-gift-btn').forEach(btn => {
+            btn.onclick = async () => {
+                if (!userId) return alert('Sign in first');
+                if (!activePerformerUid) {
+                    addMessage('System', 'Call a performer to the big screen first, then send a gift!');
+                    return;
+                }
+                // Open Stripe payment in new tab
+                window.open(btn.dataset.link, '_blank');
+                // After Stripe, record the gift send directly to the performer on screen
+                const giftInfo = { id: btn.dataset.id, name: btn.dataset.name };
+                // Small flash on button
+                btn.classList.add('ring-2', 'ring-[#ffd700]');
+                setTimeout(() => btn.classList.remove('ring-2', 'ring-[#ffd700]'), 800);
+                // Write to Firestore sent_gifts (payment assumed completed via Stripe)
+                await addDoc(collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'sent_gifts'), {
+                    giftId: giftInfo.id,
+                    recipientId: activePerformerUid,
+                    senderId: userId,
+                    senderName: document.getElementById('profile-name').textContent,
+                    giftName: giftInfo.name,
+                    timestamp: serverTimestamp()
+                });
+                addMessage('System', `🎁 Sent ${giftInfo.name} to performer!`);
+                playGiftVideo(giftInfo.id, document.getElementById('profile-name').textContent, giftInfo.name);
+            };
+        });
+
+        // --- PROFILE GATE ---
+        function isProfileComplete() {
+            const name = document.getElementById('profile-name').textContent.trim();
+            const avatar = document.getElementById('profile-avatar').src;
+            const nameOk = name && name !== 'Guest User' && name.length > 0;
+            const avatarOk = avatar && !avatar.includes('placehold.co');
+            return nameOk && avatarOk;
+        }
+
+        function showProfileGate(onComplete) {
+            const modal = document.getElementById('profile-gate-modal');
+            modal.classList.remove('hidden');
+
+            // Pre-fill with existing values
+            document.getElementById('gate-name-input').value =
+                document.getElementById('edit-name-input').value ||
+                document.getElementById('profile-name').textContent.replace('Guest User','').trim();
+            document.getElementById('gate-avatar-input').value =
+                document.getElementById('edit-avatar-input').value || '';
+            document.getElementById('gate-error').classList.add('hidden');
+
+            document.getElementById('gate-cancel-btn').onclick = () => modal.classList.add('hidden');
+
+            document.getElementById('gate-google-btn').onclick = async () => {
+                try {
+                    const result = await signInWithPopup(auth, new GoogleAuthProvider());
+                    const gUser = result.user;
+                    // Auto-save Google profile
+                    const profileData = {
+                        name: gUser.displayName || gUser.email,
+                        imageUrl: gUser.photoURL || '',
+                        updatedAt: serverTimestamp()
+                    };
+                    await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'users', gUser.uid, 'profile', 'main'), profileData, { merge: true });
+                    await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'directory', gUser.uid), { name: profileData.name }, { merge: true });
+                    document.getElementById('profile-name').textContent = profileData.name;
+                    document.getElementById('profile-id').textContent = `@${profileData.name}`;
+                    document.getElementById('producer-name-label').textContent = profileData.name;
+                    if (profileData.imageUrl) document.getElementById('profile-avatar').src = profileData.imageUrl;
+                    document.getElementById('edit-name-input').value = profileData.name;
+                    document.getElementById('edit-avatar-input').value = profileData.imageUrl;
+                    modal.classList.add('hidden');
+                    if (onComplete) onComplete();
+                } catch(e) {
+                    document.getElementById('gate-error').textContent = e.message;
+                    document.getElementById('gate-error').classList.remove('hidden');
+                }
+            };
+
+            document.getElementById('gate-save-btn').onclick = async () => {
+                const nameVal = document.getElementById('gate-name-input').value.trim();
+                const avatarRaw = document.getElementById('gate-avatar-input').value.trim();
+                const avatarVal = normalizeImageUrl(avatarRaw);
+                const errEl = document.getElementById('gate-error');
+
+                if (!nameVal) { errEl.textContent = 'Artist name is required.'; errEl.classList.remove('hidden'); return; }
+                if (!avatarVal) { errEl.textContent = 'Profile photo URL is required.'; errEl.classList.remove('hidden'); return; }
+                errEl.classList.add('hidden');
+
+                // Save to Firestore
+                const profileData = { name: nameVal, imageUrl: avatarVal, updatedAt: serverTimestamp() };
+                await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'users', userId, 'profile', 'main'), profileData, { merge: true });
+                await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'directory', userId), { name: nameVal }, { merge: true });
+
+                document.getElementById('profile-name').textContent = nameVal;
+                document.getElementById('profile-avatar').src = avatarVal;
+                document.getElementById('edit-name-input').value = nameVal;
+                document.getElementById('edit-avatar-input').value = avatarVal;
+
+                modal.classList.add('hidden');
+                if (onComplete) onComplete();
+            };
+        }
 
         // --- VIDEO / PEER ---
         async function startCamera() {
+            if (!isProfileComplete()) {
+                showProfileGate(() => startCamera());
+                return;
+            }
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 document.getElementById('producerVideo').srcObject = localStream;
@@ -1348,25 +1913,33 @@ End with one short elegant line that feels like a signature approval, insight, o
         async function startScreenShare() {
             try {
                 const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                const screenTrack = screenStream.getVideoTracks()[0];
-                
-                // Update Local View
+                const screenVideoTrack = screenStream.getVideoTracks()[0];
+                const screenAudioTrack = screenStream.getAudioTracks()[0];
+
+                // Update local preview
                 document.getElementById('producerVideo').srcObject = screenStream;
-                
-                // If in a call, replace the video track
+
+                // If in a call, replace video track AND audio track (if screen audio available, else keep mic)
                 if (currentCall && currentCall.peerConnection) {
-                    const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
-                    if(sender) sender.replaceTrack(screenTrack);
+                    const senders = currentCall.peerConnection.getSenders();
+                    const videoSender = senders.find(s => s.track && s.track.kind === 'video');
+                    const audioSender = senders.find(s => s.track && s.track.kind === 'audio');
+                    if (videoSender) videoSender.replaceTrack(screenVideoTrack);
+                    if (audioSender && screenAudioTrack) audioSender.replaceTrack(screenAudioTrack);
                 }
 
-                // Handle "Stop Sharing" from browser UI
-                screenTrack.onended = () => {
+                // When browser "Stop Sharing" is clicked, revert to camera + mic
+                screenVideoTrack.onended = () => {
                     if (localStream) {
                         const camTrack = localStream.getVideoTracks()[0];
+                        const micTrack = localStream.getAudioTracks()[0];
                         document.getElementById('producerVideo').srcObject = localStream;
                         if (currentCall && currentCall.peerConnection) {
-                             const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
-                             if(sender) sender.replaceTrack(camTrack);
+                            const senders = currentCall.peerConnection.getSenders();
+                            const videoSender = senders.find(s => s.track && s.track.kind === 'video');
+                            const audioSender = senders.find(s => s.track && s.track.kind === 'audio');
+                            if (videoSender && camTrack) videoSender.replaceTrack(camTrack);
+                            if (audioSender && micTrack) audioSender.replaceTrack(micTrack);
                         }
                     }
                 };
@@ -1409,6 +1982,7 @@ End with one short elegant line that feels like a signature approval, insight, o
             call.on('stream', remoteStream => {
                 const vid = document.getElementById('performerVideo');
                 vid.srcObject = remoteStream;
+                vid.play().catch(() => {});
                 vid.classList.remove('hidden');
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('hangup-call-btn').classList.remove('hidden');
@@ -1466,13 +2040,18 @@ End with one short elegant line that feels like a signature approval, insight, o
                 if (!localStream) return alert('Enable your camera first');
                 const call = peer.call(tile.dataset.peerId, localStream);
                 currentCall = call;
+                activePerformerUid = uid; // track who's on screen
                 call.on('stream', s => {
                     // Small tile preview
                     vid.srcObject = s;
+                    vid.play().catch(() => {});
                     // Big screen (main stage)
                     bigScreen.srcObject = s;
+                    bigScreen.play().catch(() => {});
                     document.getElementById('performer-placeholder').classList.add('hidden');
                     document.getElementById('hangup-call-btn').classList.remove('hidden');
+                    // Update gift overlay label
+                    document.getElementById('gift-performer-label').textContent = `🎁 → ${data.name || 'Performer'}`;
                     document.getElementById('hangup-call-btn').onclick = () => {
                         call.close();
                         vid.srcObject = null;
@@ -1483,6 +2062,8 @@ End with one short elegant line that feels like a signature approval, insight, o
                         callBtn.textContent = '📞 Call';
                         callBtn.classList.replace('bg-red-700', 'bg-green-700');
                         currentCall = null;
+                        activePerformerUid = null;
+                        document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     };
                 });
                 callBtn.textContent = '🔴 Live';
@@ -1584,26 +2165,11 @@ End with one short elegant line that feels like a signature approval, insight, o
 
             // Gift Received Listener
             giftsUnsub = onSnapshot(query(collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'sent_gifts'), orderBy('timestamp', 'desc'), limit(1)), (snap) => {
-                snap.docChanges().forEach(async change => {
-                    if(change.type === 'added' && change.doc.data().recipientId === userId && !change.doc.metadata.hasPendingWrites) {
+                snap.docChanges().forEach(change => {
+                    if (change.type === 'added' && change.doc.data().recipientId === userId && !change.doc.metadata.hasPendingWrites) {
                         const gift = change.doc.data();
-                        const overlay = document.getElementById('gift-overlay');
-                        const vid = document.getElementById('gift-video');
-                        const senderTitle = document.getElementById('gift-sender');
-                        
-                        senderTitle.textContent = `${gift.senderName || 'Someone'} sent a gift!`;
-                        overlay.classList.remove('hidden');
-                        
-                        let videoUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; 
-                        try {
-                            const assetDoc = await getDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'assets', 'config'));
-                            if(assetDoc.exists() && assetDoc.data()[gift.giftId]) {
-                                videoUrl = assetDoc.data()[gift.giftId];
-                            }
-                        } catch(e) {}
-                        
-                        vid.src = videoUrl;
-                        vid.play();
+                        playGiftVideo(gift.giftId, gift.senderName || 'Someone', gift.giftName || gift.giftId);
+                        addMessage('System', `🎁 ${gift.senderName || 'Someone'} sent you a ${gift.giftName || gift.giftId}!`);
                     }
                 });
             }, (error) => console.log("Gift listener error:", error));
@@ -1674,7 +2240,12 @@ End with one short elegant line that feels like a signature approval, insight, o
             setTimeout(() => status.classList.add('hidden'), 2500);
         };
 
-        document.getElementById('edit-profile-btn')?.remove(); // remove old button if present
+        // Helper — update all name display labels atomically
+        function applyProfileName(name) {
+            document.getElementById('profile-name').textContent = name;
+            document.getElementById('profile-id').textContent = `@${name}`;
+            document.getElementById('producer-name-label').textContent = name;
+        }
 
     </script>
 </body>
