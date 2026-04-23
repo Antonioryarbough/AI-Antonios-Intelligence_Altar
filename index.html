@@ -1002,6 +1002,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 document.getElementById('profile-name').textContent = user.displayName || 'Guest Artist';
                 updatePresence();
                 initPeer();
+                listenForCameras();
                 loadInventory(); // This sets inventoryUnsub
                 loadBillingInfo();
                 setupGlobalListeners(); // This sets chatUnsub and giftsUnsub
@@ -1015,6 +1016,9 @@ End with one short elegant line that feels like a signature approval, insight, o
                 if(inventoryUnsub) inventoryUnsub();
             }
         });
+
+        // Auto sign-in anonymously so the app works without manual login
+        signInAnonymously(auth).catch(e => console.warn('Auto sign-in:', e.message));
 
         // Auth Buttons
         document.getElementById('guest-btn').onclick = () => signInAnonymously(auth).catch(e => alert(e.message));
@@ -1221,10 +1225,19 @@ End with one short elegant line that feels like a signature approval, insight, o
         async function startCamera() {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById('localVideo').srcObject = localStream;
-                document.getElementById('video-placeholder').classList.add('hidden');
+                document.getElementById('producerVideo').srcObject = localStream;
+                document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('enable-camera-btn').textContent = "Camera On";
                 document.getElementById('enable-camera-btn').classList.add('bg-green-800', 'text-green-100');
+                // Publish camera to Firestore so other users can see + call us
+                if (userId) {
+                    setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', userId), {
+                        peerId: peer?.id || null,
+                        name: document.getElementById('profile-name').textContent,
+                        active: true,
+                        timestamp: serverTimestamp()
+                    }, { merge: true });
+                }
             } catch(e) { alert("Camera failed: " + e.message); }
         }
         document.getElementById('enable-camera-btn').onclick = startCamera;
@@ -1235,7 +1248,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 const screenTrack = screenStream.getVideoTracks()[0];
                 
                 // Update Local View
-                document.getElementById('localVideo').srcObject = screenStream;
+                document.getElementById('producerVideo').srcObject = screenStream;
                 
                 // If in a call, replace the video track
                 if (currentCall && currentCall.peerConnection) {
@@ -1247,7 +1260,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 screenTrack.onended = () => {
                     if (localStream) {
                         const camTrack = localStream.getVideoTracks()[0];
-                        document.getElementById('localVideo').srcObject = localStream;
+                        document.getElementById('producerVideo').srcObject = localStream;
                         if (currentCall && currentCall.peerConnection) {
                              const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
                              if(sender) sender.replaceTrack(camTrack);
@@ -1281,7 +1294,7 @@ End with one short elegant line that feels like a signature approval, insight, o
 
         function setupCall(call) {
             call.on('stream', remoteStream => {
-                const vid = document.getElementById('remoteVideo');
+                const vid = document.getElementById('performerVideo');
                 vid.srcObject = remoteStream;
                 vid.classList.remove('hidden');
                 document.getElementById('hangup-call-btn').classList.remove('hidden');
@@ -1291,6 +1304,55 @@ End with one short elegant line that feels like a signature approval, insight, o
                     currentCall = null;
                 };
             });
+        }
+
+        // --- PUBLIC CAMERAS ---
+        function listenForCameras() {
+            const camerasRef = collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras');
+            onSnapshot(camerasRef, (snap) => {
+                snap.docChanges().forEach(change => {
+                    const uid = change.doc.id;
+                    if (change.type === 'removed') {
+                        document.getElementById(`cam-tile-${uid}`)?.remove();
+                        return;
+                    }
+                    const d = change.doc.data();
+                    if (uid === userId) return; // skip self
+                    if (!d.active || !d.peerId) return;
+                    renderCameraTile(uid, d);
+                });
+            });
+        }
+
+        function renderCameraTile(uid, data) {
+            const container = document.getElementById('public-cameras-list');
+            let tile = document.getElementById(`cam-tile-${uid}`);
+            if (!tile) {
+                tile = document.createElement('div');
+                tile.id = `cam-tile-${uid}`;
+                tile.className = 'relative aspect-video bg-black rounded overflow-hidden border border-[#3e2723]';
+                tile.innerHTML = `
+                    <video autoplay playsinline class="w-full h-full object-cover"></video>
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1 py-0.5 font-bold truncate">${data.name || 'Artist'}</div>
+                    <button class="call-btn absolute top-1 right-1 bg-green-700 text-white text-[10px] px-1.5 py-0.5 rounded shadow">📞 Call</button>
+                `;
+                container.appendChild(tile);
+            }
+            const vid = tile.querySelector('video');
+            const callBtn = tile.querySelector('.call-btn');
+            callBtn.onclick = () => {
+                if (!localStream) return alert('Enable your camera first');
+                const call = peer.call(data.peerId, localStream);
+                call.on('stream', s => { vid.srcObject = s; });
+                callBtn.textContent = '🔴 Live';
+                callBtn.classList.replace('bg-green-700', 'bg-red-700');
+                callBtn.onclick = () => {
+                    call.close();
+                    vid.srcObject = null;
+                    callBtn.textContent = '📞 Call';
+                    callBtn.classList.replace('bg-red-700', 'bg-green-700');
+                };
+            };
         }
 
         // --- CHAT & AI ---
