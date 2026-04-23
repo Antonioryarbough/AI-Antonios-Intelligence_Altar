@@ -27,7 +27,23 @@
         .tab-pane { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .chat-message { margin-bottom: 8px; line-height: 1.4; font-size: 0.9rem; }
+        /* hide scrollbars but keep scrollability */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* overlay chat messages — subtitle style */
+        .chat-message {
+            display: inline-block;
+            margin-bottom: 4px;
+            line-height: 1.4;
+            font-size: 0.78rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.25);
+            border-radius: 6px;
+            padding: 2px 6px;
+            max-width: 100%;
+            word-break: break-word;
+        }
         
         /* Video JS Customization */
         .video-js .vjs-control-bar { background: rgba(62, 39, 35, 0.9); }
@@ -230,21 +246,7 @@
     <!-- Main App Area -->
 
     <div class="flex h-full">
-        <!-- Sidebar: Producer and Public Cameras -->
-        <aside class="flex flex-col w-[350px] min-w-[300px] max-w-[400px] bg-[#ffd700] text-[#3e2723] border-r-4 border-[#3e2723] p-2 z-30">
-            <div class="mb-4">
-                <h3 class="text-xs font-bold uppercase mb-2">Producer (Me)</h3>
-                <video id="producerVideo" autoplay muted playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
-            </div>
-            <div class="mb-2">
-                <h4 class="text-xs font-bold uppercase mb-1">Public Cameras</h4>
-                <div id="public-cameras-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-                    <!-- Tiles for public cameras will be injected here -->
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content: Performer Camera -->
+        <!-- Main Content: Performer Camera (full width, no sidebar eating space) -->
         <div class="flex-1 flex flex-col p-4 relative">
             <div class="flex items-center justify-between mb-4 bg-[#3e2723] p-3 rounded-lg shadow-lg border border-[#ffd700] z-10">
                 <div class="flex gap-2">
@@ -264,10 +266,62 @@
                     <div class="text-6xl mb-4">🎤</div>
                     <p class="font-mono uppercase tracking-widest text-[#8d6e63]">Select a Performer</p>
                 </div>
-                <!-- Gift Box Chat Area -->
-                <div id="gift-box-chat" class="absolute bottom-0 left-0 right-0 p-4 z-20 flex flex-col justify-end h-1/4 bg-gradient-to-t from-[#2e2015] via-[#2e2015]/60 to-transparent">
-                    <div id="gift-messages" class="flex-1 overflow-y-auto mb-2 space-y-1 pr-2"></div>
+                <!-- Hangup button — shown only during an active call -->
+                <button id="hangup-call-btn" class="hidden absolute top-3 right-3 z-30 bg-red-700 hover:bg-red-600 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg border border-red-900">📵 Hang Up</button>
+
+                <!-- LIVE OVERLAY: chat left, gifts right — sits over video, no solid bg -->
+                <div class="absolute inset-x-0 bottom-0 z-20 flex items-end gap-3 p-3 pointer-events-none" style="height:55%">
+
+                    <!-- Chat column -->
+                    <div class="flex flex-col flex-1 h-full pointer-events-auto">
+                        <!-- Messages scroll area -->
+                        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-1 pr-1 mb-2 no-scrollbar"></div>
+                        <!-- Input row -->
+                        <div class="flex gap-1">
+                            <input id="chat-input" type="text" placeholder="say something…" maxlength="200"
+                                class="flex-1 bg-black/40 text-white placeholder-white/40 text-xs rounded-full px-3 py-1.5 border border-white/20 outline-none focus:border-[#ffd700]/60">
+                            <button id="send-chat-btn"
+                                class="bg-[#ffd700]/80 hover:bg-[#ffd700] text-[#3e2723] font-bold text-xs px-3 py-1.5 rounded-full">→</button>
+                        </div>
+                    </div>
+
+                    <!-- Gift shop column -->
+                    <div class="flex flex-col w-28 h-full pointer-events-auto">
+                        <p class="text-[9px] text-white/50 uppercase tracking-widest mb-1 text-center font-bold">🛍 Send Gift</p>
+                        <div class="flex-1 overflow-y-auto space-y-1 no-scrollbar">
+                            <!-- Rose -->
+                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                                data-link="https://buy.stripe.com/dRm14ndNHbQagre1Vg7EQ0M" data-id="rose" data-name="Rose" data-cost="5">
+                                <span class="text-base">🌹</span><span>Rose $5</span>
+                            </button>
+                            <!-- Heart -->
+                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                                data-link="https://buy.stripe.com/14A00j24Z8DY0sg8jE7EQ0O" data-id="heart" data-name="Heart" data-cost="10">
+                                <span class="text-base">💖</span><span>Heart $10</span>
+                            </button>
+                            <!-- Toast -->
+                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                                data-link="https://buy.stripe.com/8x2fZh4d79I2caYfM67EQ0N" data-id="champagne" data-name="Toast" data-cost="15">
+                                <span class="text-base">🥂</span><span>Toast $15</span>
+                            </button>
+                            <!-- Star -->
+                            <button class="purchase-btn w-full flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white text-[10px] font-bold border border-white/10 transition"
+                                data-link="https://buy.stripe.com/eVqeVd10V4nI7UIbvQ7EQ0P" data-id="star" data-name="Star" data-cost="20">
+                                <span class="text-base">🌠</span><span>Star $20</span>
+                            </button>
+                        </div>
+                        <!-- Send to performer -->
+                        <div class="mt-1">
+                            <select id="wallet-recipient-overlay" class="w-full text-[9px] bg-black/40 text-white border border-white/20 rounded px-1 py-0.5 mb-1">
+                                <option value="">-- Send to --</option>
+                            </select>
+                            <button id="confirm-send-overlay" class="w-full bg-[#ffd700]/70 hover:bg-[#ffd700] text-[#3e2723] text-[9px] font-bold py-1 rounded">Send 🎁</button>
+                        </div>
+                    </div>
+
                 </div>
+                <!-- legacy gift-messages kept for incoming gift event JS (hidden) -->
+                <div id="gift-messages" class="hidden"></div>
             </div>
         </div>
     </div>
@@ -279,7 +333,8 @@
     <aside class="sidebar bg-[#ffd700] text-[#3e2723] border-l-4 border-[#3e2723]">
         <!-- Tabs -->
         <div class="flex overflow-x-auto bg-[#fcd34d] border-b border-[#3e2723] p-2 gap-2 sticky top-0 z-10 no-scrollbar">
-            <button class="tab-btn active px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow bg-[#3e2723] text-[#ffd700]" data-tab="studio">Studio</button>
+            <button class="tab-btn active px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow bg-[#3e2723] text-[#ffd700]" data-tab="cameras">Cameras</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="studio">Studio</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="community">Community</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="marketplace">Shop</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="profile">Profile</button>
@@ -287,9 +342,27 @@
         </div>
 
         <div id="tab-content" class="p-4 overflow-y-auto flex-1">
+
+            <!-- Cameras Tab -->
+            <div id="cameras-tab" class="tab-pane">
+                <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
+                    <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">📹 Producer (Me)</h3>
+                    <div class="relative">
+                        <video id="producerVideo" autoplay muted playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1.5 py-0.5 font-bold truncate rounded-b" id="producer-name-label">Me</div>
+                    </div>
+                </div>
+                <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
+                    <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">🎥 Public Cameras</h3>
+                    <div id="public-cameras-list" class="grid grid-cols-2 gap-2">
+                        <!-- Camera tiles injected here -->
+                    </div>
+                    <p class="text-[10px] text-[#8d6e63] text-center mt-2">Enable camera to appear here</p>
+                </div>
+            </div>
             
             <!-- Studio Tab -->
-            <div id="studio-tab" class="tab-pane">
+            <div id="studio-tab" class="tab-pane hidden">
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
                     <h2 class="text-xl font-bold mb-2 text-[#3e2723] flex items-center gap-2">🎬 Media Deck <span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded">LIVE</span></h2>
                     <div class="border-2 border-[#3e2723] rounded-lg overflow-hidden bg-black mb-3">
@@ -387,10 +460,26 @@
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#3e2723] to-transparent"></div>
                     <img id="profile-avatar" src="https://placehold.co/100x100/ffd700/3e2723?text=User" class="w-24 h-24 rounded-full mx-auto border-4 border-[#3e2723] mb-3 object-cover shadow-xl p-1 bg-[#ffd700]" alt="User profile avatar" title="Profile avatar">
                     <h2 id="profile-name" class="text-xl font-bold text-[#3e2723]">Guest User</h2>
-                    <p id="profile-id" class="text-xs text-[#5d4037] font-mono mb-4 bg-[#ffd700]/20 inline-block px-2 py-1 rounded">ID: ...</p>
-                    
-                    <button id="edit-profile-btn" class="bg-[#ffd700] hover:bg-[#fcd34d] text-[#3e2723] border border-[#3e2723] px-4 py-1.5 rounded-full text-xs mb-4 font-bold transition shadow">Edit Profile</button>
-                    
+                    <p id="profile-id" class="text-xs text-[#5d4037] font-bold mb-4 bg-[#ffd700]/20 inline-block px-2 py-1 rounded">@Artist</p>
+
+                    <!-- Profile Edit Form -->
+                    <div id="profile-edit-form" class="text-left space-y-3 border border-[#3e2723] rounded p-3 bg-[#fdf6e3] mb-4">
+                        <h3 class="text-xs font-bold uppercase text-[#3e2723] mb-2 text-center tracking-wider">✏️ Edit Profile</h3>
+                        <div>
+                            <label class="block text-[10px] font-bold text-[#3e2723] uppercase mb-1">Artist Name</label>
+                            <input type="text" id="edit-name-input" placeholder="Your name..." maxlength="40"
+                                class="w-full text-xs p-2 rounded bg-white border border-[#3e2723] text-[#3e2723] font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-[#3e2723] uppercase mb-1">Avatar Image URL</label>
+                            <input type="url" id="edit-avatar-input" placeholder="https://i.imgur.com/..."
+                                class="w-full text-xs p-2 rounded bg-white border border-[#3e2723] text-[#3e2723]">
+                            <p class="text-[9px] text-[#8d6e63] mt-1">Paste a direct image link (Imgur, etc.)</p>
+                        </div>
+                        <button id="save-profile-btn" class="w-full bg-[#3e2723] text-[#ffd700] border border-[#ffd700] py-2 rounded font-bold text-xs hover:bg-[#5d4037] transition shadow">💾 Save Profile</button>
+                        <p id="profile-save-status" class="text-[10px] text-center text-green-700 font-bold hidden">✅ Saved!</p>
+                    </div>
+
                     <div class="border-t border-[#3e2723] pt-4 mt-2 bg-[#fdf6e3] p-3 rounded">
                          <label class="block text-left text-[10px] font-bold text-[#3e2723] uppercase mb-1">OpenAI API Key (Optional)</label>
                          <div class="flex gap-2">
@@ -460,6 +549,47 @@
             <div class="flex gap-2">
                 <button id="cancel-purchase-btn" class="flex-1 bg-gray-400 text-white py-2 rounded font-bold">No</button>
                 <button id="confirm-purchase-btn" class="flex-1 bg-[#3e2723] text-[#ffd700] py-2 rounded font-bold hover:bg-[#4e342e]">Yes, Add to Inventory</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Gate Modal — shown when user tries to go live without a complete profile -->
+    <div id="profile-gate-modal" class="fixed inset-0 z-[200] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-[#3e2723] border-2 border-[#ffd700] rounded-2xl p-7 max-w-sm w-full text-center shadow-2xl">
+            <div class="text-5xl mb-3">🎤</div>
+            <h2 class="text-2xl font-bold text-[#ffd700] mb-1">Going Live?</h2>
+            <p class="text-[#bcaaa4] text-sm mb-5">Set up your artist profile so everyone knows who's on screen.</p>
+
+            <!-- Google one-click -->
+            <button id="gate-google-btn" class="w-full bg-white text-gray-800 font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition mb-4">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
+                Sign in with Google (fills name &amp; photo automatically)
+            </button>
+
+            <div class="flex items-center text-[#d4af37] text-xs mb-4 gap-2">
+                <hr class="flex-1 border-[#5d4037]"><span>OR enter manually</span><hr class="flex-1 border-[#5d4037]">
+            </div>
+
+            <!-- Manual fields -->
+            <div class="space-y-3 text-left mb-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-[#fcd34d] uppercase mb-1">Artist Name <span class="text-red-400">*</span></label>
+                    <input id="gate-name-input" type="text" placeholder="Your stage name…" maxlength="40"
+                        class="w-full text-sm p-2.5 rounded-lg bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-[#fcd34d] uppercase mb-1">Profile Photo URL <span class="text-red-400">*</span></label>
+                    <input id="gate-avatar-input" type="url" placeholder="https://i.imgur.com/…"
+                        class="w-full text-sm p-2.5 rounded-lg bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
+                    <p class="text-[9px] text-[#8d6e63] mt-1">Direct image link (Imgur, etc.). Required to go live.</p>
+                </div>
+            </div>
+
+            <p id="gate-error" class="text-red-400 text-xs mb-3 hidden"></p>
+
+            <div class="flex gap-2">
+                <button id="gate-cancel-btn" class="flex-1 bg-[#5d4037] text-[#bcaaa4] font-bold py-2 rounded-lg text-sm hover:bg-[#4e342e]">Cancel</button>
+                <button id="gate-save-btn" class="flex-1 bg-[#ffd700] text-[#3e2723] font-bold py-2 rounded-lg text-sm hover:bg-[#ffca28] transition">💾 Save &amp; Go Live</button>
             </div>
         </div>
     </div>
@@ -993,32 +1123,48 @@ End with one short elegant line that feels like a signature approval, insight, o
         let chatUnsub = null;
         let giftsUnsub = null;
         let inventoryUnsub = null;
+
+        function getProfileDisplayName(user) {
+            if (!user) return 'Guest User';
+            if (user.isAnonymous) return 'Guest Artist';
+            if (user.displayName && user.displayName.trim()) return user.displayName.trim();
+            if (user.email && user.email.includes('@')) return user.email.split('@')[0];
+            return 'Studio Member';
+        }
         
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
                 authContainer.classList.add('hidden');
-                document.getElementById('profile-id').textContent = `ID: ${userId.slice(0,8)}...`;
-                document.getElementById('profile-name').textContent = user.displayName || 'Guest Artist';
+                document.getElementById('profile-id').textContent = `@${getProfileDisplayName(user)}`;
+                document.getElementById('profile-name').textContent = getProfileDisplayName(user);
+                document.getElementById('producer-name-label').textContent = getProfileDisplayName(user);
+
+                // If Google user, auto-populate avatar from Google photo if not already set
+                if (user.photoURL) {
+                    const currentAvatar = document.getElementById('profile-avatar').src;
+                    if (currentAvatar.includes('placehold.co')) {
+                        document.getElementById('profile-avatar').src = user.photoURL;
+                    }
+                }
+
+                await loadProfile(); // load saved name/avatar from Firestore
                 updatePresence();
                 initPeer();
                 listenForCameras();
-                loadInventory(); // This sets inventoryUnsub
+                loadInventory();
                 loadBillingInfo();
-                setupGlobalListeners(); // This sets chatUnsub and giftsUnsub
+                setupGlobalListeners();
             } else {
                 userId = null;
                 authContainer.classList.remove('hidden');
-                
-                // Cleanup listeners
                 if(chatUnsub) chatUnsub();
                 if(giftsUnsub) giftsUnsub();
                 if(inventoryUnsub) inventoryUnsub();
             }
         });
 
-        // Auto sign-in anonymously so the app works without manual login
-        signInAnonymously(auth).catch(e => console.warn('Auto sign-in:', e.message));
+        // NOTE: No auto-anonymous sign-in — users must choose how to sign in
 
         // Auth Buttons
         document.getElementById('guest-btn').onclick = () => signInAnonymously(auth).catch(e => alert(e.message));
@@ -1164,6 +1310,7 @@ End with one short elegant line that feels like a signature approval, insight, o
         async function loadDirectory(forDropdown = false) {
              const list = document.getElementById('directory-list');
              const select = document.getElementById('wallet-recipient-select');
+             const selectOverlay = document.getElementById('wallet-recipient-overlay');
              if(!forDropdown && list) list.innerHTML = '<p class="text-xs text-center">Loading...</p>';
              
              try {
@@ -1172,16 +1319,21 @@ End with one short elegant line that feels like a signature approval, insight, o
                  
                  if(!forDropdown && list) list.innerHTML = '';
                  if(forDropdown && select) select.innerHTML = '<option value="">-- Choose User --</option>';
+                 if(forDropdown && selectOverlay) selectOverlay.innerHTML = '<option value="">-- Send to --</option>';
                  
                  snap.forEach(doc => {
                      const d = doc.data();
                      if(doc.id === userId) return; // Skip self
                      
                      if(forDropdown) {
-                         const opt = document.createElement('option');
-                         opt.value = doc.id;
-                         opt.textContent = d.name || 'Anonymous';
-                         select.appendChild(opt);
+                         const makeOpt = () => {
+                             const opt = document.createElement('option');
+                             opt.value = doc.id;
+                             opt.textContent = d.name || 'Anonymous';
+                             return opt;
+                         };
+                         if(select) select.appendChild(makeOpt());
+                         if(selectOverlay) selectOverlay.appendChild(makeOpt());
                      } else {
                          const div = document.createElement('div');
                          div.className = 'bg-[#fcd34d] p-2 rounded border border-[#3e2723] flex justify-between items-center';
@@ -1193,50 +1345,132 @@ End with one short elegant line that feels like a signature approval, insight, o
         }
 
 
-        // Sending Logic
-        document.getElementById('confirm-send-btn').onclick = async () => {
-            const recipientId = document.getElementById('wallet-recipient-select').value;
+        // Sending Logic — shared handler
+        async function doSendGift(recipientId) {
             if(!recipientId || !selectedGiftToSend) return alert("Select a recipient first");
-
-            // 1. Deduct Inventory
             const invRef = doc(db, 'users', userId, 'inventory', selectedGiftToSend.id);
             const snap = await getDoc(invRef);
             if(snap.exists() && snap.data().count > 0) {
                 await setDoc(invRef, { count: snap.data().count - 1 }, { merge: true });
-                
-                // 2. Create Sent Gift Entry (Triggers animation for recipient)
                 await addDoc(collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'sent_gifts'), {
                     giftId: selectedGiftToSend.id,
-                    recipientId: recipientId,
+                    recipientId,
                     senderId: userId,
                     senderName: document.getElementById('profile-name').textContent,
                     timestamp: serverTimestamp()
                 });
-                
                 addMessage('System', `Sent ${selectedGiftToSend.name} successfully!`);
                 document.getElementById('send-controls').classList.add('hidden');
                 selectedGiftToSend = null;
             } else {
                 alert("Out of stock!");
             }
+        }
+
+        document.getElementById('confirm-send-btn').onclick = async () => {
+            await doSendGift(document.getElementById('wallet-recipient-select').value);
         };
+        document.getElementById('confirm-send-overlay').onclick = async () => {
+            await doSendGift(document.getElementById('wallet-recipient-overlay').value);
+        };
+
+        // --- PROFILE GATE ---
+        function isProfileComplete() {
+            const name = document.getElementById('profile-name').textContent.trim();
+            const avatar = document.getElementById('profile-avatar').src;
+            const nameOk = name && name !== 'Guest User' && name.length > 0;
+            const avatarOk = avatar && !avatar.includes('placehold.co');
+            return nameOk && avatarOk;
+        }
+
+        function showProfileGate(onComplete) {
+            const modal = document.getElementById('profile-gate-modal');
+            modal.classList.remove('hidden');
+
+            // Pre-fill with existing values
+            document.getElementById('gate-name-input').value =
+                document.getElementById('edit-name-input').value ||
+                document.getElementById('profile-name').textContent.replace('Guest User','').trim();
+            document.getElementById('gate-avatar-input').value =
+                document.getElementById('edit-avatar-input').value || '';
+            document.getElementById('gate-error').classList.add('hidden');
+
+            document.getElementById('gate-cancel-btn').onclick = () => modal.classList.add('hidden');
+
+            document.getElementById('gate-google-btn').onclick = async () => {
+                try {
+                    const result = await signInWithPopup(auth, new GoogleAuthProvider());
+                    const gUser = result.user;
+                    // Auto-save Google profile
+                    const profileData = {
+                        name: gUser.displayName || gUser.email,
+                        imageUrl: gUser.photoURL || '',
+                        updatedAt: serverTimestamp()
+                    };
+                    await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'users', gUser.uid, 'profile', 'main'), profileData, { merge: true });
+                    await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'directory', gUser.uid), { name: profileData.name }, { merge: true });
+                    document.getElementById('profile-name').textContent = profileData.name;
+                    document.getElementById('profile-id').textContent = `@${profileData.name}`;
+                    document.getElementById('producer-name-label').textContent = profileData.name;
+                    if (profileData.imageUrl) document.getElementById('profile-avatar').src = profileData.imageUrl;
+                    document.getElementById('edit-name-input').value = profileData.name;
+                    document.getElementById('edit-avatar-input').value = profileData.imageUrl;
+                    modal.classList.add('hidden');
+                    if (onComplete) onComplete();
+                } catch(e) {
+                    document.getElementById('gate-error').textContent = e.message;
+                    document.getElementById('gate-error').classList.remove('hidden');
+                }
+            };
+
+            document.getElementById('gate-save-btn').onclick = async () => {
+                const nameVal = document.getElementById('gate-name-input').value.trim();
+                const avatarRaw = document.getElementById('gate-avatar-input').value.trim();
+                const avatarVal = normalizeImageUrl(avatarRaw);
+                const errEl = document.getElementById('gate-error');
+
+                if (!nameVal) { errEl.textContent = 'Artist name is required.'; errEl.classList.remove('hidden'); return; }
+                if (!avatarVal) { errEl.textContent = 'Profile photo URL is required.'; errEl.classList.remove('hidden'); return; }
+                errEl.classList.add('hidden');
+
+                // Save to Firestore
+                const profileData = { name: nameVal, imageUrl: avatarVal, updatedAt: serverTimestamp() };
+                await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'users', userId, 'profile', 'main'), profileData, { merge: true });
+                await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'directory', userId), { name: nameVal }, { merge: true });
+
+                document.getElementById('profile-name').textContent = nameVal;
+                document.getElementById('profile-avatar').src = avatarVal;
+                document.getElementById('edit-name-input').value = nameVal;
+                document.getElementById('edit-avatar-input').value = avatarVal;
+
+                modal.classList.add('hidden');
+                if (onComplete) onComplete();
+            };
+        }
 
         // --- VIDEO / PEER ---
         async function startCamera() {
+            if (!isProfileComplete()) {
+                showProfileGate(() => startCamera());
+                return;
+            }
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 document.getElementById('producerVideo').srcObject = localStream;
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('enable-camera-btn').textContent = "Camera On";
                 document.getElementById('enable-camera-btn').classList.add('bg-green-800', 'text-green-100');
-                // Publish camera to Firestore so other users can see + call us
-                if (userId) {
+                // Publish camera — peer.id may be ready now; if not, initPeer's 'open' handler will publish
+                if (userId && peer?.id) {
+                    console.log('[Camera] Publishing with peerId:', peer.id);
                     setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', userId), {
-                        peerId: peer?.id || null,
+                        peerId: peer.id,
                         name: document.getElementById('profile-name').textContent,
                         active: true,
                         timestamp: serverTimestamp()
                     }, { merge: true });
+                } else {
+                    console.log('[Camera] Peer not ready yet — will publish when peer opens. userId:', userId, 'peer:', peer?.id);
                 }
             } catch(e) { alert("Camera failed: " + e.message); }
         }
@@ -1276,9 +1510,19 @@ End with one short elegant line that feels like a signature approval, insight, o
             peer.on('open', id => {
                 document.getElementById('my-peer-id').textContent = id;
                 updatePresence({ peerId: id });
+                // If camera was already started before peer opened, publish now
+                if (localStream && userId) {
+                    setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', userId), {
+                        peerId: id,
+                        name: document.getElementById('profile-name').textContent,
+                        active: true,
+                        timestamp: serverTimestamp()
+                    }, { merge: true });
+                }
             });
+            peer.on('disconnected', () => { try { peer.reconnect(); } catch(e) { console.error('Reconnect failed', e); } });
             peer.on('call', call => {
-                currentCall = call; // Track call
+                currentCall = call;
                 call.answer(localStream);
                 setupCall(call);
             });
@@ -1297,10 +1541,14 @@ End with one short elegant line that feels like a signature approval, insight, o
                 const vid = document.getElementById('performerVideo');
                 vid.srcObject = remoteStream;
                 vid.classList.remove('hidden');
+                document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('hangup-call-btn').classList.remove('hidden');
                 document.getElementById('hangup-call-btn').onclick = () => {
                     call.close();
+                    vid.srcObject = null;
                     vid.classList.add('hidden');
+                    document.getElementById('performer-placeholder').classList.remove('hidden');
+                    document.getElementById('hangup-call-btn').classList.add('hidden');
                     currentCall = null;
                 };
             });
@@ -1338,20 +1586,38 @@ End with one short elegant line that feels like a signature approval, insight, o
                 `;
                 container.appendChild(tile);
             }
+            // Update peerId on tile in case it arrived late
+            tile.dataset.peerId = data.peerId;
+
             const vid = tile.querySelector('video');
             const callBtn = tile.querySelector('.call-btn');
+            const bigScreen = document.getElementById('performerVideo');
+
             callBtn.onclick = () => {
                 if (!localStream) return alert('Enable your camera first');
-                const call = peer.call(data.peerId, localStream);
-                call.on('stream', s => { vid.srcObject = s; });
+                const call = peer.call(tile.dataset.peerId, localStream);
+                currentCall = call;
+                call.on('stream', s => {
+                    // Small tile preview
+                    vid.srcObject = s;
+                    // Big screen (main stage)
+                    bigScreen.srcObject = s;
+                    document.getElementById('performer-placeholder').classList.add('hidden');
+                    document.getElementById('hangup-call-btn').classList.remove('hidden');
+                    document.getElementById('hangup-call-btn').onclick = () => {
+                        call.close();
+                        vid.srcObject = null;
+                        bigScreen.srcObject = null;
+                        bigScreen.classList.add('hidden');
+                        document.getElementById('performer-placeholder').classList.remove('hidden');
+                        document.getElementById('hangup-call-btn').classList.add('hidden');
+                        callBtn.textContent = '📞 Call';
+                        callBtn.classList.replace('bg-red-700', 'bg-green-700');
+                        currentCall = null;
+                    };
+                });
                 callBtn.textContent = '🔴 Live';
                 callBtn.classList.replace('bg-green-700', 'bg-red-700');
-                callBtn.onclick = () => {
-                    call.close();
-                    vid.srcObject = null;
-                    callBtn.textContent = '📞 Call';
-                    callBtn.classList.replace('bg-red-700', 'bg-green-700');
-                };
             };
         }
 
@@ -1484,15 +1750,67 @@ End with one short elegant line that feels like a signature approval, insight, o
             }
         };
 
-        document.getElementById('edit-profile-btn').onclick = async () => {
-             const newName = prompt("Enter new profile name:");
-             if(newName) {
-                 await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'directory', userId), { name: newName }, { merge: true });
-                 document.getElementById('profile-name').textContent = newName;
-                 // Sync auth profile
-                 // Note: updateProfile is not imported, keeping simple for now
-             }
+        // --- PROFILE PERSISTENCE ---
+        function normalizeImageUrl(url) {
+            if (!url) return null;
+            url = url.trim();
+            // Imgur page → direct image
+            const imgur = url.match(/imgur\.com\/(?!a\/)([a-zA-Z0-9]+)$/);
+            if (imgur) return `https://i.imgur.com/${imgur[1]}.jpg`;
+            // Dropbox → direct
+            url = url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '');
+            return url;
+        }
+
+        async function loadProfile() {
+            if (!userId) return;
+            try {
+                const snap = await getDoc(doc(db, 'artifacts', 'studio-2fb13', 'users', userId, 'profile', 'main'));
+                if (snap.exists()) {
+                    const d = snap.data();
+                    if (d.name) {
+                        document.getElementById('profile-name').textContent = d.name;
+                        document.getElementById('edit-name-input').value = d.name;
+                    }
+                    if (d.imageUrl) {
+                        document.getElementById('profile-avatar').src = d.imageUrl;
+                        document.getElementById('edit-avatar-input').value = d.imageUrl;
+                    }
+                } else {
+                    // Pre-fill name input with current display name
+                    document.getElementById('edit-name-input').value = document.getElementById('profile-name').textContent;
+                }
+            } catch(e) { console.warn('loadProfile:', e); }
+        }
+
+        document.getElementById('save-profile-btn').onclick = async () => {
+            if (!userId) return alert('Sign in first');
+            const nameVal = document.getElementById('edit-name-input').value.trim();
+            const avatarRaw = document.getElementById('edit-avatar-input').value.trim();
+            const avatarVal = normalizeImageUrl(avatarRaw);
+            if (!nameVal) return alert('Enter a name');
+
+            const profileData = { name: nameVal, updatedAt: serverTimestamp() };
+            if (avatarVal) profileData.imageUrl = avatarVal;
+
+            await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'users', userId, 'profile', 'main'), profileData, { merge: true });
+            // Also update public directory so others see new name
+            await setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'directory', userId), { name: nameVal }, { merge: true });
+
+            document.getElementById('profile-name').textContent = nameVal;
+            if (avatarVal) document.getElementById('profile-avatar').src = avatarVal;
+
+            const status = document.getElementById('profile-save-status');
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2500);
         };
+
+        // Helper — update all name display labels atomically
+        function applyProfileName(name) {
+            document.getElementById('profile-name').textContent = name;
+            document.getElementById('profile-id').textContent = `@${name}`;
+            document.getElementById('producer-name-label').textContent = name;
+        }
 
     </script>
 </body>

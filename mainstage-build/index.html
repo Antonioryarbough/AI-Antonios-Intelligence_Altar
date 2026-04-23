@@ -1718,6 +1718,14 @@ In the school of rhyme, there's no way to lose.
                         signoutSection.classList.remove('hidden');
                     }
                 }
+
+                function getProfileDisplayName(user) {
+                    if (!user) return 'Guest User';
+                    if (user.isAnonymous) return 'Anonymous User';
+                    if (user.displayName && user.displayName.trim()) return user.displayName.trim();
+                    if (user.email && user.email.includes('@')) return user.email.split('@')[0];
+                    return 'Studio Member';
+                }
                 
                 onAuthStateChanged(auth, (user) => {
                     console.log('[Auth] Auth state changed. User:', user);
@@ -1730,7 +1738,7 @@ In the school of rhyme, there's no way to lose.
                         if (elements.authContainer) elements.authContainer.classList.add('hidden');
                         if (elements.mainContent) elements.mainContent.classList.remove('hidden');
                         if (elements.mainChatArea) elements.mainChatArea.classList.remove('hidden'); // Show chat on startup (Studio tab is default)
-                        if (elements.userNameDisplay) elements.userNameDisplay.textContent = user.displayName || 'Anonymous User';
+                        if (elements.userNameDisplay) elements.userNameDisplay.textContent = getProfileDisplayName(user);
 
                         // Setup everything that depends on a logged-in user
                         console.log('[Init] Setting up realtime listeners...');
