@@ -4,9 +4,9 @@
   "description": "AI Enterprise Studio - A fully functional multimedia collaboration platform",
   "scripts": {
     "clean:builds": "rimraf mainstage-build studio-build videochat-build",
-    "build:studio": "mkdir -p studio-build && cp public/index.html studio-build/ && cp public/styles.css studio-build/ && cp configs/config.studio.js studio-build/config.js",
-    "build:mainstage": "mkdir -p mainstage-build && cp public/index.html mainstage-build/ && cp public/styles.css mainstage-build/ && cp configs/config.mainstage.js mainstage-build/config.js",
-    "build:videochat": "mkdir -p videochat-build && cp public/index.html videochat-build/ && cp public/styles.css videochat-build/ && cp configs/config.lobby.js videochat-build/config.js",
+    "build:studio": "node scripts/build-target.mjs studio studio-build configs/config.studio.js",
+    "build:mainstage": "node scripts/build-target.mjs mainstage mainstage-build configs/config.mainstage.js",
+    "build:videochat": "node scripts/build-target.mjs videochat videochat-build configs/config.lobby.js",
     "build:all": "npm run clean:builds && npm run build:mainstage && npm run build:studio && npm run build:videochat",
     "deploy": "npm run deploy:studio",
     "deploy:hosting": "npm run deploy:studio",
