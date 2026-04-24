@@ -659,11 +659,11 @@
 
                     <div class="border-t border-[#3e2723] pt-4 mt-2 bg-[#fdf6e3] p-3 rounded">
                          <label class="block text-left text-[10px] font-bold text-[#3e2723] uppercase mb-1">OpenAI API Key (Optional)</label>
-                        <div style="display:flex;gap:4px;align-items:center;">
-                            <input id="chat-input" type="text" placeholder="say something…" maxlength="200"
-                                style="flex:1;min-width:0;background:rgba(0,0,0,0.4);color:white;font-size:12px;border-radius:9999px;padding:5px 12px;border:1px solid rgba(255,255,255,0.2);outline:none;">
-                            <button id="send-chat-btn"
-                                style="flex-shrink:0;background:rgba(255,215,0,0.85);color:#3e2723;font-weight:700;font-size:12px;padding:5px 12px;border-radius:9999px;border:none;cursor:pointer;">→</button>
+                         <div class="flex gap-2">
+                             <input type="password" id="openai-api-key" placeholder="Enter API Key" class="flex-1 text-xs p-2 rounded bg-white border border-[#3e2723] text-[#3e2723]">
+                             <button id="save-api-key" class="bg-green-700 text-white border border-green-900 px-3 rounded text-xs font-bold hover:bg-green-600">Save</button>
+                         </div>
+                    </div>
 
                     <button id="signout-btn" class="mt-4 w-full bg-red-100 text-red-800 border border-red-300 hover:bg-red-200 py-2 rounded text-sm font-bold shadow-inner">Sign Out</button>
                 </div>
