@@ -14,7 +14,7 @@ const profiles = {
   "ai-enterprise": {
     html: "index.html",
     css: "styles.css",
-    extra: ["rooms/assets/gifts:gifts"]
+    extra: ["rooms/assets/gifts:gifts", "rooms/assets/assets:assets"]
   },
   "babyray-classic": {
     html: "public/index.html",

@@ -291,6 +291,24 @@ function LobbyScene() {
     }
   }
 
+  async function handleSendSharedChat() {
+    if (!input.trim()) return;
+    if (!window.BabyRayChat?.sendUserMessage) {
+      setStatus("Chat bridge offline. Message stayed local.");
+      return;
+    }
+
+    await window.BabyRayChat.sendUserMessage({
+      text: input,
+      name: "Lobby User",
+      senderType: "user",
+      roomTargets: { lobby: true, videochat: true, mainStage: false },
+      roomId
+    });
+    setInput("");
+    setStatus("Message mirrored to Videochat Room stream.");
+  }
+
   return (
     <div className="lobby-root">
       <div className="lobby-top lobby-top-stack">
@@ -328,28 +346,18 @@ function LobbyScene() {
         <textarea
           value={input}
           onChange={(event) => setInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              handleSendSharedChat();
+            }
+          }}
           placeholder="Drop your bars, ideas, or questions here..."
         />
 
         <div className="lobby-actions">
           <button
-            onClick={async () => {
-              if (!input.trim()) return;
-              if (!window.BabyRayChat?.sendUserMessage) {
-                setStatus("Chat bridge offline. Message stayed local.");
-                return;
-              }
-
-              await window.BabyRayChat.sendUserMessage({
-                text: input,
-                name: "Lobby User",
-                senderType: "user",
-                roomTargets: { lobby: true, videochat: true, mainStage: false },
-                roomId
-              });
-              setInput("");
-              setStatus("Message mirrored to Videochat Room stream.");
-            }}
+            onClick={handleSendSharedChat}
             disabled={!input.trim()}
           >
             Send To Shared Chat

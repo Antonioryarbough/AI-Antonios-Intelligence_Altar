@@ -29,12 +29,46 @@
         
         @keyframes splashFadeOut { from { opacity:1; } to { opacity:0; pointer-events:none; } }
         #intro-splash.fading { animation: splashFadeOut 1s ease forwards; }
-        /* Gift video overlay fade */
-        #gift-video-overlay { animation: none; }
-        #gift-video-overlay.show { animation: giftFadeIn 0.4s ease forwards; }
-        #gift-video-overlay.hide { animation: giftFadeOut 0.5s ease forwards; }
-        @keyframes giftFadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
-        @keyframes giftFadeOut { from { opacity:1; } to { opacity:0; } }
+        /* Gift overlay + roaming gift card animation */
+        #gift-video-overlay { animation: none; opacity: 0; }
+        #gift-video-overlay.show { opacity: 1; transition: opacity 220ms ease; }
+        #gift-video-overlay.hide { opacity: 0; transition: opacity 380ms ease; }
+        #gift-video-overlay .gift-roamer {
+            will-change: transform;
+            animation-duration: var(--gift-roam-duration, 12s);
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
+        }
+        #gift-video-overlay .gift-roamer.roam-a { animation-name: giftRoamA; }
+        #gift-video-overlay .gift-roamer.roam-b { animation-name: giftRoamB; }
+        #gift-video-overlay .gift-roamer.roam-c { animation-name: giftRoamC; }
+
+        @keyframes giftRoamA {
+            0%   { transform: translate(-36vw, 20vh) scale(0.62) rotate(-12deg); }
+            18%  { transform: translate(-14vw, -18vh) scale(0.82) rotate(6deg); }
+            42%  { transform: translate(10vw, -10vh) scale(0.95) rotate(-4deg); }
+            66%  { transform: translate(24vw, 12vh) scale(1) rotate(8deg); }
+            86%  { transform: translate(4vw, 18vh) scale(0.9) rotate(-6deg); }
+            100% { transform: translate(-12vw, -4vh) scale(0.84) rotate(0deg); }
+        }
+
+        @keyframes giftRoamB {
+            0%   { transform: translate(32vw, -18vh) scale(0.64) rotate(10deg); }
+            22%  { transform: translate(8vw, -4vh) scale(0.86) rotate(-8deg); }
+            46%  { transform: translate(-12vw, 14vh) scale(0.98) rotate(5deg); }
+            68%  { transform: translate(-30vw, 2vh) scale(0.92) rotate(-5deg); }
+            88%  { transform: translate(-8vw, -16vh) scale(0.82) rotate(7deg); }
+            100% { transform: translate(14vw, 8vh) scale(0.88) rotate(0deg); }
+        }
+
+        @keyframes giftRoamC {
+            0%   { transform: translate(-2vw, 24vh) scale(0.62) rotate(-10deg); }
+            20%  { transform: translate(-24vw, 6vh) scale(0.86) rotate(8deg); }
+            44%  { transform: translate(-6vw, -18vh) scale(1) rotate(-7deg); }
+            70%  { transform: translate(24vw, -8vh) scale(0.92) rotate(6deg); }
+            90%  { transform: translate(10vw, 14vh) scale(0.84) rotate(-4deg); }
+            100% { transform: translate(-10vw, 2vh) scale(0.88) rotate(0deg); }
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -475,22 +509,22 @@
                             <span class="text-[#ffd700] text-xs font-bold">$500 · WAV</span>
                         </div>
                         <div class="space-y-2">
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 1</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 2</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 3</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 4</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 5</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 6</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 7</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 8</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 9</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 10</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 11 – 143 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 12 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 13 – RnB Vibe 130 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 14 – 145.56 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 15 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">Beat 16 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 1</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 1');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 2</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 2.mp4','SBM Beat 2');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 3</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 3.mp4','SBM Beat 3');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 4</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM Beat 4.mp4','SBM Beat 4');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 5</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 5.mp4','SBM Beat 5');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 6</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/beat.mp4','SBM Beat 6');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 7</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 7.mp4','SBM Beat 7');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 8</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 8.mp4','SBM Beat 8');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 9</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 9.mp4','SBM Beat 9');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 10</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 10');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 11 – 143 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 11 – 143 BPM');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 12 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 12 – 140 BPM');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 13 – RnB Vibe 130 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 13 – RnB Vibe 130 BPM');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 14 – 145.56 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 14 – 145.56 BPM');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 15 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 15 – 140 BPM');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-[#ffd700]/30 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">Beat 16 – 140 BPM</p><p class="text-[#bcaaa4] text-[10px]">Black Label · WAV</p></div><button onclick="openBeatPreview('gifts/Beat 16 140 bpm (BLACK LABEL).mp4','Beat 16 – 140 BPM');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/14k0005e04vs1t614l" target="_blank" class="beat-buy-btn bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">Buy $500</a></div>
                         </div>
                     </div>
 
@@ -501,12 +535,12 @@
                             <span class="text-white text-xs font-bold">$200 · WAV</span>
                         </div>
                         <div class="space-y-2">
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 17</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/dR65kk6i46DAfjW9AM" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 18</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/00g5kkfSE5zwc7KbIV" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $200</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 19</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/8wM3cc21Od1YfjWcN0" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $200</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 20</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/00gfYYaykd1Y4FibIX" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 21</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/28ofYY8qc2nk8Vy28q" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
-                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 22</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><a href="https://buy.stripe.com/6oEcMM21O1jgfjW8wP" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 17</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 17');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/dR65kk6i46DAfjW9AM" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 18</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 18');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/00g5kkfSE5zwc7KbIV" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $200</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 19</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 1.mp4','SBM Beat 19');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/8wM3cc21Od1YfjWcN0" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $200</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 20</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 2.mp4','SBM Beat 20');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/00gfYYaykd1Y4FibIX" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 21</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 2.mp4','SBM Beat 21');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/28ofYY8qc2nk8Vy28q" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
+                            <div class="beat-card flex items-center justify-between bg-black/60 border border-white/10 rounded-lg px-3 py-2"><div><p class="text-white text-xs font-bold">SBM Beat 22</p><p class="text-[#bcaaa4] text-[10px]">White Label · WAV</p></div><button onclick="openBeatPreview('gifts/SBM BEAT 2.mp4','SBM Beat 22');event.preventDefault()" class="text-[10px] text-[#ffd700] underline mr-2 hover:text-white transition">&#9654; Preview</button><a href="https://buy.stripe.com/6oEcMM21O1jgfjW8wP" target="_blank" class="beat-buy-btn bg-white text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-gray-200 transition">Buy $100</a></div>
                         </div>
                     </div>
 
@@ -810,10 +844,23 @@
     </div>
 
     <!-- Gift Video Overlay — plays over the big screen when a gift is sent/received -->
-    <div id="gift-video-overlay" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/70 pointer-events-none">
-        <div class="relative max-w-lg w-full mx-4">
+    <div id="gift-video-overlay" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/40 pointer-events-none overflow-hidden">
+        <div id="gift-video-roamer" class="gift-roamer relative max-w-lg w-full mx-4">
             <video id="gift-video-player" class="w-full rounded-2xl shadow-2xl border-4 border-[#ffd700]" autoplay muted playsinline></video>
             <div id="gift-video-label" class="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-bold drop-shadow-lg"></div>
+        </div>
+    </div>
+
+    <!-- Beat Preview Player with Watermark -->
+    <div id="beat-preview-modal" class="fixed inset-0 z-[400] hidden items-center justify-center bg-black/80" onclick="closeBeatPreview()">
+        <div class="relative w-full max-w-sm mx-4" onclick="event.stopPropagation()">
+            <p id="beat-preview-title" class="text-[#ffd700] font-black text-center mb-2 text-sm"></p>
+            <div class="relative rounded-2xl overflow-hidden border-2 border-[#ffd700]">
+                <video id="beat-preview-video" class="w-full" autoplay playsinline></video>
+                <!-- Watermark overlay (bird video, looping, corner) -->
+                <video id="watermark-video" src="gifts/WATERMARK.mp4" class="absolute bottom-2 right-2 w-20 h-20 object-cover rounded-lg opacity-80 pointer-events-none" autoplay loop muted playsinline></video>
+            </div>
+            <button onclick="closeBeatPreview()" class="mt-3 w-full bg-[#ffd700] text-black font-black py-2 rounded-xl text-sm">✕ Close Preview</button>
         </div>
     </div>
 
@@ -833,6 +880,29 @@
             // Auto-close after 30s max as safety fallback
             setTimeout(closeSplash, 30000);
         })();
+
+        // Beat preview with watermark
+        window.openBeatPreview = function(src, title) {
+            const modal = document.getElementById('beat-preview-modal');
+            const video = document.getElementById('beat-preview-video');
+            const wm    = document.getElementById('watermark-video');
+            const label = document.getElementById('beat-preview-title');
+            label.textContent = title;
+            video.src = src;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            video.play().catch(()=>{});
+            wm.play().catch(()=>{});
+        };
+        window.closeBeatPreview = function() {
+            const modal = document.getElementById('beat-preview-modal');
+            const video = document.getElementById('beat-preview-video');
+            const wm    = document.getElementById('watermark-video');
+            video.pause(); video.src = '';
+            wm.pause();
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, linkWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1360,10 +1430,10 @@ End with one short elegant line that feels like a signature approval, insight, o
 
         // --- GIFT VIDEOS — only files with (gift) in the name, cycled per gift type ---
         const GIFT_VIDEOS = {
-            rose:      ['gifts/BabyRaysLEANA(gift).mp4', 'gifts/FirstLadyGhost(gift).mp4', 'gifts/AntonioRYarboughinstudio(gift).mp4'],
-            heart:     ['gifts/MultiBabyRays(gift).mp4', 'gifts/Da_Cru_Soldier_Bangah(gift).mp4', 'gifts/AIAntonioBOSS(gift).mp4'],
-            champagne: ['gifts/BabyRayinRedCar(gift).mp4', 'gifts/PoliceHelicopterCHASE(Gift).mp4'],
-            star:      ['gifts/KingAntonio(gift).mp4', 'gifts/BabyRayon bike(gift).mp4', 'gifts/preview video for SBM mafia(gift).mp4']
+            rose:      ['gifts/BabyRaysLEANA(gift).mp4', 'gifts/FirstLadyGhost(gift).mp4', 'gifts/AntonioRYarboughinstudio(gift).mp4', 'gifts/BabyRayFlight(gift).MP4'],
+            heart:     ['gifts/MultiBabyRays(gift).mp4', 'gifts/Da_Cru_Soldier_Bangah(gift).mp4', 'gifts/AIAntonioBOSS(gift).mp4', 'gifts/BabyRayInJeep(gift).MP4'],
+            champagne: ['gifts/BabyRayinRedCar(gift).mp4', 'gifts/PoliceHelicopterCHASE(Gift).mp4', 'gifts/BabyRayFlight(gift).MP4', 'gifts/JunkyardTruck(gift).MP4'],
+            star:      ['gifts/KingAntonio(gift).mp4', 'gifts/BabyRayon bike(gift).mp4', 'gifts/preview video for SBM mafia(gift).mp4', 'gifts/BabyRayInJeep(gift).MP4', 'gifts/JunkyardTruck(gift).MP4']
         };
         const _giftVideoIdx = { rose: 0, heart: 0, champagne: 0, star: 0 };
 
@@ -1373,11 +1443,22 @@ End with one short elegant line that feels like a signature approval, insight, o
             _giftVideoIdx[giftId] = idx + 1;
             const src  = list[idx];
             const overlay = document.getElementById('gift-video-overlay');
+            const roamer = document.getElementById('gift-video-roamer');
             const player  = document.getElementById('gift-video-player');
             const label   = document.getElementById('gift-video-label');
 
             label.textContent = `🎁 ${senderName} sent a ${giftName || giftId}!`;
             player.src = src;
+            if (roamer) {
+                const roamClasses = ['roam-a', 'roam-b', 'roam-c'];
+                const roamClass = roamClasses[Math.floor(Math.random() * roamClasses.length)];
+                const roamDurationMs = 10500 + Math.floor(Math.random() * 2500);
+                roamer.classList.remove(...roamClasses);
+                // Force a reflow so restarting the same class still retriggers animation.
+                void roamer.offsetWidth;
+                roamer.style.setProperty('--gift-roam-duration', `${roamDurationMs}ms`);
+                roamer.classList.add(roamClass);
+            }
             overlay.classList.remove('hidden', 'hide');
             overlay.classList.add('show');
             player.play().catch(() => {});
@@ -1388,6 +1469,9 @@ End with one short elegant line that feels like a signature approval, insight, o
                 setTimeout(() => {
                     overlay.classList.add('hidden');
                     overlay.classList.remove('hide');
+                    if (roamer) {
+                        roamer.classList.remove('roam-a', 'roam-b', 'roam-c');
+                    }
                     player.src = '';
                 }, 500);
             }
