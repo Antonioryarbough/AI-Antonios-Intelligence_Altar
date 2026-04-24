@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Enterprise Studio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
@@ -258,7 +258,6 @@
 
         .hidden { display: none !important; }
     </style>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-[#1a120b] h-screen w-screen overflow-hidden">
 
@@ -922,6 +921,7 @@
         const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
         const auth = getAuth(app);
         const storage = getStorage(app);
+        const APP_ID = firebaseConfig.projectId;
         
         let userId = null;
         let localStream = null;
@@ -1392,7 +1392,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 applyPersonaRegistry(registry);
                 personaRegistryLoaded = true;
             } catch (error) {
-                console.warn('Persona registry load failed, using inline persona instructions.', error);
+                console.info('Persona registry not found for this build, using inline persona instructions.');
                 personaRegistryLoaded = true;
             }
         }
@@ -1710,14 +1710,14 @@ End with one short elegant line that feels like a signature approval, insight, o
                 email: document.getElementById('billing-email').value,
                 updatedAt: serverTimestamp()
             };
-            await setDoc(doc(db, 'users', userId, 'private', 'billing'), info, { merge: true });
+            await setDoc(doc(db, 'artifacts', APP_ID, 'users', userId, 'private', 'billing'), info, { merge: true });
             document.getElementById('billing-status').classList.remove('hidden');
             setTimeout(() => document.getElementById('billing-status').classList.add('hidden'), 3000);
         };
 
         function loadBillingInfo() {
             if(!userId) return;
-            getDoc(doc(db, 'users', userId, 'private', 'billing')).then(snap => {
+            getDoc(doc(db, 'artifacts', APP_ID, 'users', userId, 'private', 'billing')).then(snap => {
                 if(snap.exists()) {
                     const d = snap.data();
                     document.getElementById('billing-name').value = d.name || '';
@@ -1743,7 +1743,7 @@ End with one short elegant line that feels like a signature approval, insight, o
         document.getElementById('confirm-purchase-btn').onclick = async () => {
             if(pendingPurchase && userId) {
                 // Add to inventory (Simulated backend trigger)
-                const ref = doc(db, 'users', userId, 'inventory', pendingPurchase.id);
+                const ref = doc(db, 'artifacts', APP_ID, 'users', userId, 'inventory', pendingPurchase.id);
                 // Simple increment simulation using reading first (transaction better in real app)
                 const snap = await getDoc(ref);
                 const count = snap.exists() ? (snap.data().count || 0) + 1 : 1;
@@ -1769,7 +1769,7 @@ End with one short elegant line that feels like a signature approval, insight, o
             const container = document.getElementById('wallet-inventory');
             const sendControls = document.getElementById('send-controls');
             
-            inventoryUnsub = onSnapshot(collection(db, 'users', userId, 'inventory'), (snap) => {
+            inventoryUnsub = onSnapshot(collection(db, 'artifacts', APP_ID, 'users', userId, 'inventory'), (snap) => {
                 container.innerHTML = '';
                 if(snap.empty) {
                     container.innerHTML = '<p class="col-span-2 text-xs text-center text-[#8d6e63]">No gifts yet. Buy some below!</p>';
@@ -1840,7 +1840,7 @@ End with one short elegant line that feels like a signature approval, insight, o
         // Sending Logic — shared handler
         async function doSendGift(recipientId) {
             if(!recipientId || !selectedGiftToSend) return alert("Select a recipient first");
-            const invRef = doc(db, 'users', userId, 'inventory', selectedGiftToSend.id);
+            const invRef = doc(db, 'artifacts', APP_ID, 'users', userId, 'inventory', selectedGiftToSend.id);
             const snap = await getDoc(invRef);
             if(snap.exists() && snap.data().count > 0) {
                 await setDoc(invRef, { count: snap.data().count - 1 }, { merge: true });
@@ -2054,13 +2054,17 @@ End with one short elegant line that feels like a signature approval, insight, o
             });
         }
         
-        document.getElementById('start-call-btn').onclick = () => {
-            const dest = document.getElementById('remote-peer-id-input').value;
-            if(!dest || !localStream) return alert("Enter ID and enable camera");
-            const call = peer.call(dest, localStream);
-            currentCall = call; // Track call
-            setupCall(call);
-        };
+        const startCallBtn = document.getElementById('start-call-btn');
+        const remotePeerIdInput = document.getElementById('remote-peer-id-input');
+        if (startCallBtn && remotePeerIdInput) {
+            startCallBtn.onclick = () => {
+                const dest = remotePeerIdInput.value;
+                if(!dest || !localStream) return alert("Enter ID and enable camera");
+                const call = peer.call(dest, localStream);
+                currentCall = call; // Track call
+                setupCall(call);
+            };
+        }
 
         function setupCall(call) {
             call.on('stream', remoteStream => {
@@ -2157,64 +2161,87 @@ End with one short elegant line that feels like a signature approval, insight, o
 
         // --- CHAT & AI ---
         async function sendChat() {
-            const txt = document.getElementById('chat-input').value;
-            if(!txt) return;
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-chat-btn');
+            const txt = inputEl.value.trim();
+            if (!txt) return;
+
             addMessage('You', txt);
-            document.getElementById('chat-input').value = '';
-            
-            if(userId) {
-                addDoc(collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'messages'), {
-                    text: txt, userId, name: document.getElementById('profile-name').textContent,
+            inputEl.value = '';
+
+            if (!userId) {
+                addMessage('System', 'Sign in first so chat can post to the room.');
+                return;
+            }
+
+            sendBtn.disabled = true;
+
+            try {
+                await addDoc(collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'messages'), {
+                    text: txt,
+                    userId,
+                    name: document.getElementById('profile-name').textContent,
                     timestamp: serverTimestamp()
                 });
+            } catch (error) {
+                console.error('Chat send failed:', error);
+                addMessage('System', `Chat failed to send: ${error.message || 'Unknown error'}`);
+            } finally {
+                sendBtn.disabled = false;
             }
         }
-        document.getElementById('send-chat-btn').onclick = sendChat;
-        
-        // Connect Enter key to Send button
-        document.getElementById('chat-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+
+        document.getElementById('send-chat-btn').addEventListener('click', () => {
+            sendChat();
+        });
+
+        document.getElementById('chat-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendChat();
             }
         });
 
         // OpenAI Logic
-        document.getElementById('generate-rhyme-btn').onclick = async () => {
-            await ensurePersonaRegistryLoaded();
-            const input = document.getElementById('chat-input').value;
-            const persona = getActiveCouncilPersona();
-            if(!openAIKey) return alert("Please set OpenAI API Key in Profile tab first!");
-            if(!input) return;
-            setRapperPerforming(true);
-            addMessage('System', `${persona.label} is performing...`);
-            try {
-                const res = await fetch('https://api.openai.com/v1/responses', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${openAIKey}`
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-4.1-mini',
-                        input: [
-                            { role: 'system', content: persona.systemInstruction || DEFAULT_RAPPER_PROMPT },
-                            { role: 'user', content: persona.buildUserPrompt(input) }
-                        ],
-                        max_output_tokens: 450
-                    })
-                });
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.error?.message || 'OpenAI request failed');
+        const generateRhymeBtn = document.getElementById('generate-rhyme-btn');
+        if (generateRhymeBtn) {
+            generateRhymeBtn.onclick = async () => {
+                await ensurePersonaRegistryLoaded();
+                const input = document.getElementById('chat-input').value;
+                const persona = getActiveCouncilPersona();
+                if(!openAIKey) return alert("Please set OpenAI API Key in Profile tab first!");
+                if(!input) return;
+                setRapperPerforming(true);
+                addMessage('System', `${persona.label} is performing...`);
+                try {
+                    const res = await fetch('https://api.openai.com/v1/responses', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${openAIKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4.1-mini',
+                            input: [
+                                { role: 'system', content: persona.systemInstruction || DEFAULT_RAPPER_PROMPT },
+                                { role: 'user', content: persona.buildUserPrompt(input) }
+                            ],
+                            max_output_tokens: 450
+                        })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.error?.message || 'OpenAI request failed');
+                    }
+                    const rap = data.output_text || data.output?.[0]?.content?.[0]?.text || 'No response text returned.';
+                    addMessage(persona.responseName, rap);
+                } catch(e) {
+                    addMessage('System', 'AI Error: ' + e.message);
+                } finally {
+                    setRapperPerforming(false);
                 }
-                const rap = data.output_text || data.output?.[0]?.content?.[0]?.text || 'No response text returned.';
-                addMessage(persona.responseName, rap);
-            } catch(e) {
-                addMessage('System', 'AI Error: ' + e.message);
-            } finally {
-                setRapperPerforming(false);
-            }
-        };
+            };
+        }
 
         function addMessage(name, text) {
             const div = document.createElement('div');
@@ -2242,6 +2269,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 snap.docChanges().forEach(change => {
                     if(change.type === 'added' && !change.doc.metadata.hasPendingWrites) {
                         const d = change.doc.data();
+                        if (d.userId === userId) return;
                         addMessage(d.name || 'Anon', d.text);
                     }
                 });
