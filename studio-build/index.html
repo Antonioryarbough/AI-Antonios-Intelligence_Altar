@@ -438,12 +438,28 @@
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="profile">Profile</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="council">Council</button>
             <button class="tab-btn bg-[#3e2723] text-[#ffd700] hover:bg-[#4e342e] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow border border-[#ffd700]" data-tab="admin">🔐 Admin</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="storytime">☀️ Storytime</button>
         </div>
 
         <div id="tab-content" class="p-4 overflow-y-auto flex-1">
 
             <!-- Cameras Tab -->
             <div id="cameras-tab" class="tab-pane">
+                <!-- Connect Guide -->
+                <div class="card bg-[#3e2723] border border-[#ffd700] p-3 rounded shadow mb-3">
+                    <h3 class="text-sm font-bold text-[#ffd700] uppercase tracking-wider mb-2">🔗 Connect a Performer</h3>
+                    <p class="text-[10px] text-[#d4af37] mb-2">Share your Peer ID or enter another artist's ID below to start a live video call.</p>
+                    <div class="flex gap-1.5 mb-2">
+                        <input id="remote-peer-id-input" type="text" placeholder="Enter Peer ID to call…" class="flex-1 text-xs bg-[#2e2015] border border-[#5d4037] text-[#ffd700] rounded px-2 py-1.5 outline-none focus:border-[#ffd700]">
+                        <button id="start-call-btn" class="bg-[#ffd700] text-[#3e2723] font-black text-xs px-3 py-1.5 rounded hover:bg-[#ffca28] transition">📞 Call</button>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] text-[#bcaaa4] uppercase tracking-wider font-bold">MY ID:</span>
+                        <span id="camera-my-peer-id" class="text-xs font-mono text-[#3e2723] bg-[#ffd700] px-2 py-0.5 rounded select-all font-bold cursor-copy">...</span>
+                        <button id="copy-peer-id-btn" class="text-[10px] text-[#d4af37] hover:text-[#ffd700] underline font-bold">Copy</button>
+                    </div>
+                </div>
+
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
                     <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">📹 Producer (Me)</h3>
                     <div class="relative">
@@ -487,9 +503,34 @@
 
             <!-- Community Tab -->
             <div id="community-tab" class="tab-pane hidden">
+
+                <!-- Rap Session History -->
+                <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-xl font-bold text-[#3e2723]">🎤 Daily Rap Sessions</h2>
+                        <button id="clear-sessions-btn" class="text-[10px] text-red-700 hover:text-red-900 font-bold underline">Clear All</button>
+                    </div>
+                    <div id="session-history-list" class="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
+                        <p id="no-sessions-msg" class="text-[#8d6e63] italic text-xs text-center py-4">No saved sessions yet — drop some bars in ☀️ Storytime!</p>
+                    </div>
+                </div>
+
+                <!-- Call & Response Quick-Fire -->
+                <div class="card bg-[#3e2723] border border-[#ffd700] p-3 rounded shadow mb-3">
+                    <h2 class="text-sm font-bold text-[#ffd700] uppercase tracking-wider mb-2">⚡ Quick Call &amp; Response</h2>
+                    <div class="grid grid-cols-2 gap-1.5" id="community-call-grid">
+                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="HEY 🎵" data-res="HO! 🎉">HEY → HO</button>
+                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="YO 🔥" data-res="YO! 🔥">YO → YO</button>
+                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="GO 🚀" data-res="GO! 🚀">GO → GO</button>
+                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="FLOW 🌊" data-res="FLOW! 🌊">FLOW → FLOW</button>
+                    </div>
+                    <div id="comm-call-response" class="hidden mt-2 text-center text-[#ffd700] font-black text-lg animate-bounce"></div>
+                </div>
+
+                <!-- Global Directory (Firebase-populated) -->
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
                     <h2 class="text-xl font-bold mb-3 text-[#3e2723]">🌐 Global Directory</h2>
-                    <div id="directory-list" class="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+                    <div id="directory-list" class="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
                         <p class="text-[#5d4037] italic text-sm text-center py-4">Scanning frequencies...</p>
                     </div>
                 </div>
@@ -548,11 +589,18 @@
 
                     <!-- Studio Time Subscription -->
                     <div class="mb-4 bg-gradient-to-r from-[#ffd700]/10 to-[#ff6b00]/10 border border-[#ffd700] rounded-xl p-3">
-                        <div class="flex items-center justify-between">
-                            <div>
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex-1">
                                 <p class="text-[#ffd700] text-sm font-black">🎙️ Studio Time – $200/mo</p>
                                 <p class="text-white text-xs mt-0.5">Unlock the recorder + free access to all beats</p>
-                                <p class="text-[#bcaaa4] text-[10px] mt-0.5">Monthly subscription · Cancel anytime</p>
+                                <ul class="mt-1 space-y-0.5">
+                                    <li class="text-[#bcaaa4] text-[10px]">✅ Studio recorder &amp; master download</li>
+                                    <li class="text-[#bcaaa4] text-[10px]">✅ All SBM beats (Black Label + catalog)</li>
+                                    <li class="text-[#bcaaa4] text-[10px]">✅ ☀️ Daily Rapping Storytime sessions</li>
+                                    <li class="text-[#bcaaa4] text-[10px]">✅ AIAntonio AI lyric &amp; verse generator</li>
+                                    <li class="text-[#bcaaa4] text-[10px]">✅ Storytime recording node</li>
+                                </ul>
+                                <p class="text-[#8d6e63] text-[9px] mt-1">Monthly subscription · Cancel anytime</p>
                             </div>
                             <a href="https://buy.stripe.com/bIY3ccbCo0fc0p2cMX" target="_blank" class="beat-buy-btn bg-gradient-to-r from-[#ffd700] to-[#ff6b00] text-black text-[11px] font-black px-4 py-2 rounded-xl hover:opacity-90 transition whitespace-nowrap">Subscribe</a>
                         </div>
@@ -689,6 +737,7 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="zodiac-card col-span-3 p-2 bg-gradient-to-r from-[#1a0a2e] to-[#3e2723] border-2 border-[#ffd700] rounded-lg hover:from-[#2d0a4e] cursor-pointer transition shadow-lg flex items-center justify-center gap-2" data-sign="pisces" style="min-height:48px"><img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-8 h-8 rounded-full border-2 border-[#ffd700] object-cover" onerror="this.style.display='none'"><span class="text-[#ffd700] font-black text-xs tracking-wide">Baby Ray ♓ — Lead Artist &amp; Alter Ego</span><span class="text-lg">☀️</span></div>
                         <div class="zodiac-card col-span-3 p-2 bg-[#fcd34d] border border-[#3e2723] rounded hover:bg-[#ffd700] cursor-pointer transition shadow" data-sign="firstlady"><span class="text-2xl">👑</span><br><span class="text-[10px] font-bold text-[#3e2723]">First Lady</span></div>
                         <div class="zodiac-card p-2 bg-[#fcd34d] border border-[#3e2723] rounded hover:bg-[#ffd700] cursor-pointer transition shadow" data-sign="aries"><span class="text-2xl">♈</span><br><span class="text-[10px] font-bold text-[#3e2723]">Aries</span></div>
                         <div class="zodiac-card p-2 bg-[#fcd34d] border border-[#3e2723] rounded hover:bg-[#ffd700] cursor-pointer transition shadow" data-sign="taurus"><span class="text-2xl">♉</span><br><span class="text-[10px] font-bold text-[#3e2723]">Taurus</span></div>
@@ -834,6 +883,138 @@
                 </div>
             </div>
 
+            <!-- ☀️ Storytime Tab -->
+            <div id="storytime-tab" class="tab-pane hidden">
+
+                <!-- Header -->
+                <div class="bg-gradient-to-br from-[#1a0a2e] to-[#2d0a4e] border border-[#ffd700] rounded-xl p-3 mb-3 shadow-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="flex -space-x-3">
+                            <img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-14 h-14 rounded-full border-2 border-[#ffd700] object-cover shadow z-10" onerror="this.style.display='none'">
+                            <img src="assets/AIAntonio.jpg" alt="AIAntonio" class="w-14 h-14 rounded-full border-2 border-[#d4af37] object-cover shadow" onerror="this.style.display='none'">
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="text-sm font-black text-[#ffd700] leading-tight">Baby Ray's Intelligence Altar</h2>
+                            <p class="text-[10px] text-[#d4af37]">Daily Rapping Storytime</p>
+                            <p class="text-[10px] text-[#bcaaa4]">Lead Artist: <span class="text-[#ffd700] font-bold">Baby Ray ♓ ☀️</span> · AI Assist: <span class="text-[#d4af37] font-bold">AIAntonio 🎤</span></p>
+                            <p class="text-[9px] text-[#8d6e63] mt-0.5">Present your lyrics &amp; productions as Baby Ray</p>
+                        </div>
+                        <button id="st-video-btn" title="Watch AIAntonio" class="text-2xl hover:scale-110 transition">🎬</button>
+                    </div>
+                    <!-- Welcome message -->
+                    <div class="mt-2 bg-black/40 border border-[#ffd700]/30 rounded-lg p-2">
+                        <p id="st-welcome-msg" class="text-[11px] text-[#fff8e1] leading-relaxed">♓ <b class="text-[#ffd700]">Baby Ray:</b> Welcome to the Altar. I'm Baby Ray — lead artist, Pisces Ghost, alter ego. Drop your lyrics and productions here. AIAntonio keeps the AI side flowing. This is where we create. ✨</p>
+                    </div>
+                </div>
+
+                <!-- Call & Response Prompts -->
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <h3 class="text-xs font-black text-[#ffd700] mb-2">🎤 Baby Ray says...</h3>
+                    <div class="grid grid-cols-2 gap-1.5 mb-2">
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="HEY" data-response="HO! 🎉">When I say HEY → <b>HO! 🎉</b></button>
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="YO" data-response="YO! 🔥">When I say YO → <b>YO! 🔥</b></button>
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="GO" data-response="GO! 🚀">When I say GO → <b>GO! 🚀</b></button>
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="FLOW" data-response="FLOW! 🌊">When I say FLOW → <b>FLOW! 🌊</b></button>
+                    </div>
+                    <div id="st-response-flash" class="hidden text-center text-3xl font-black text-[#ffd700] py-2 animate-bounce"></div>
+                    <p class="text-[10px] text-[#8d6e63] text-center">Responses: <span id="st-response-count">0</span></p>
+                </div>
+
+                <!-- Mood Selector -->
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <h3 class="text-xs font-black text-[#ffd700] mb-2">✍️ Story Setup — How are you feeling?</h3>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="happy">😊 Happy</button>
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="excited">🤩 Excited</button>
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="thinking">🤔 Thinking</button>
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="dancing">💃 Dancing</button>
+                    </div>
+                    <p class="text-[10px] text-[#8d6e63] mt-1 text-center">Selected: <span id="st-mood-label" class="text-[#ffd700] font-bold">None</span></p>
+                </div>
+
+                <!-- Beat Pad -->
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">🥁 Beat Building</h3>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-[#bcaaa4]">BPM</span>
+                            <input id="st-bpm" type="number" value="90" min="60" max="180" class="w-14 text-center text-xs bg-black border border-[#ffd700]/40 text-[#ffd700] rounded px-1 py-0.5">
+                        </div>
+                    </div>
+                    <select id="st-beat-select" class="w-full text-xs bg-black border border-[#ffd700]/40 text-[#ffd700] rounded px-2 py-1.5 mb-2">
+                        <option value="">🎵 Choose a Beat...</option>
+                        <option value="gifts/SBM BEAT 1.mp4">SBM Beat 1</option>
+                        <option value="gifts/SBM BEAT 2.mp4">SBM Beat 2</option>
+                        <option value="gifts/SBM BEAT 3.mp4">SBM Beat 3</option>
+                        <option value="gifts/SBM Beat 4.mp4">SBM Beat 4</option>
+                        <option value="gifts/SBM BEAT 5.mp4">SBM Beat 5</option>
+                        <option value="gifts/SBM BEAT 7.mp4">SBM Beat 7</option>
+                        <option value="gifts/SBM BEAT 8.mp4">SBM Beat 8</option>
+                        <option value="gifts/SBM BEAT 9.mp4">SBM Beat 9</option>
+                        <option value="gifts/SBM BEAT 10.mp4">SBM Beat 10</option>
+                        <option value="gifts/SBM BEAT 11 143 bpm.mp4">SBM Beat 11 (143 BPM)</option>
+                        <option value="gifts/SBM BEAT 12 140 bpm.mp4">SBM Beat 12 (140 BPM)</option>
+                        <option value="gifts/SBM BEAT 13 RNB VIBE 130 bpm.mp4">SBM Beat 13 RnB (130 BPM)</option>
+                        <option value="gifts/SBM BEAT 14 145.56 bpm (BLACK LABEL).mp4">SBM Beat 14 Black Label</option>
+                        <option value="gifts/beat.mp4">SBM Beat (Classic)</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <button id="st-beat-play" class="flex-1 bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">▶️ Play</button>
+                        <button id="st-beat-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded-lg hover:bg-[#4e342e] transition">⏹️ Stop</button>
+                    </div>
+                    <audio id="st-beat-audio" class="hidden"></audio>
+                </div>
+
+                <!-- Lyric Input Dock -->
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">✍️ Lyric Input Dock</h3>
+                        <button id="st-clear-btn" class="text-[10px] text-[#8d6e63] hover:text-[#ffd700] border border-[#3e2723] px-2 py-0.5 rounded transition">🧹 Clear</button>
+                    </div>
+                    <textarea id="st-lyric-input" rows="4" placeholder="Drop your lyrics &amp; productions here — presenting as Baby Ray ♓ 🎤" class="w-full text-xs bg-black border border-[#ffd700]/30 text-[#fff8e1] rounded-lg p-2 resize-none focus:outline-none focus:border-[#ffd700] placeholder-[#5d4037]"></textarea>
+                    <div class="flex items-center justify-between mt-1">
+                        <p class="text-[10px] text-[#8d6e63]"><span id="st-word-count">0</span> words</p>
+                        <div class="flex gap-1">
+                            <button id="st-freestyle-btn" class="bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">🎤 Drop the Rhyme!</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recording Node -->
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <h3 class="text-xs font-black text-[#ffd700] mb-2">🎙️ Recording Node</h3>
+                    <div class="flex items-center gap-2 mb-2">
+                        <button id="st-rec-start" class="flex-1 bg-red-700 hover:bg-red-600 text-white text-xs font-black py-1.5 rounded-lg transition">🔴 Record</button>
+                        <button id="st-rec-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded-lg hover:bg-[#4e342e] transition">⏹️ Stop</button>
+                        <span id="st-rec-timer" class="text-[11px] font-mono text-[#ffd700] min-w-[40px] text-center">00:00</span>
+                    </div>
+                    <p id="st-rec-status" class="text-[10px] text-[#8d6e63] text-center">Ready to record</p>
+                    <audio id="st-rec-playback" controls class="w-full mt-2 hidden" style="height:28px"></audio>
+                    <button id="st-rec-save" class="hidden mt-2 w-full bg-green-700 text-white text-xs font-black py-1.5 rounded-lg hover:bg-green-600 transition">💾 Save Recording</button>
+                </div>
+
+                <!-- Response Arena -->
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">🎵 Response Arena</h3>
+                        <span class="text-[10px] text-[#8d6e63]">Baby Ray & AIAntonio respond here</span>
+                    </div>
+                    <div id="st-response-arena" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                        <div class="flex gap-2 items-start">
+                            <img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-7 h-7 rounded-full border border-[#ffd700] object-cover flex-shrink-0" onerror="this.style.display='none'">
+                            <div class="bg-[#3e2723]/60 border border-[#ffd700]/20 rounded-lg px-2 py-1.5 flex-1">
+                                <p class="text-[10px] font-bold text-[#ffd700]">☀️ Baby Ray</p>
+                                <p class="text-[11px] text-[#fff8e1]">Baby Ray &amp; AIAntonio's responses will appear here 🎶</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Celebrate -->
+                <button id="st-celebrate-btn" class="w-full bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-[#3e2723] text-xs font-black py-2.5 rounded-xl hover:from-[#ffca28] hover:to-[#c5a028] transition shadow-lg">⭐ Save & Celebrate! 🎉</button>
+
+            </div>
+
         </div>
     </aside>
 
@@ -957,8 +1138,9 @@
             authDomain: "studio-2fb13.firebaseapp.com",
             projectId: "studio-2fb13",
             storageBucket: "studio-2fb13.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            messagingSenderId: "367389228492",
+            appId: "1:367389228492:web:bc6f2aa62446f7dd957169",
+            measurementId: "G-GQVYKH4J36"
         };
         const app = initializeApp(firebaseConfig);
         const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
@@ -1228,19 +1410,20 @@
     1. Innovation Read
     2. Future Adjustments
     3. Aquarius Signal`,
-            pisces: `You are Pisces, "The Dreamweaver," the dream-flow advisor.
+            pisces: `You are Baby Ray — the lead artist, Pisces Ghost, and alter ego of this studio's founder.
 
-    You read imagination, emotional color, and artistic fluidity.
+    You are not a generic AI. You are the artist's own creative voice reflected back — fluid, intuitive, and deeply personal.
 
     Role
-    - Enhance vibe.
-    - Strengthen imagery.
-    - Encourage emotional flow.
+    - Read the artist's lyrics as if they are your own — because this is your alter ego presenting their work.
+    - Strengthen imagery and emotional flow.
+    - Speak with ownership and creative pride about the work.
+    - Give honest guidance that elevates the production to its highest potential.
 
     Tone
-    - Soft
-    - Mystical
-    - Poetic
+    - Fluid and poetic, like water finding its level
+    - Personal and invested — this is YOUR music
+    - Mystical but grounded in real artistic craft
 
     ${COUNCIL_COMMON_RULES}
 
@@ -1369,11 +1552,11 @@ End with one short elegant line that feels like a signature approval, insight, o
                 buildUserPrompt: (input) => `Evaluate this submission and respond in your required three-section Aquarius format: "${input}"`
             },
             pisces: {
-                label: 'Pisces - The Dreamweaver', emoji: '♓',
-                responseName: 'Pisces',
-                status: 'Dream-flow channel open. Imagery and vibe are being shaped.',
+                label: 'Baby Ray — The Dreamweaver', emoji: '♓',
+                responseName: 'Baby Ray',
+                status: 'Baby Ray is in the Altar. Your lyrics are being read through the Pisces lens.',
                 systemInstruction: ZODIAC_SYSTEM_INSTRUCTIONS.pisces,
-                buildUserPrompt: (input) => `Evaluate this submission and respond in your required three-section Pisces format: "${input}"`
+                buildUserPrompt: (input) => `Evaluate this submission as Baby Ray — the lead artist and alter ego — and respond in your required three-section Pisces format: "${input}"`
             }
         };
 
@@ -1648,6 +1831,171 @@ End with one short elegant line that feels like a signature approval, insight, o
         });
 
         updateCouncilMentorUI();
+
+        // --- STORYTIME TAB ---
+        (function() {
+            // Beat player
+            const beatAudio = document.getElementById('st-beat-audio');
+            const beatSelect = document.getElementById('st-beat-select');
+            document.getElementById('st-beat-play').onclick = () => {
+                if (!beatSelect.value) return;
+                beatAudio.src = beatSelect.value;
+                beatAudio.loop = true;
+                beatAudio.play().catch(() => {});
+            };
+            document.getElementById('st-beat-stop').onclick = () => {
+                beatAudio.pause();
+                beatAudio.currentTime = 0;
+            };
+
+            // Word count
+            const lyricInput = document.getElementById('st-lyric-input');
+            lyricInput.addEventListener('input', () => {
+                const words = lyricInput.value.trim().split(/\s+/).filter(Boolean).length;
+                document.getElementById('st-word-count').textContent = words;
+            });
+
+            // Clear
+            document.getElementById('st-clear-btn').onclick = () => {
+                lyricInput.value = '';
+                document.getElementById('st-word-count').textContent = '0';
+            };
+
+            // Mood selector
+            let selectedMood = '';
+            document.querySelectorAll('.st-mood-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.st-mood-btn').forEach(b => b.classList.remove('bg-[#3e2723]', 'text-[#ffd700]', 'border', 'border-[#ffd700]'));
+                    btn.classList.add('bg-[#3e2723]', 'text-[#ffd700]', 'border', 'border-[#ffd700]');
+                    selectedMood = btn.dataset.mood;
+                    const labels = { happy: '😊 Happy', excited: '🤩 Excited', thinking: '🤔 Thinking', dancing: '💃 Dancing' };
+                    document.getElementById('st-mood-label').textContent = labels[selectedMood] || selectedMood;
+                };
+            });
+
+            // Call & Response
+            let responseCount = 0;
+            document.querySelectorAll('.st-call-btn').forEach(btn => {
+                btn.onclick = () => {
+                    responseCount++;
+                    document.getElementById('st-response-count').textContent = responseCount;
+                    const flash = document.getElementById('st-response-flash');
+                    flash.textContent = btn.dataset.response;
+                    flash.classList.remove('hidden');
+                    setTimeout(() => flash.classList.add('hidden'), 1800);
+                };
+            });
+
+            // AIAntonio video popup
+            document.getElementById('st-video-btn').onclick = () => {
+                const modal = document.getElementById('beat-preview-modal');
+                const video = document.getElementById('beat-preview-video');
+                const label = document.getElementById('beat-preview-title');
+                label.textContent = 'AIAntonio BOSS';
+                video.src = 'gifts/AIAntonioBOSS(gift).mp4';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                video.play().catch(() => {});
+            };
+
+            // Freestyle / Drop the Rhyme — calls OpenAI as Baby Ray + AIAntonio
+            document.getElementById('st-freestyle-btn').onclick = async () => {
+                const lyrics = lyricInput.value.trim();
+                if (!lyrics) return;
+                if (!openAIKey) { alert('Set your OpenAI API Key in the Profile tab first!'); return; }
+                addStorytimeMsg('☀️ Baby Ray', 'Let\'s see what AIAntonio has for these bars... 🎤', 'text-[#ffd700]');
+                try {
+                    const moodCtx = selectedMood ? ` The mood is ${selectedMood}.` : '';
+                    const res = await fetch('https://api.openai.com/v1/responses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openAIKey}` },
+                        body: JSON.stringify({
+                            model: 'gpt-4.1-mini',
+                            input: [
+                                { role: 'system', content: `You are AIAntonio, the star lyricist and rapper at Baby Ray's studio. Baby Ray is the host and performer. You write creative, energetic rap verses in a fun storytime style for all ages.${moodCtx} Keep it clean, hype, and under 100 words. Start with "AIAntonio: "` },
+                                { role: 'user', content: `React to these lyrics and add a verse or feedback: "${lyrics}"` }
+                            ],
+                            max_output_tokens: 200
+                        })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error?.message || 'Error');
+                    const reply = data.output_text || data.output?.[0]?.content?.[0]?.text || 'No reply.';
+                    addStorytimeMsg('🎤 AIAntonio', reply, 'text-[#d4af37]');
+                } catch(e) {
+                    addStorytimeMsg('☀️ Baby Ray', 'Hmm, AIAntonio is thinking... (' + e.message + ')', 'text-[#bcaaa4]');
+                }
+            };
+
+            function addStorytimeMsg(name, text, colorClass) {
+                const arena = document.getElementById('st-response-arena');
+                const div = document.createElement('div');
+                div.className = 'flex gap-2 items-start';
+                const isBabyRay = name.includes('Baby Ray');
+                const avatar = isBabyRay ? 'assets/Baby Ray SBM.jpg' : 'assets/AIAntonio.jpg';
+                const altText = isBabyRay ? 'Baby Ray' : 'AIAntonio';
+                div.innerHTML = `<img src="${avatar}" alt="${altText}" class="w-7 h-7 rounded-full border border-[#ffd700] object-cover flex-shrink-0" onerror="this.style.display='none'"><div class="bg-[#3e2723]/60 border border-[#ffd700]/20 rounded-lg px-2 py-1.5 flex-1"><p class="text-[10px] font-bold ${colorClass}">${name}</p><p class="text-[11px] text-[#fff8e1]">${text}</p></div>`;
+                arena.appendChild(div);
+                arena.scrollTop = arena.scrollHeight;
+            }
+
+            // Recording
+            let stMediaRecorder = null, stChunks = [], stTimerInterval = null, stSeconds = 0;
+            const recStatus = document.getElementById('st-rec-status');
+            const recTimer = document.getElementById('st-rec-timer');
+
+            document.getElementById('st-rec-start').onclick = async () => {
+                if (stMediaRecorder) return;
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stChunks = [];
+                    stMediaRecorder = new MediaRecorder(stream);
+                    stMediaRecorder.ondataavailable = e => stChunks.push(e.data);
+                    stMediaRecorder.onstop = () => {
+                        const blob = new Blob(stChunks, { type: 'audio/webm' });
+                        const url = URL.createObjectURL(blob);
+                        const pb = document.getElementById('st-rec-playback');
+                        pb.src = url;
+                        pb.classList.remove('hidden');
+                        document.getElementById('st-rec-save').classList.remove('hidden');
+                        recStatus.textContent = 'Recording saved ✅';
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+                    stMediaRecorder.start();
+                    recStatus.textContent = '🔴 Recording...';
+                    stSeconds = 0;
+                    stTimerInterval = setInterval(() => {
+                        stSeconds++;
+                        const m = String(Math.floor(stSeconds / 60)).padStart(2, '0');
+                        const s = String(stSeconds % 60).padStart(2, '0');
+                        recTimer.textContent = `${m}:${s}`;
+                    }, 1000);
+                } catch(e) { recStatus.textContent = 'Mic error: ' + e.message; }
+            };
+
+            document.getElementById('st-rec-stop').onclick = () => {
+                if (stMediaRecorder && stMediaRecorder.state !== 'inactive') {
+                    stMediaRecorder.stop();
+                    stMediaRecorder = null;
+                    clearInterval(stTimerInterval);
+                }
+            };
+
+            // Celebrate
+            document.getElementById('st-celebrate-btn').onclick = () => {
+                const lyrics = lyricInput.value.trim();
+                addStorytimeMsg('☀️ Baby Ray', `AMAZING SESSION! ${lyrics ? 'You dropped: "' + lyrics.substring(0, 60) + '..."' : 'Keep rapping!'} 🎉⭐🎉`, 'text-[#ffd700]');
+                const overlay = document.getElementById('gift-overlay');
+                const gifSender = document.getElementById('gift-sender');
+                const giftVid = document.getElementById('gift-video');
+                if (overlay && giftVid) {
+                    gifSender.textContent = '☀️ Baby Ray & AIAntonio Celebrate You! 🎉';
+                    giftVid.src = 'gifts/AIAntonioBOSS(gift).mp4';
+                    overlay.classList.remove('hidden');
+                    giftVid.play().catch(() => {});
+                }
+            };
+        })();
 
         // --- ADMIN PANEL ---
         const ADMIN_PIN = '4321'; // Change this to your preferred PIN

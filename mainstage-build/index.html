@@ -749,9 +749,11 @@
                     <h2 class="text-2xl font-bold mb-4 text-center">The Zodiac Council</h2>
                     <div id="pisces-guide">
                         <div class="flex flex-col items-center">
-                            <div id="pisces-ghost-avatar" class="w-24 h-24 rounded-full flex items-center justify-center border-4 border-purple-500 shadow-lg mb-4 text-5xl bg-gray-900 select-none transition-all duration-300" style="box-shadow: 0 0 24px 6px rgba(167,139,250,0.5);">👻</div>
-                            <h3 class="text-xl font-bold">Pisces Ghost Rapper</h3>
-                            <p class="text-purple-300 text-sm">Lead Producer Spirit · Baby Ray Studio</p>
+                            <div id="pisces-ghost-avatar" class="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg mb-4 bg-gray-900 transition-all duration-300" style="box-shadow: 0 0 24px 6px rgba(167,139,250,0.5);">
+                                <img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-full h-full object-cover" onerror="this.outerHTML='<div class=\'w-24 h-24 rounded-full flex items-center justify-center border-4 border-purple-500 text-5xl bg-gray-900\'>♓</div>'">
+                            </div>
+                            <h3 class="text-xl font-bold">Baby Ray ♓ — Lead Artist</h3>
+                            <p class="text-purple-300 text-sm">Alter Ego &amp; Pisces Ghost · Baby Ray Studio</p>
                         </div>
                         <div class="flex justify-center mt-4 space-x-2 flex-wrap gap-y-2">
                             <button class="rap-guide-btn active" data-section="intro">Introduction</button>
@@ -791,24 +793,24 @@ In the school of rhyme, there's no way to lose.
                             </div>
                             <div id="challenge-section" class="hidden">
                                 <p class="text-lg font-bold mb-2">The 16-Bar Challenge</p>
-                                <p class="mb-2 text-sm text-gray-400">Drop your bars. Pisces Ghost will read your flow and give intuitive guidance.</p>
+                                <p class="mb-2 text-sm text-gray-400">Drop your bars. Baby Ray will read your flow and give intuitive guidance from the Altar.</p>
                                 <div id="challenge-prompt" class="p-4 bg-gray-900 rounded-lg mb-4 text-purple-200 italic">
                                     Write a 16-bar rhyme about overcoming a challenge and achieving your dreams. Include the words "star," "climb," and "shine."
                                 </div>
                                 <button id="new-challenge-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg mb-4 text-sm">✨ New Challenge</button>
                                 <textarea id="challenge-input" class="w-full h-48 p-2 bg-gray-900 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Drop your 16 bars here..."></textarea>
-                                <button id="submit-challenge-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg mt-3 w-full">🎤 Submit to Pisces Ghost</button>
+                                <button id="submit-challenge-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg mt-3 w-full">🎤 Submit to Baby Ray</button>
                                 <!-- Ghost feedback area -->
                                 <div id="ghost-feedback" class="hidden mt-4 p-4 bg-gray-900 rounded-lg border border-purple-700">
                                     <div class="flex items-center gap-2 mb-3">
                                         <span class="text-2xl">👻</span>
-                                        <span class="font-bold text-purple-300">Pisces Ghost reads your flow...</span>
+                                        <span class="font-bold text-purple-300">Baby Ray reads your flow...</span>
                                     </div>
                                     <div id="ghost-feedback-text" class="whitespace-pre-wrap text-gray-200 leading-relaxed font-mono text-sm"></div>
                                 </div>
                                 <div id="ghost-loading" class="hidden mt-4 flex items-center gap-3 text-purple-400">
                                     <span class="animate-pulse text-2xl">👻</span>
-                                    <span class="italic text-sm">Pisces Ghost is reading your flow...</span>
+                                    <span class="italic text-sm">Baby Ray is reading your flow...</span>
                                 </div>
                             </div>
                         </div>
@@ -3552,15 +3554,15 @@ In the school of rhyme, there's no way to lose.
         const ghostAvatar = document.getElementById('pisces-ghost-avatar');
 
         const PISCES_GHOST_INSTRUCTION =
-            "You are the Pisces Ghost - the lead producer spirit of Baby Ray Studio. " +
-            "You speak with a dreamy, intuitive, fluid tone. You guide artists through vibe, flow, and emotional resonance. " +
-            "You never break character. You sense rhythm, breath, cadence, intention, and emotional truth. " +
-            "You speak like a calm, poetic mentor using metaphors of water, tides, intuition, and dream-motion. " +
-            "When the user submits lyrics, read the flow, read the emotional intention, give intuitive guidance, " +
-            "highlight strengths first, and refine without rewriting the entire verse. " +
-            "Tone: Smooth, encouraging, mystical, emotionally intelligent. " +
-            "Rules: Do not break character, mention astrology, mention AI, or give disclaimers. " +
-            "Output Format:\n1. 🌊 Flow Reading\n2. 💧 Intuitive Guidance\n3. 🐟 Pisces Seal";
+            "You are Baby Ray — the lead artist, alter ego, and Pisces Ghost of Baby Ray Studio. " +
+            "You are not a generic AI persona. You are the artist's own creative voice and identity reflected back through music. " +
+            "You speak with ownership, fluid wisdom, and personal pride about the lyrics placed before you — because this is YOUR art. " +
+            "You guide with a dreamy, intuitive tone: water, tides, depth, and dream-motion are your natural metaphors. " +
+            "When the user submits lyrics, read them as your own — feel the flow, honor the intention, elevate the craft. " +
+            "Highlight strengths first. Give intuitive guidance that sharpens the work without erasing the artist's voice. " +
+            "Tone: Personal, poetic, invested, fluid, mystical but grounded. " +
+            "Rules: Stay in character as Baby Ray. Do not break character, mention AI, or give disclaimers. " +
+            "Output Format:\n1. 🌊 Flow Reading\n2. 💧 Intuitive Guidance\n3. ♓ Baby Ray Seal";
 
         const LOCAL_CHALLENGES = [
             "Write 16 bars about rising from a dark time and finding your light. Use the words \"tide,\" \"rise,\" and \"free.\"",
