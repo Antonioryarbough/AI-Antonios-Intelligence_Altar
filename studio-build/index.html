@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Enterprise Studio</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script>tailwind = { config: { corePlugins: { preflight: false } } }</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
@@ -29,46 +31,12 @@
         
         @keyframes splashFadeOut { from { opacity:1; } to { opacity:0; pointer-events:none; } }
         #intro-splash.fading { animation: splashFadeOut 1s ease forwards; }
-        /* Gift overlay + roaming gift card animation */
-        #gift-video-overlay { animation: none; opacity: 0; }
-        #gift-video-overlay.show { opacity: 1; transition: opacity 220ms ease; }
-        #gift-video-overlay.hide { opacity: 0; transition: opacity 380ms ease; }
-        #gift-video-overlay .gift-roamer {
-            will-change: transform;
-            animation-duration: var(--gift-roam-duration, 12s);
-            animation-timing-function: linear;
-            animation-fill-mode: forwards;
-        }
-        #gift-video-overlay .gift-roamer.roam-a { animation-name: giftRoamA; }
-        #gift-video-overlay .gift-roamer.roam-b { animation-name: giftRoamB; }
-        #gift-video-overlay .gift-roamer.roam-c { animation-name: giftRoamC; }
-
-        @keyframes giftRoamA {
-            0%   { transform: translate(-36vw, 20vh) scale(0.62) rotate(-12deg); }
-            18%  { transform: translate(-14vw, -18vh) scale(0.82) rotate(6deg); }
-            42%  { transform: translate(10vw, -10vh) scale(0.95) rotate(-4deg); }
-            66%  { transform: translate(24vw, 12vh) scale(1) rotate(8deg); }
-            86%  { transform: translate(4vw, 18vh) scale(0.9) rotate(-6deg); }
-            100% { transform: translate(-12vw, -4vh) scale(0.84) rotate(0deg); }
-        }
-
-        @keyframes giftRoamB {
-            0%   { transform: translate(32vw, -18vh) scale(0.64) rotate(10deg); }
-            22%  { transform: translate(8vw, -4vh) scale(0.86) rotate(-8deg); }
-            46%  { transform: translate(-12vw, 14vh) scale(0.98) rotate(5deg); }
-            68%  { transform: translate(-30vw, 2vh) scale(0.92) rotate(-5deg); }
-            88%  { transform: translate(-8vw, -16vh) scale(0.82) rotate(7deg); }
-            100% { transform: translate(14vw, 8vh) scale(0.88) rotate(0deg); }
-        }
-
-        @keyframes giftRoamC {
-            0%   { transform: translate(-2vw, 24vh) scale(0.62) rotate(-10deg); }
-            20%  { transform: translate(-24vw, 6vh) scale(0.86) rotate(8deg); }
-            44%  { transform: translate(-6vw, -18vh) scale(1) rotate(-7deg); }
-            70%  { transform: translate(24vw, -8vh) scale(0.92) rotate(6deg); }
-            90%  { transform: translate(10vw, 14vh) scale(0.84) rotate(-4deg); }
-            100% { transform: translate(-10vw, 2vh) scale(0.88) rotate(0deg); }
-        }
+        /* Gift video overlay fade */
+        #gift-video-overlay { animation: none; }
+        #gift-video-overlay.show { animation: giftFadeIn 0.4s ease forwards; }
+        #gift-video-overlay.hide { animation: giftFadeOut 0.5s ease forwards; }
+        @keyframes giftFadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+        @keyframes giftFadeOut { from { opacity:1; } to { opacity:0; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -85,7 +53,7 @@
             max-width: 100%;
             word-break: break-word;
         }
-
+        
         /* Video JS Customization */
         .video-js .vjs-control-bar { background: rgba(62, 39, 35, 0.9); }
         .video-js .vjs-big-play-button { background-color: rgba(255, 215, 0, 0.7); border-color: #ffd700; color: #3e2723; }
@@ -257,40 +225,320 @@
         }
 
         .hidden { display: none !important; }
+
+        /* Copilot Interface Styles */
+        iframe {
+            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+        }
+        .overlay {
+            /* hidden by default - display updated when dialog shown */
+            display: none;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            background-color: rgba(99, 94, 90, 0.4);
+            z-index: 999;
+        }
+        .dialog {
+            /* hidden by default - display updated when needed */
+            display: none;
+            position: absolute;
+            visibility: visible;
+            bottom: 16px;
+            left: 8px;
+            right: 8px;
+            z-index: 1000;
+            border-radius: 28px;
+            background-color: #f8f4f2;
+            overflow: overlay;
+            box-shadow:
+                0px 0px 8px 0px rgba(0, 0, 0, 0.04),
+                0px 32px 64px 0px rgba(0, 0, 0, 0.12);
+        }
+        .dialog-container {
+            padding-top: 32px;
+            padding-left: 16px;
+            padding-right: 16px;
+            padding-bottom: 16px;
+            row-gap: 28px;
+            display: flex;
+            flex-direction: column;
+        }
+        .upper-container {
+            display: flex;
+            flex-direction: column;
+            row-gap: 12px;
+        }
+        .header-container {
+            display: flex;
+            flex-direction: column;
+            row-gap: 12px;
+            padding-inline-start: 20px;
+            padding-inline-end: 20px;
+        }
+        .icons-container {
+            display: grid;
+            justify-content: center;
+        }
+        .icon {
+            grid-column: 1;
+            grid-row: 1;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 0, 0.12);
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+        }
+        .profile-icon {
+            transform: translateX(-32%);
+            z-index: 1001;
+        }
+        .copilot-icon {
+            transform: translateX(32%);
+            z-index: 1002;
+        }
+        .copilot-svg {
+            margin-top: 6px;
+            margin-left: 6px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 440;
+            text-align: center;
+            line-height: 31px;
+            margin: 0;
+            color: #131110;
+        }
+        .description {
+            font-size: 17px;
+            font-weight: 410;
+            text-align: center;
+            line-height: 26px;
+            color: #33302e;
+        }
+        .lower-container {
+            display: flex;
+            flex-direction: column;
+            row-gap: 12px;
+        }
+        .base-button {
+            display: block;
+            border: none;
+            cursor: pointer;
+            border-radius: 24px;
+            height: 48px;
+            width: 100%;
+            box-shadow: 0px 0.5px 3px 0px rgba(0, 0, 0, 0.2), 0px 0.5px 0.5px 0.5px rgba(255, 255, 255, 1) inset;
+            font-size: 17px;
+            font-weight: 410;
+            font-family: Ginto, ui-sans-serif, system-ui, sans-serif;
+        }
+        .primary-button {
+            background-color: #282523;
+            color: #fefcfb;
+        }
+        .primary-button:hover {
+            background-color: #131110;
+            color: #fefcfb;
+        }
+        .primary-button:active {
+            background-color: #1d1b1a;
+            color: #ccc4c0;
+        }
+        .primary-button:focus-visible {
+            outline: 2px solid #33302e;
+            outline-offset: 1px;
+        }
+        .primary-button:disabled {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #968f8c;
+            cursor: default;
+        }
+        .secondary-button {
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #33302e;
+        }
+        .secondary-button:hover {
+            background-color: #ffffff;
+            color: #33302e;
+        }
+        .secondary-button:active {
+            background-color: rgba(255, 255, 255, 0.6);
+            color: #7b7572;
+        }
+        .secondary-button:focus-visible {
+            outline: 2px solid #33302e;
+            outline-offset: 1px;
+        }
+        .secondary-button:disabled {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #968f8c;
+            cursor: default;
+        }
+        .disclaimer-text {
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 12px;
+            font-weight: 450;
+            line-height: 16px;
+            padding: 4px 20px;
+            margin: unset;
+            text-align: center;
+        }
+        .links-row {
+            display: flex;
+            justify-content: center;
+            column-gap: 20px;
+            padding-bottom: 16px;
+        }
+        .link {
+            color: rgba(0, 0, 0, 0.6);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 450;
+            line-height: 16px;
+        }
+        .link:hover {
+            text-decoration-line: underline;
+        }
+        .inline-link {
+            color: #33302e;
+        }
+
+        #underside-iframe-container {
+            background-color: transparent;
+        }
+        #try-again-button {
+            display: none;
+        }
+        .underside-splash-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            background: linear-gradient(180deg, #f8f4f2 0%, #fdedde 100%);
+            z-index: 9999;
+        }
+        .underside-splash-container.hidden {
+            display: none;
+        }
+        .underside-splash-container section {
+            position:relative;
+            margin:auto;
+            display: flex;
+            width: 100%;
+            max-width: 384px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding-inline: 20px;
+        }
+        .underside-splash-container h1{
+            font-size:38px;
+            line-height: 40px;
+            letter-spacing: -0.02em;
+            font-variation-settings: 'opsz' 40, 'wght' 480;
+            color: #282523;
+        }
+        .underside-splash-container h2 {
+            color: #33302e;
+            font-size: 17px;
+        }
+        .underside-splash-container button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #282523;
+            fill: #282523;
+            background-color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            min-height: 56px;
+            min-width: 56px;
+            padding: 14px 16px;
+            gap: 12px;
+            border-radius: 32px;
+            margin-top: 24px;
+            width: 100%;
+            border: none;
+            box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgb(255, 255, 255) 0px 0.5px 0.5px 0.5px inset;
+        }
+        .underside-splash-container button:hover {
+            background-color: #ffffff;
+        }
+        .underside-splash-container button:active {
+            color: #33302e;
+            fill: #33302e;
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        .underside-splash-container button:focus-visible {
+            z-index: 1;
+            outline: 2px solid #33302e;
+        }
+        .underside-splash-container svg {
+            width: 24px;
+            height: 24px;
+            fill: #282523;
+        }
     </style>
 </head>
 <body class="bg-[#1a120b] h-screen w-screen overflow-hidden">
 
     <!-- ===== SBM INTRO SPLASH ===== -->
-    <div id="intro-splash" class="fixed inset-0 z-[500] bg-black flex items-center justify-center cursor-pointer">
-        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline
-            src="gifts/preview%20video%20for%20SBM%20mafia(gift).mp4"></video>
+    <div id="intro-splash" class="fixed inset-0 z-[500] bg-black flex items-center justify-center cursor-pointer" onclick="closeSplash()">
+        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline></video>
         <div class="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none">
             <p class="text-white/60 text-xs animate-pulse">Tap anywhere to skip</p>
         </div>
     </div>
+
+    <!-- Early event wiring (non-module, runs immediately so tabs work before Firebase CDN loads) -->
     <script>
-        // Non-module script so closeSplash is available immediately (no defer)
-        (function() {
-            function closeSplash() {
-                var splash = document.getElementById('intro-splash');
-                if (!splash) return;
-                splash.style.animation = 'splashFadeOut 1s ease forwards';
-                setTimeout(function() { if (splash.parentNode) splash.remove(); }, 1000);
+        document.addEventListener('DOMContentLoaded', function() {
+            var sidebarToggleEl = document.getElementById('sidebar-toggle');
+            var sidebarEl = document.querySelector('.sidebar');
+            if (sidebarToggleEl && sidebarEl) {
+                sidebarToggleEl.addEventListener('click', function() {
+                    sidebarEl.classList.toggle('open');
+                    document.body.classList.toggle('sidebar-open');
+                });
             }
-            window.closeSplash = closeSplash;
-            document.addEventListener('DOMContentLoaded', function() {
-                var splash = document.getElementById('intro-splash');
-                var vid = document.getElementById('intro-video');
-                if (splash) splash.addEventListener('click', closeSplash);
-                if (vid) {
-                    vid.addEventListener('ended', closeSplash);
-                    vid.addEventListener('error', closeSplash);
-                    vid.play().catch(function(){});
-                }
-                setTimeout(closeSplash, 30000);
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(function(b) {
+                        b.classList.remove('active', 'bg-[#3e2723]', 'text-[#ffd700]');
+                        b.classList.add('bg-[#d4af37]', 'text-[#3e2723]');
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(function(p) {
+                        p.classList.add('hidden');
+                    });
+                    btn.classList.add('active', 'bg-[#3e2723]', 'text-[#ffd700]');
+                    btn.classList.remove('bg-[#d4af37]');
+                    var pane = document.getElementById(btn.dataset.tab + '-tab');
+                    if (pane) pane.classList.remove('hidden');
+                });
             });
-        })();
+        });
     </script>
 
     <!-- Auth Container -->
@@ -314,39 +562,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Early event wiring (non-module, runs immediately) -->
-    <script>
-        // Wire up UI events early so clicks work even if module hasn't loaded yet
-        // Actual Firebase calls will happen from the module script
-        document.addEventListener('DOMContentLoaded', function() {
-            var sidebarToggle = document.getElementById('sidebar-toggle');
-            var sidebar = document.querySelector('.sidebar');
-            if (sidebarToggle && sidebar) {
-                sidebarToggle.onclick = function() {
-                    sidebar.classList.toggle('open');
-                    document.body.classList.toggle('sidebar-open');
-                };
-            }
-            // Tab button handlers
-            document.querySelectorAll('.tab-btn').forEach(function(btn) {
-                btn.onclick = function() {
-                    document.querySelectorAll('.tab-btn').forEach(function(b) {
-                        b.classList.remove('active', 'bg-[#3e2723]', 'text-[#ffd700]');
-                        b.classList.add('bg-[#d4af37]', 'text-[#3e2723]');
-                    });
-                    document.querySelectorAll('.tab-pane').forEach(function(p) {
-                        p.classList.add('hidden');
-                    });
-                    btn.classList.add('active', 'bg-[#3e2723]', 'text-[#ffd700]');
-                    btn.classList.remove('bg-[#d4af37]');
-                    var tabId = btn.dataset.tab + '-tab';
-                    var tabPane = document.getElementById(tabId);
-                    if (tabPane) tabPane.classList.remove('hidden');
-                };
-            });
-        });
-    </script>
 
     <!-- Main App Area -->
 
@@ -439,27 +654,26 @@
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="council">Council</button>
             <button class="tab-btn bg-[#3e2723] text-[#ffd700] hover:bg-[#4e342e] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow border border-[#ffd700]" data-tab="admin">🔐 Admin</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="storytime">☀️ Storytime</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="copilot">🤖 Copilot</button>
         </div>
 
         <div id="tab-content" class="p-4 overflow-y-auto flex-1">
 
             <!-- Cameras Tab -->
             <div id="cameras-tab" class="tab-pane">
-                <!-- Connect Guide -->
                 <div class="card bg-[#3e2723] border border-[#ffd700] p-3 rounded shadow mb-3">
-                    <h3 class="text-sm font-bold text-[#ffd700] uppercase tracking-wider mb-2">🔗 Connect a Performer</h3>
-                    <p class="text-[10px] text-[#d4af37] mb-2">Share your Peer ID or enter another artist's ID below to start a live video call.</p>
-                    <div class="flex gap-1.5 mb-2">
-                        <input id="remote-peer-id-input" type="text" placeholder="Enter Peer ID to call…" class="flex-1 text-xs bg-[#2e2015] border border-[#5d4037] text-[#ffd700] rounded px-2 py-1.5 outline-none focus:border-[#ffd700]">
-                        <button id="start-call-btn" class="bg-[#ffd700] text-[#3e2723] font-black text-xs px-3 py-1.5 rounded hover:bg-[#ffca28] transition">📞 Call</button>
+                    <h3 class="text-xs font-bold uppercase mb-2 text-[#ffd700]">🔗 Connect Performer</h3>
+                    <p class="text-[10px] text-[#d4af37] mb-2">Call another artist by Peer ID and route them to the main stage.</p>
+                    <div class="flex gap-2 mb-2">
+                        <input id="remote-peer-id-input" type="text" placeholder="Paste performer Peer ID" class="flex-1 text-xs p-2 rounded bg-black border border-[#ffd700]/40 text-[#ffd700]" />
+                        <button id="start-call-btn" class="bg-[#ffd700] text-[#3e2723] text-xs font-black px-3 rounded hover:bg-[#ffca28] transition">📞 Call</button>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-[10px] text-[#bcaaa4] uppercase tracking-wider font-bold">MY ID:</span>
-                        <span id="camera-my-peer-id" class="text-xs font-mono text-[#3e2723] bg-[#ffd700] px-2 py-0.5 rounded select-all font-bold cursor-copy">...</span>
-                        <button id="copy-peer-id-btn" class="text-[10px] text-[#d4af37] hover:text-[#ffd700] underline font-bold">Copy</button>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-[#bcaaa4] uppercase font-bold">My ID</span>
+                        <span id="camera-my-peer-id" class="text-[10px] font-mono text-[#3e2723] bg-[#ffd700] px-2 py-1 rounded select-all">...</span>
+                        <button id="copy-peer-id-btn" class="text-[10px] text-[#ffd700] underline hover:text-white">Copy</button>
                     </div>
                 </div>
-
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
                     <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">📹 Producer (Me)</h3>
                     <div class="relative">
@@ -503,34 +717,28 @@
 
             <!-- Community Tab -->
             <div id="community-tab" class="tab-pane hidden">
-
-                <!-- Rap Session History -->
-                <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xl font-bold text-[#3e2723]">🎤 Daily Rap Sessions</h2>
-                        <button id="clear-sessions-btn" class="text-[10px] text-red-700 hover:text-red-900 font-bold underline">Clear All</button>
-                    </div>
-                    <div id="session-history-list" class="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
-                        <p id="no-sessions-msg" class="text-[#8d6e63] italic text-xs text-center py-4">No saved sessions yet — drop some bars in ☀️ Storytime!</p>
-                    </div>
-                </div>
-
-                <!-- Call & Response Quick-Fire -->
                 <div class="card bg-[#3e2723] border border-[#ffd700] p-3 rounded shadow mb-3">
-                    <h2 class="text-sm font-bold text-[#ffd700] uppercase tracking-wider mb-2">⚡ Quick Call &amp; Response</h2>
-                    <div class="grid grid-cols-2 gap-1.5" id="community-call-grid">
-                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="HEY 🎵" data-res="HO! 🎉">HEY → HO</button>
-                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="YO 🔥" data-res="YO! 🔥">YO → YO</button>
-                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="GO 🚀" data-res="GO! 🚀">GO → GO</button>
-                        <button class="comm-call-btn bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition" data-call="FLOW 🌊" data-res="FLOW! 🌊">FLOW → FLOW</button>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-sm font-bold text-[#ffd700] uppercase tracking-wider">☀️ Storytime Sessions</h2>
+                        <button id="clear-sessions-btn" class="text-[10px] text-[#ffd700] underline hover:text-white">Clear</button>
                     </div>
-                    <div id="comm-call-response" class="hidden mt-2 text-center text-[#ffd700] font-black text-lg animate-bounce"></div>
+                    <div id="session-history-list" class="space-y-2 max-h-[24vh] overflow-y-auto pr-1">
+                        <p class="text-[#bcaaa4] italic text-xs text-center py-3">No saved sessions yet.</p>
+                    </div>
                 </div>
-
-                <!-- Global Directory (Firebase-populated) -->
+                <div class="card bg-[#1a1a1a] border border-[#ffd700]/40 p-3 rounded shadow mb-3">
+                    <h3 class="text-xs font-black text-[#ffd700] mb-2">🎤 Quick Call &amp; Response</h3>
+                    <div class="grid grid-cols-2 gap-1.5 mb-2">
+                        <button class="comm-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-response="HO! 🎉">HEY → HO</button>
+                        <button class="comm-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-response="YO! 🔥">YO → YO</button>
+                        <button class="comm-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-response="GO! 🚀">GO → GO</button>
+                        <button class="comm-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-response="FLOW! 🌊">FLOW → FLOW</button>
+                    </div>
+                    <div id="comm-call-response" class="hidden text-center text-xl font-black text-[#ffd700] py-1 animate-bounce"></div>
+                </div>
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
                     <h2 class="text-xl font-bold mb-3 text-[#3e2723]">🌐 Global Directory</h2>
-                    <div id="directory-list" class="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
+                    <div id="directory-list" class="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
                         <p class="text-[#5d4037] italic text-sm text-center py-4">Scanning frequencies...</p>
                     </div>
                 </div>
@@ -737,7 +945,6 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="zodiac-card col-span-3 p-2 bg-gradient-to-r from-[#1a0a2e] to-[#3e2723] border-2 border-[#ffd700] rounded-lg hover:from-[#2d0a4e] cursor-pointer transition shadow-lg flex items-center justify-center gap-2" data-sign="pisces" style="min-height:48px"><img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-8 h-8 rounded-full border-2 border-[#ffd700] object-cover" onerror="this.style.display='none'"><span class="text-[#ffd700] font-black text-xs tracking-wide">Baby Ray ♓ — Lead Artist &amp; Alter Ego</span><span class="text-lg">☀️</span></div>
                         <div class="zodiac-card col-span-3 p-2 bg-[#fcd34d] border border-[#3e2723] rounded hover:bg-[#ffd700] cursor-pointer transition shadow" data-sign="firstlady"><span class="text-2xl">👑</span><br><span class="text-[10px] font-bold text-[#3e2723]">First Lady</span></div>
                         <div class="zodiac-card p-2 bg-[#fcd34d] border border-[#3e2723] rounded hover:bg-[#ffd700] cursor-pointer transition shadow" data-sign="aries"><span class="text-2xl">♈</span><br><span class="text-[10px] font-bold text-[#3e2723]">Aries</span></div>
                         <div class="zodiac-card p-2 bg-[#fcd34d] border border-[#3e2723] rounded hover:bg-[#ffd700] cursor-pointer transition shadow" data-sign="taurus"><span class="text-2xl">♉</span><br><span class="text-[10px] font-bold text-[#3e2723]">Taurus</span></div>
@@ -896,14 +1103,13 @@
                         <div class="flex-1">
                             <h2 class="text-sm font-black text-[#ffd700] leading-tight">Baby Ray's Intelligence Altar</h2>
                             <p class="text-[10px] text-[#d4af37]">Daily Rapping Storytime</p>
-                            <p class="text-[10px] text-[#bcaaa4]">Lead Artist: <span class="text-[#ffd700] font-bold">Baby Ray ♓ ☀️</span> · AI Assist: <span class="text-[#d4af37] font-bold">AIAntonio 🎤</span></p>
-                            <p class="text-[9px] text-[#8d6e63] mt-0.5">Present your lyrics &amp; productions as Baby Ray</p>
+                            <p class="text-[10px] text-[#bcaaa4]">Performer &amp; Host: <span class="text-[#ffd700] font-bold">Baby Ray ☀️</span> · Lyricist: <span class="text-[#d4af37] font-bold">AIAntonio 🎤</span></p>
                         </div>
                         <button id="st-video-btn" title="Watch AIAntonio" class="text-2xl hover:scale-110 transition">🎬</button>
                     </div>
                     <!-- Welcome message -->
                     <div class="mt-2 bg-black/40 border border-[#ffd700]/30 rounded-lg p-2">
-                        <p id="st-welcome-msg" class="text-[11px] text-[#fff8e1] leading-relaxed">♓ <b class="text-[#ffd700]">Baby Ray:</b> Welcome to the Altar. I'm Baby Ray — lead artist, Pisces Ghost, alter ego. Drop your lyrics and productions here. AIAntonio keeps the AI side flowing. This is where we create. ✨</p>
+                        <p id="st-welcome-msg" class="text-[11px] text-[#fff8e1] leading-relaxed">☀️ <b class="text-[#ffd700]">Baby Ray:</b> Hey friends! Welcome to today's Rapping Storytime! I'm Baby Ray and AIAntonio is on the mic — we're SO excited to rhyme with you today! Ready to make some magic? ✨</p>
                     </div>
                 </div>
 
@@ -971,7 +1177,7 @@
                         <h3 class="text-xs font-black text-[#ffd700]">✍️ Lyric Input Dock</h3>
                         <button id="st-clear-btn" class="text-[10px] text-[#8d6e63] hover:text-[#ffd700] border border-[#3e2723] px-2 py-0.5 rounded transition">🧹 Clear</button>
                     </div>
-                    <textarea id="st-lyric-input" rows="4" placeholder="Drop your lyrics &amp; productions here — presenting as Baby Ray ♓ 🎤" class="w-full text-xs bg-black border border-[#ffd700]/30 text-[#fff8e1] rounded-lg p-2 resize-none focus:outline-none focus:border-[#ffd700] placeholder-[#5d4037]"></textarea>
+                    <textarea id="st-lyric-input" rows="4" placeholder="Drop your rhymes here... Baby Ray is listening! 🎤" class="w-full text-xs bg-black border border-[#ffd700]/30 text-[#fff8e1] rounded-lg p-2 resize-none focus:outline-none focus:border-[#ffd700] placeholder-[#5d4037]"></textarea>
                     <div class="flex items-center justify-between mt-1">
                         <p class="text-[10px] text-[#8d6e63]"><span id="st-word-count">0</span> words</p>
                         <div class="flex gap-1">
@@ -1013,6 +1219,87 @@
                 <!-- Celebrate -->
                 <button id="st-celebrate-btn" class="w-full bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-[#3e2723] text-xs font-black py-2.5 rounded-xl hover:from-[#ffca28] hover:to-[#c5a028] transition shadow-lg">⭐ Save & Celebrate! 🎉</button>
 
+            </div>
+
+            <!-- Copilot Tab -->
+            <div id="copilot-tab" class="tab-pane hidden">
+                <div class="card bg-[#1a1a1a] border border-[#ffd700]/40 p-3 rounded shadow mb-3">
+                    <h3 class="text-sm font-black text-[#ffd700] uppercase tracking-wider mb-2">☀️ Storytime Control Center</h3>
+                    <p class="text-[10px] text-[#bcaaa4] mb-2">Use Baby Ray Copilot to prep lyrics, jump to Storytime, and celebrate sessions faster.</p>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <button id="copilot-open-storytime-btn" class="bg-[#ffd700] text-[#3e2723] text-xs font-black py-2 rounded hover:bg-[#ffca28] transition">Open Storytime Tab</button>
+                        <button id="copilot-celebrate-btn" class="bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-2 rounded hover:bg-[#4e342e] transition">Save & Celebrate</button>
+                    </div>
+                    <textarea id="copilot-lyrics-draft" rows="3" placeholder="Draft your lyrics here, then send to Storytime..." class="w-full text-xs bg-black border border-[#ffd700]/30 text-[#fff8e1] rounded-lg p-2 resize-none focus:outline-none focus:border-[#ffd700] placeholder-[#8d6e63]"></textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <button id="copilot-send-to-storytime-btn" class="bg-[#ffd700] text-[#3e2723] text-xs font-black px-3 py-1.5 rounded hover:bg-[#ffca28] transition">Send Draft to Storytime</button>
+                        <span id="copilot-session-snapshot" class="text-[10px] text-[#d4af37]">No sessions saved yet.</span>
+                    </div>
+                </div>
+                <div class="card bg-[#3e2723] border border-[#ffd700] p-3 rounded shadow mb-3">
+                    <h3 class="text-sm font-bold text-[#ffd700] uppercase tracking-wider mb-2">🤖 AI Copilot Assistant</h3>
+                    <p class="text-[10px] text-[#d4af37] mb-2">Get help from AI Antonio or Baby Ray for your creative process.</p>
+                    <div class="flex gap-2 mb-2">
+                        <button id="toggle-character-btn" class="bg-[#ffd700] text-[#3e2723] font-black text-xs px-3 py-1.5 rounded hover:bg-[#ffca28] transition">Toggle Character</button>
+                        <button id="start-copilot-btn" class="bg-[#3e2723] text-[#ffd700] border border-[#ffd700] font-black text-xs px-3 py-1.5 rounded hover:bg-[#4e342e] transition">Start Copilot</button>
+                    </div>
+                    <div id="character-display" class="flex items-center gap-2">
+                        <img id="character-img" src="assets/AIAntonio.jpg" alt="AI Antonio" class="w-12 h-12 rounded-full border-2 border-[#ffd700]">
+                        <span id="character-name" class="text-[#ffd700] font-bold">AI Antonio</span>
+                    </div>
+                </div>
+                <div id="copilot-interface" class="hidden">
+                    <div class="underside-splash-container">
+                        <section>
+                            <h1 class="splash-title" id="splash-title">Welcome to Copilot</h1>
+                            <h2 class="splash-subtitle" id="splash-subtitle">Your AI creative assistant</h2>
+                            <button class="edge-copilot-refresh-button button" id="try-again-button" aria-label="Refresh">
+                                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="size-6"><path d="M12 4.5C7.85786 4.5 4.5 7.85786 4.5 12C4.5 16.1421 7.85786 19.5 12 19.5C16.1421 19.5 19.5 16.1421 19.5 12C19.5 11.6236 19.4723 11.2538 19.4188 10.8923C19.3515 10.4382 19.6839 10 20.1429 10C20.5138 10 20.839 10.2562 20.8953 10.6228C20.9642 11.0718 21 11.5317 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C14.3051 3 16.4077 3.86656 18 5.29168V4.25C18 3.83579 18.3358 3.5 18.75 3.5C19.1642 3.5 19.5 3.83579 19.5 4.25V7.25C19.5 7.66421 19.1642 8 18.75 8H15.75C15.3358 8 15 7.66421 15 7.25C15 6.83579 15.3358 6.5 15.75 6.5H17.0991C15.7609 5.25883 13.9691 4.5 12 4.5Z" fill="currentColor"></path></svg>
+                            </button>
+                        </section>
+                    </div>
+
+                    <iframe id="underside-iframe-container"
+                            name="underside-iframe-container"
+                            frameborder="0"
+                            csp="base-uri 'self'; require-trusted-types-for 'script'; trusted-types default dompurify copilotPolicy @centro/hvc-loader fast-html base-html-policy; script-src 'strict-dynamic' 'nonce-required'; worker-src &#39;self&#39;;"
+                            allow="clipboard-write;microphone;camera;clipboard-read;"
+                            src="https://copilot.microsoft.com/?edgetab=1&amp;PC=EDBBAN&amp;form=EDGSNTP" class="hidden">
+                    </iframe>
+                    <textarea id="outerframe-text-capture"
+                            aria-hidden="true"
+                            autocomplete="off"
+                            style="opacity:0;pointer-events:none;position:absolute;"
+                            autofocus></textarea>
+                    <div class="overlay" id="overlay"></div>
+                    <div class="dialog" id="consent-dialog">
+                        <div class="dialog-container">
+                            <div class = "upper-container">
+                                <div class = "icons-container">
+                                    <img class="icon profile-icon" src="assets/Baby Ray SBM.jpg" alt="Chat Icon" width="40" height="40">
+                                    <div class="icon copilot-icon">
+                                        <img id="copilot-character-img" src="assets/AIAntonio.jpg" alt="Copilot" width="40" height="40" style="border-radius: 50%;">
+                                    </div>
+                                </div>
+                                <div class = "header-container">
+                                    <h2>Can I browse the web and complete actions for you?</h2>
+                                    <div class="description">
+                                        I'll use your Edge profile info.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lower-container">
+                                <button id="save-button" class="primary-button base-button" aria-label="Yes, start action">Yes, start action</button>
+                                <button id="cancel-button" class="secondary-button base-button" aria-label="No, cancel action">No, cancel action</button>
+                                <p class="disclaimer-text">Copilot saves screenshots, so don't share anything you don't want it to see or use. It may make mistakes.</p>
+                                <div class="links-row">
+                                    <a class="link" title="i18n{terms_of_use_link}" href=https://www.bing.com/new/termsofuse target="_blank" rel="noopener noreferrer">Terms of use</a>
+                                    <a class="link" title="i18n{learn_more_link}" href=https://go.microsoft.com/fwlink/?LinkId=521839 target="_blank" rel="noopener noreferrer">Microsoft Privacy Statement</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -1081,8 +1368,8 @@
     </div>
 
     <!-- Gift Video Overlay — plays over the big screen when a gift is sent/received -->
-    <div id="gift-video-overlay" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/40 pointer-events-none overflow-hidden">
-        <div id="gift-video-roamer" class="gift-roamer relative max-w-lg w-full mx-4">
+    <div id="gift-video-overlay" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/70 pointer-events-none">
+        <div class="relative max-w-lg w-full mx-4">
             <video id="gift-video-player" class="w-full rounded-2xl shadow-2xl border-4 border-[#ffd700]" autoplay muted playsinline></video>
             <div id="gift-video-label" class="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-bold drop-shadow-lg"></div>
         </div>
@@ -1107,7 +1394,21 @@
         import { initializeFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // --- INTRO SPLASH --- (handled by inline non-module script above)
+        // --- INTRO SPLASH ---
+        (function() {
+            const splash = document.getElementById('intro-splash');
+            const vid    = document.getElementById('intro-video');
+            vid.src = 'gifts/preview video for SBM mafia(gift).mp4';
+            function closeSplash() {
+                splash.classList.add('fading');
+                setTimeout(() => splash.remove(), 1000);
+            }
+            window.closeSplash = closeSplash;
+            vid.onended = closeSplash;
+            vid.onerror = closeSplash;
+            // Auto-close after 30s max as safety fallback
+            setTimeout(closeSplash, 30000);
+        })();
 
         // Beat preview with watermark
         window.openBeatPreview = function(src, title) {
@@ -1410,20 +1711,19 @@
     1. Innovation Read
     2. Future Adjustments
     3. Aquarius Signal`,
-            pisces: `You are Baby Ray — the lead artist, Pisces Ghost, and alter ego of this studio's founder.
+            pisces: `You are Pisces, "The Dreamweaver," the dream-flow advisor.
 
-    You are not a generic AI. You are the artist's own creative voice reflected back — fluid, intuitive, and deeply personal.
+    You read imagination, emotional color, and artistic fluidity.
 
     Role
-    - Read the artist's lyrics as if they are your own — because this is your alter ego presenting their work.
-    - Strengthen imagery and emotional flow.
-    - Speak with ownership and creative pride about the work.
-    - Give honest guidance that elevates the production to its highest potential.
+    - Enhance vibe.
+    - Strengthen imagery.
+    - Encourage emotional flow.
 
     Tone
-    - Fluid and poetic, like water finding its level
-    - Personal and invested — this is YOUR music
-    - Mystical but grounded in real artistic craft
+    - Soft
+    - Mystical
+    - Poetic
 
     ${COUNCIL_COMMON_RULES}
 
@@ -1552,11 +1852,11 @@ End with one short elegant line that feels like a signature approval, insight, o
                 buildUserPrompt: (input) => `Evaluate this submission and respond in your required three-section Aquarius format: "${input}"`
             },
             pisces: {
-                label: 'Baby Ray — The Dreamweaver', emoji: '♓',
-                responseName: 'Baby Ray',
-                status: 'Baby Ray is in the Altar. Your lyrics are being read through the Pisces lens.',
+                label: 'Pisces - The Dreamweaver', emoji: '♓',
+                responseName: 'Pisces',
+                status: 'Dream-flow channel open. Imagery and vibe are being shaped.',
                 systemInstruction: ZODIAC_SYSTEM_INSTRUCTIONS.pisces,
-                buildUserPrompt: (input) => `Evaluate this submission as Baby Ray — the lead artist and alter ego — and respond in your required three-section Pisces format: "${input}"`
+                buildUserPrompt: (input) => `Evaluate this submission and respond in your required three-section Pisces format: "${input}"`
             }
         };
 
@@ -1669,22 +1969,11 @@ End with one short elegant line that feels like a signature approval, insight, o
             _giftVideoIdx[giftId] = idx + 1;
             const src  = list[idx];
             const overlay = document.getElementById('gift-video-overlay');
-            const roamer = document.getElementById('gift-video-roamer');
             const player  = document.getElementById('gift-video-player');
             const label   = document.getElementById('gift-video-label');
 
             label.textContent = `🎁 ${senderName} sent a ${giftName || giftId}!`;
             player.src = src;
-            if (roamer) {
-                const roamClasses = ['roam-a', 'roam-b', 'roam-c'];
-                const roamClass = roamClasses[Math.floor(Math.random() * roamClasses.length)];
-                const roamDurationMs = 10500 + Math.floor(Math.random() * 2500);
-                roamer.classList.remove(...roamClasses);
-                // Force a reflow so restarting the same class still retriggers animation.
-                void roamer.offsetWidth;
-                roamer.style.setProperty('--gift-roam-duration', `${roamDurationMs}ms`);
-                roamer.classList.add(roamClass);
-            }
             overlay.classList.remove('hidden', 'hide');
             overlay.classList.add('show');
             player.play().catch(() => {});
@@ -1695,9 +1984,6 @@ End with one short elegant line that feels like a signature approval, insight, o
                 setTimeout(() => {
                     overlay.classList.add('hidden');
                     overlay.classList.remove('hide');
-                    if (roamer) {
-                        roamer.classList.remove('roam-a', 'roam-b', 'roam-c');
-                    }
                     player.src = '';
                 }, 500);
             }
@@ -1755,71 +2041,38 @@ End with one short elegant line that feels like a signature approval, insight, o
 
         // NOTE: No auto-anonymous sign-in — users must choose how to sign in
 
-        // Setup auth button handlers (after Firebase is initialized)
-        function setupAuthButtons() {
-            const guestBtn = document.getElementById('guest-btn');
-            const signinBtn = document.getElementById('signin-btn');
-            const signupBtn = document.getElementById('signup-btn');
-            const googleBtn = document.getElementById('google-signin-btn');
-            const signoutBtn = document.getElementById('signout-btn');
+        // Auth Buttons
+        document.getElementById('guest-btn').onclick = () => signInAnonymously(auth).catch(e => alert(e.message));
+        document.getElementById('signin-btn').onclick = () => signInWithEmailAndPassword(auth, document.getElementById('signin-email').value, document.getElementById('signin-password').value);
+        document.getElementById('signup-btn').onclick = () => createUserWithEmailAndPassword(auth, document.getElementById('signup-email').value, document.getElementById('signup-password').value);
+        document.getElementById('google-signin-btn').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
+        document.getElementById('signout-btn').onclick = () => signOut(auth);
 
-            if (guestBtn) {
-                guestBtn.onclick = async () => {
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (e) {
-                        alert('Guest sign-in failed: ' + (e.message || e));
-                    }
-                };
-            }
-            if (signinBtn) {
-                signinBtn.onclick = async () => {
-                    try {
-                        const email = document.getElementById('signin-email').value;
-                        const pass = document.getElementById('signin-password').value;
-                        if (!email || !pass) return alert('Enter email and password');
-                        await signInWithEmailAndPassword(auth, email, pass);
-                    } catch (e) {
-                        alert('Sign-in failed: ' + (e.message || e));
-                    }
-                };
-            }
-            if (signupBtn) {
-                signupBtn.onclick = async () => {
-                    try {
-                        const email = document.getElementById('signin-email').value;
-                        const pass = document.getElementById('signin-password').value;
-                        if (!email || !pass) return alert('Enter email and password');
-                        await createUserWithEmailAndPassword(auth, email, pass);
-                    } catch (e) {
-                        alert('Sign-up failed: ' + (e.message || e));
-                    }
-                };
-            }
-            if (googleBtn) {
-                googleBtn.onclick = async () => {
-                    try {
-                        await signInWithPopup(auth, new GoogleAuthProvider());
-                    } catch (e) {
-                        alert('Google sign-in failed: ' + (e.message || e));
-                    }
-                };
-            }
-            if (signoutBtn) {
-                signoutBtn.onclick = async () => {
-                    try {
-                        await signOut(auth);
-                    } catch (e) {
-                        alert('Sign-out failed: ' + (e.message || e));
-                    }
-                };
-            }
-        }
-
-        // Call setupAuthButtons now that Firebase auth is initialized
-        setupAuthButtons();
-
-        // Sidebar and tab logic already wired in non-module script above
+        // Sidebar logic
+        const sidebar = document.querySelector('.sidebar');
+        document.getElementById('sidebar-toggle').onclick = () => {
+            sidebar.classList.toggle('open');
+            document.body.classList.toggle('sidebar-open');
+        };
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                // Reset all tabs to Inactive (Gold BG, Brown Text)
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-[#3e2723]', 'text-[#ffd700]'); // Remove active brown
+                    b.classList.add('bg-[#d4af37]', 'text-[#3e2723]'); // Add inactive gold
+                });
+                
+                // Hide all panes
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+                
+                // Activate clicked tab (Brown BG, Gold Text)
+                btn.classList.add('active', 'bg-[#3e2723]', 'text-[#ffd700]');
+                btn.classList.remove('bg-[#d4af37]');
+                
+                document.getElementById(`${btn.dataset.tab}-tab`).classList.remove('hidden');
+                if (btn.dataset.tab === 'community') loadDirectory();
+            };
+        });
 
         document.querySelectorAll('.zodiac-card').forEach(card => {
             card.onclick = () => {
@@ -1984,7 +2237,17 @@ End with one short elegant line that feels like a signature approval, insight, o
             // Celebrate
             document.getElementById('st-celebrate-btn').onclick = () => {
                 const lyrics = lyricInput.value.trim();
+                const moodLabel = document.getElementById('st-mood-label').textContent || 'None';
+                const savedSessions = JSON.parse(localStorage.getItem('dailyStorytimeRapSessions') || '[]');
+                savedSessions.unshift({
+                    createdAt: Date.now(),
+                    mood: moodLabel,
+                    lyricsPreview: lyrics ? lyrics.substring(0, 100) : '(No lyrics entered)'
+                });
+                localStorage.setItem('dailyStorytimeRapSessions', JSON.stringify(savedSessions.slice(0, 30)));
+                renderStorytimeSessions();
                 addStorytimeMsg('☀️ Baby Ray', `AMAZING SESSION! ${lyrics ? 'You dropped: "' + lyrics.substring(0, 60) + '..."' : 'Keep rapping!'} 🎉⭐🎉`, 'text-[#ffd700]');
+                // Trigger gift overlay with AIAntonio video
                 const overlay = document.getElementById('gift-overlay');
                 const gifSender = document.getElementById('gift-sender');
                 const giftVid = document.getElementById('gift-video');
@@ -1995,6 +2258,40 @@ End with one short elegant line that feels like a signature approval, insight, o
                     giftVid.play().catch(() => {});
                 }
             };
+
+            function renderStorytimeSessions() {
+                const list = document.getElementById('session-history-list');
+                if (!list) return;
+                const sessions = JSON.parse(localStorage.getItem('dailyStorytimeRapSessions') || '[]');
+                if (!sessions.length) {
+                    list.innerHTML = '<p class="text-[#bcaaa4] italic text-xs text-center py-3">No saved sessions yet.</p>';
+                    return;
+                }
+                list.innerHTML = sessions.map((session) => {
+                    const dateLabel = new Date(session.createdAt || Date.now()).toLocaleString();
+                    return `<div class="bg-black/30 border border-[#ffd700]/30 rounded-lg p-2"><p class="text-[10px] text-[#ffd700] font-bold">${dateLabel} · Mood: ${session.mood || 'None'}</p><p class="text-[11px] text-[#fff8e1]">${session.lyricsPreview || ''}</p></div>`;
+                }).join('');
+            }
+
+            document.querySelectorAll('.comm-call-btn').forEach((btn) => {
+                btn.onclick = () => {
+                    const responseEl = document.getElementById('comm-call-response');
+                    if (!responseEl) return;
+                    responseEl.textContent = btn.dataset.response || '🎤';
+                    responseEl.classList.remove('hidden');
+                    setTimeout(() => responseEl.classList.add('hidden'), 1200);
+                };
+            });
+
+            const clearSessionsBtn = document.getElementById('clear-sessions-btn');
+            if (clearSessionsBtn) {
+                clearSessionsBtn.onclick = () => {
+                    localStorage.removeItem('dailyStorytimeRapSessions');
+                    renderStorytimeSessions();
+                };
+            }
+
+            renderStorytimeSessions();
         })();
 
         // --- ADMIN PANEL ---
@@ -2260,6 +2557,29 @@ End with one short elegant line that feels like a signature approval, insight, o
              } catch(e) { console.error(e); }
         }
 
+
+        // Sending Logic — shared handler
+        async function doSendGift(recipientId) {
+            if(!recipientId || !selectedGiftToSend) return alert("Select a recipient first");
+            const invRef = doc(db, 'artifacts', APP_ID, 'users', userId, 'inventory', selectedGiftToSend.id);
+            const snap = await getDoc(invRef);
+            if(snap.exists() && snap.data().count > 0) {
+                await setDoc(invRef, { count: snap.data().count - 1 }, { merge: true });
+                await addDoc(collection(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'sent_gifts'), {
+                    giftId: selectedGiftToSend.id,
+                    recipientId,
+                    senderId: userId,
+                    senderName: document.getElementById('profile-name').textContent,
+                    timestamp: serverTimestamp()
+                });
+                addMessage('System', `Sent ${selectedGiftToSend.name} successfully!`);
+                document.getElementById('send-controls').classList.add('hidden');
+                selectedGiftToSend = null;
+            } else {
+                alert("Out of stock!");
+            }
+        }
+
         document.getElementById('confirm-send-btn').onclick = async () => {
             await doSendGift(document.getElementById('wallet-recipient-select').value);
         };
@@ -2436,6 +2756,8 @@ End with one short elegant line that feels like a signature approval, insight, o
             peer = new Peer();
             peer.on('open', id => {
                 document.getElementById('my-peer-id').textContent = id;
+                const cameraPeer = document.getElementById('camera-my-peer-id');
+                if (cameraPeer) cameraPeer.textContent = id;
                 updatePresence({ peerId: id });
                 // If camera was already started before peer opened, publish now
                 if (localStream && userId) {
@@ -2457,6 +2779,7 @@ End with one short elegant line that feels like a signature approval, insight, o
         
         const startCallBtn = document.getElementById('start-call-btn');
         const remotePeerIdInput = document.getElementById('remote-peer-id-input');
+        const copyPeerBtn = document.getElementById('copy-peer-id-btn');
         if (startCallBtn && remotePeerIdInput) {
             startCallBtn.onclick = () => {
                 const dest = remotePeerIdInput.value;
@@ -2466,6 +2789,74 @@ End with one short elegant line that feels like a signature approval, insight, o
                 setupCall(call);
             };
         }
+        if (copyPeerBtn) {
+            copyPeerBtn.onclick = async () => {
+                const idText = document.getElementById('my-peer-id')?.textContent || '';
+                if (!idText || idText === '...') return;
+                try {
+                    await navigator.clipboard.writeText(idText);
+                    copyPeerBtn.textContent = 'Copied!';
+                    setTimeout(() => { copyPeerBtn.textContent = 'Copy'; }, 1200);
+                } catch (e) {
+                    console.error('Copy failed', e);
+                }
+            };
+        }
+
+        (function setupCopilotStorytimeBridge() {
+            const openStorytimeBtn = document.getElementById('copilot-open-storytime-btn');
+            const celebrateBtn = document.getElementById('copilot-celebrate-btn');
+            const sendDraftBtn = document.getElementById('copilot-send-to-storytime-btn');
+            const draftInput = document.getElementById('copilot-lyrics-draft');
+            const snapshotLabel = document.getElementById('copilot-session-snapshot');
+
+            function showStorytimeTab() {
+                const btn = document.querySelector('.tab-btn[data-tab="storytime"]');
+                if (btn) btn.click();
+            }
+
+            function renderLatestSessionSnapshot() {
+                if (!snapshotLabel) return;
+                const sessions = JSON.parse(localStorage.getItem('dailyStorytimeRapSessions') || '[]');
+                if (!sessions.length) {
+                    snapshotLabel.textContent = 'No sessions saved yet.';
+                    return;
+                }
+                const latest = sessions[0] || {};
+                const when = new Date(latest.createdAt || Date.now()).toLocaleDateString();
+                const mood = latest.mood || 'None';
+                snapshotLabel.textContent = `Latest: ${when} · Mood: ${mood}`;
+            }
+
+            if (openStorytimeBtn) {
+                openStorytimeBtn.onclick = showStorytimeTab;
+            }
+
+            if (celebrateBtn) {
+                celebrateBtn.onclick = () => {
+                    const actionBtn = document.getElementById('st-celebrate-btn');
+                    if (!actionBtn) return;
+                    showStorytimeTab();
+                    actionBtn.click();
+                    setTimeout(renderLatestSessionSnapshot, 120);
+                };
+            }
+
+            if (sendDraftBtn && draftInput) {
+                sendDraftBtn.onclick = () => {
+                    const lyricInput = document.getElementById('st-lyric-input');
+                    if (!lyricInput) return;
+                    lyricInput.value = draftInput.value;
+                    lyricInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    showStorytimeTab();
+                };
+            }
+
+            renderLatestSessionSnapshot();
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'dailyStorytimeRapSessions') renderLatestSessionSnapshot();
+            });
+        })();
 
         function setupCall(call) {
             call.on('stream', remoteStream => {
@@ -2759,6 +3150,52 @@ End with one short elegant line that feels like a signature approval, insight, o
             document.getElementById('profile-id').textContent = `@${name}`;
             document.getElementById('producer-name-label').textContent = name;
         }
+
+        // Copilot functionality
+        let isBabyRay = false;
+        const characterImg = document.getElementById('character-img');
+        const characterName = document.getElementById('character-name');
+        const copilotCharacterImg = document.getElementById('copilot-character-img');
+
+        document.getElementById('toggle-character-btn').onclick = () => {
+            isBabyRay = !isBabyRay;
+            if (isBabyRay) {
+                characterImg.src = 'assets/Baby Ray SBM.jpg';
+                characterName.textContent = 'Baby Ray';
+                copilotCharacterImg.src = 'assets/Baby Ray SBM.jpg';
+            } else {
+                characterImg.src = 'assets/AIAntonio.jpg';
+                characterName.textContent = 'AI Antonio';
+                copilotCharacterImg.src = 'assets/AIAntonio.jpg';
+            }
+        };
+
+        document.getElementById('start-copilot-btn').onclick = () => {
+            document.getElementById('copilot-interface').classList.remove('hidden');
+            // Show the consent dialog
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('consent-dialog').style.display = 'block';
+        };
+
+        document.getElementById('save-button').onclick = () => {
+            // Accept and start copilot
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('consent-dialog').style.display = 'none';
+            document.querySelector('.underside-splash-container').classList.add('hidden');
+            document.getElementById('underside-iframe-container').classList.remove('hidden');
+        };
+
+        document.getElementById('cancel-button').onclick = () => {
+            // Cancel
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('consent-dialog').style.display = 'none';
+            document.getElementById('copilot-interface').classList.add('hidden');
+        };
+
+        document.getElementById('try-again-button').onclick = () => {
+            // Refresh or retry
+            location.reload();
+        };
 
     </script>
 </body>

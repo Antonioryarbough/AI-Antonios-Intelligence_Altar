@@ -87,12 +87,16 @@ function copyDirTo(absSource, absDest) {
 }
 
 const outAbs = path.resolve(cwd, outDir);
-fs.rmSync(outAbs, { recursive: true, force: true });
+if (target !== 'studio') {
+  fs.rmSync(outAbs, { recursive: true, force: true });
+}
 fs.mkdirSync(outAbs, { recursive: true });
 
-const htmlAbs = resolveInput(sourceHtml);
-ensureExists(htmlAbs, "HTML source");
-copyFileTo(htmlAbs, path.join(outAbs, "index.html"));
+if (target !== 'studio') {
+  const htmlAbs = resolveInput(sourceHtml);
+  ensureExists(htmlAbs, "HTML source");
+  copyFileTo(htmlAbs, path.join(outAbs, "index.html"));
+}
 
 if (sourceCss) {
   const cssAbs = resolveInput(sourceCss);
