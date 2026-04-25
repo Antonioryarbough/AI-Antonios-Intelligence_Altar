@@ -1,10 +1,21 @@
 {
   "hosting": {
-    "public": "public",
+    "site": "studio-2fb13",
+    "public": ".",
     "ignore": [
       "firebase.json",
+      "firebase.*.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "functions/**",
+      "evaluation/**",
+      "peer-server/**",
+      "scripts/**",
+      "src/**",
+      "deploy.sh",
+      "*.config.js",
+      "package.json",
+      "get-pip.py"
     ],
     "rewrites": [
       {
