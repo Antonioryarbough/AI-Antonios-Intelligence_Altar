@@ -520,7 +520,7 @@
                             </div>
                             <div class="mt-2">
                                 <label for="tts-voice" class="text-xs text-gray-500">Voice:</label>
-                                <select id="tts-voice" class="w-full p-2 rounded bg-gray-800 text-sm text-gray-200 mt-1"></select>
+                                <select id="tts-voice" name="tts-voice" title="Voice selection" aria-label="Voice selection" class="w-full p-2 rounded bg-gray-800 text-sm text-gray-200 mt-1"></select>
                             </div>
                         </div>
                     </div>
@@ -612,10 +612,10 @@
                         <div id="unlocked-gifts-display" class="flex flex-wrap gap-2 mb-3">
                             <span class="text-sm text-gray-500">No gifts unlocked yet.</span>
                         </div>
-                        <select id="gift-recipient-selector" class="mb-2 w-full" aria-label="Select Recipient">
+                        <select id="gift-recipient-selector" name="gift-recipient-selector" title="Select Recipient" class="mb-2 w-full" aria-label="Select Recipient">
                             <option value="">-- Select Recipient --</option>
                         </select>
-                        <select id="gift-selector" class="mb-2 w-full" disabled aria-label="Select Gift to Send">
+                        <select id="gift-selector" name="gift-selector" title="Select Gift to Send" class="mb-2 w-full" disabled aria-label="Select Gift to Send">
                             <option value="">-- Select Gift to Send --</option>
                         </select>
                         <button id="send-selected-gift-btn" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg w-full" disabled>💝 Send Gift</button>
@@ -653,8 +653,8 @@
 
                     <!-- Folder selector -->
                     <div class="mb-3">
-                        <label class="text-xs text-gray-400 block mb-1">Upload to folder</label>
-                        <select id="asset-folder-select" class="w-full bg-gray-800 text-white p-2 rounded-lg text-sm">
+                        <label for="asset-folder-select" class="text-xs text-gray-400 block mb-1">Upload to folder</label>
+                        <select id="asset-folder-select" name="asset-folder-select" title="Upload to folder" aria-label="Upload to folder" class="w-full bg-gray-800 text-white p-2 rounded-lg text-sm">
                             <option value="gifts">gifts/ (gift animations)</option>
                             <option value="profiles">profiles/ (avatars)</option>
                             <option value="beats">beats/ (audio)</option>
