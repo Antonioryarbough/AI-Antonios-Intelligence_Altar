@@ -31,6 +31,14 @@ cp -r "$SRC/gifts"   "$TMP/gifts"   2>/dev/null || true
 cp -r "$SRC/rooms"   "$TMP/rooms"   2>/dev/null || true
 cp "$SRC/config.js"  "$TMP/config.js" 2>/dev/null || true
 
+# Fallback: if root assets/gifts are missing, copy from studio-build so intro videos and gift media resolve.
+if [[ ! -d "$TMP/assets" && -d "$SRC/studio-build/assets" ]]; then
+  cp -r "$SRC/studio-build/assets" "$TMP/assets"
+fi
+if [[ ! -d "$TMP/gifts" && -d "$SRC/studio-build/gifts" ]]; then
+  cp -r "$SRC/studio-build/gifts" "$TMP/gifts"
+fi
+
 # Write firebase.json in staging dir
 cat > "$TMP/firebase.json" <<'EOF'
 {

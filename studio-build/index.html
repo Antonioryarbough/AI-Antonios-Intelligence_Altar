@@ -17,17 +17,131 @@
         ::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #e5c100; }
         
+        :root { --sidebar-width: 350px; }
+
         body { background-color: #1a120b; color: #ffd700; overflow: hidden; }
+        .app-shell {
+            height: 100vh;
+            width: 100%;
+            padding-right: var(--sidebar-width);
+        }
+        .stage-panel { min-width: 0; }
         .sidebar {
-            position: fixed; top: 0; right: -350px; width: 350px; height: 100vh;
+            position: fixed; top: 0; right: calc(-1 * var(--sidebar-width)); width: var(--sidebar-width); height: 100vh;
             background-color: #ffd700; color: #3e2723;
             transition: right 0.3s ease-in-out; z-index: 40;
             box-shadow: -5px 0 15px rgba(0,0,0,0.5);
             display: flex; flex-direction: column;
         }
         .sidebar.open { right: 0; }
+        .sidebar .tabs-row {
+            padding: 0.2rem !important;
+            gap: 0.2rem !important;
+            flex-wrap: wrap !important;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+        .sidebar .tab-btn {
+            padding: 0.18rem 0.35rem !important;
+            font-size: 9px !important;
+            line-height: 1.1;
+            letter-spacing: 0;
+            white-space: nowrap;
+            width: auto !important;
+            flex: 0 0 auto;
+        }
+        .sidebar .tabs-row::-webkit-scrollbar { height: 6px; }
+        .sidebar .tabs-row::-webkit-scrollbar-thumb { background: #8d6e63; border-radius: 9999px; }
         .tab-pane { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .aiantonio-dock {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            z-index: 25;
+            background: radial-gradient(circle at 20% 10%, rgba(255, 215, 0, 0.25), transparent 45%), linear-gradient(180deg, #22150f 0%, #140b07 100%);
+            border-left: 2px solid rgba(255, 215, 0, 0.55);
+            padding: 18px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: opacity 0.24s ease, transform 0.24s ease;
+        }
+        .aiantonio-dock.dock-off {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(20px);
+        }
+        .aiantonio-head {
+            width: 102px;
+            height: 102px;
+            margin: 0 auto;
+            border-radius: 9999px;
+            border: 3px solid #ffd700;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15), 0 0 28px rgba(255, 215, 0, 0.3);
+        }
+        .aiantonio-head img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .aiantonio-mouth {
+            position: absolute;
+            left: 50%;
+            bottom: 14px;
+            width: 28px;
+            height: 8px;
+            border-radius: 9999px;
+            background: rgba(20, 7, 4, 0.76);
+            transform: translateX(-50%);
+            transition: height 0.08s linear;
+        }
+        .aiantonio-avatar.dancing {
+            animation: aiAntonioBounce 0.62s ease-in-out infinite;
+        }
+        .aiantonio-avatar.dancing .aiantonio-mouth {
+            height: 17px;
+        }
+        .aiantonio-eq {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            align-items: end;
+            height: 36px;
+        }
+        .aiantonio-eq span {
+            background: linear-gradient(180deg, #ffd700, #e69800);
+            border-radius: 3px;
+            height: 8px;
+            transition: height 0.1s linear;
+        }
+        .aiantonio-dock.flowing .aiantonio-eq span:nth-child(1) { height: 14px; }
+        .aiantonio-dock.flowing .aiantonio-eq span:nth-child(2) { height: 28px; }
+        .aiantonio-dock.flowing .aiantonio-eq span:nth-child(3) { height: 18px; }
+        .aiantonio-dock.flowing .aiantonio-eq span:nth-child(4) { height: 33px; }
+        .aiantonio-dock.flowing .aiantonio-eq span:nth-child(5) { height: 20px; }
+        .aiantonio-dock.flowing .aiantonio-eq span:nth-child(6) { height: 26px; }
+        .aiantonio-dock.flowing .aiantonio-eq span:nth-child(7) { height: 15px; }
+        @keyframes aiAntonioBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-4px) rotate(-2deg); }
+            50% { transform: translateY(0) rotate(1.6deg); }
+            75% { transform: translateY(-3px) rotate(-1.2deg); }
+        }
+
+        @media (max-width: 1023px) {
+            .app-shell { padding-right: 0; }
+            .aiantonio-dock { display: none; }
+            .sidebar {
+                width: min(var(--sidebar-width), 92vw);
+                right: -92vw;
+            }
+        }
         
         @keyframes splashFadeOut { from { opacity:1; } to { opacity:0; pointer-events:none; } }
         #intro-splash.fading { animation: splashFadeOut 1s ease forwards; }
@@ -39,6 +153,17 @@
         @keyframes giftFadeOut { from { opacity:1; } to { opacity:0; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Keep chat send button compact even with global button styles from styles.css */
+        #send-chat-btn {
+            width: auto !important;
+            min-width: 34px;
+            margin: 0 !important;
+            padding: 0.35rem 0.6rem !important;
+            line-height: 1;
+            border-radius: 9999px;
+            flex: 0 0 auto;
+        }
 
         /* overlay chat messages — subtitle style */
         .chat-message {
@@ -517,13 +642,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             var sidebarToggleEl = document.getElementById('sidebar-toggle');
             var sidebarEl = document.querySelector('.sidebar');
-            if (sidebarToggleEl && sidebarEl) {
+            if (sidebarToggleEl && sidebarEl && !sidebarToggleEl.dataset.sidebarBound) {
                 sidebarToggleEl.addEventListener('click', function() {
                     sidebarEl.classList.toggle('open');
                     document.body.classList.toggle('sidebar-open');
                 });
+                sidebarToggleEl.dataset.sidebarBound = '1';
             }
             document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                if (btn.dataset.tabBound) return;
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.tab-btn').forEach(function(b) {
                         b.classList.remove('active', 'bg-[#3e2723]', 'text-[#ffd700]');
@@ -537,6 +664,7 @@
                     var pane = document.getElementById(btn.dataset.tab + '-tab');
                     if (pane) pane.classList.remove('hidden');
                 });
+                btn.dataset.tabBound = '1';
             });
         });
     </script>
@@ -565,9 +693,9 @@
 
     <!-- Main App Area -->
 
-    <div class="flex h-full">
+    <div class="flex h-full app-shell">
         <!-- Main Content: Performer Camera (full width, no sidebar eating space) -->
-        <div class="flex-1 flex flex-col p-4 relative">
+        <div class="flex-1 flex flex-col p-4 relative stage-panel">
             <div class="flex items-center justify-between mb-4 bg-[#3e2723] p-3 rounded-lg shadow-lg border border-[#ffd700] z-10">
                 <div class="flex gap-2">
                     <button id="enable-camera-btn" class="bg-[#d4af37] hover:bg-[#c5a028] text-[#3e2723] font-bold text-xs py-1 px-3 rounded shadow">📹 Camera</button>
@@ -645,16 +773,16 @@
     <!-- Sidebar - Gold Background -->
     <aside class="sidebar bg-[#ffd700] text-[#3e2723] border-l-4 border-[#3e2723]">
         <!-- Tabs -->
-        <div class="flex flex-wrap bg-[#fcd34d] border-b border-[#3e2723] p-2 gap-1.5 sticky top-0 z-10">
-            <button class="tab-btn active px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow bg-[#3e2723] text-[#ffd700]" data-tab="cameras">Cameras</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="studio">Studio</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="community">Community</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="marketplace">Shop</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="profile">Profile</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="council">Council</button>
-            <button class="tab-btn bg-[#3e2723] text-[#ffd700] hover:bg-[#4e342e] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow border border-[#ffd700]" data-tab="admin">🔐 Admin</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="storytime">☀️ Storytime</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition shadow" data-tab="copilot">🤖 Copilot</button>
+        <div class="tabs-row flex flex-wrap bg-[#fcd34d] border-b border-[#3e2723] p-1 gap-1 sticky top-0 z-10">
+            <button class="tab-btn active px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow bg-[#3e2723] text-[#ffd700]" data-tab="cameras">📹 Cam</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="studio">Studio</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="community">Comm</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="marketplace">Shop</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="profile">Profile</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="council">Council</button>
+            <button class="tab-btn bg-[#3e2723] text-[#ffd700] hover:bg-[#4e342e] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow border border-[#ffd700]" data-tab="admin">🔐</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="storytime">☀️ Story</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="copilot">🤖</button>
         </div>
 
         <div id="tab-content" class="p-4 overflow-y-auto flex-1">
@@ -1305,6 +1433,31 @@
         </div>
     </aside>
 
+    <section id="aiantonio-dock" class="aiantonio-dock dock-off" aria-label="AIAntonio Rap Dock">
+        <div class="text-center">
+            <p class="text-[10px] uppercase tracking-wider text-[#bcaaa4]">AIAntonio Live</p>
+            <h3 class="text-sm font-black text-[#ffd700]">Rap + Dance Engine</h3>
+        </div>
+        <div id="aiantonio-avatar" class="aiantonio-avatar">
+            <div class="aiantonio-head">
+                <img src="assets/AIAntonio.jpg" alt="AIAntonio" onerror="this.style.display='none'">
+                <div class="aiantonio-mouth"></div>
+            </div>
+        </div>
+        <div class="aiantonio-eq" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="bg-black/35 border border-[#ffd700]/30 rounded-lg p-2">
+            <p class="text-[10px] text-[#bcaaa4] uppercase tracking-wide mb-1">Now Spitting</p>
+            <p id="aiantonio-lyric-line" class="text-xs text-[#fff8e1] min-h-[36px] leading-snug">Drop lyrics in Storytime and press Play Beat.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+            <button id="aiantonio-toggle-flow" class="bg-[#ffd700] text-[#3e2723] text-xs font-black py-1.5 rounded hover:bg-[#ffca28] transition">Start Flow</button>
+            <button id="aiantonio-mpc-link" class="bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded hover:bg-[#4e342e] transition">MPC Link</button>
+        </div>
+        <p id="aiantonio-mpc-status" class="text-[10px] text-[#bcaaa4] text-center">MPC link idle. Tap MPC Link to detect MIDI devices.</p>
+    </section>
+
     <!-- Gift Animation Overlay -->
     <div id="gift-overlay" class="fixed inset-0 z-[100] bg-black/95 hidden flex items-center justify-center flex-col">
         <h2 id="gift-sender" class="text-4xl font-bold text-[#ffd700] mb-6 animate-bounce drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">Someone sent a gift!</h2>
@@ -1398,14 +1551,27 @@
         (function() {
             const splash = document.getElementById('intro-splash');
             const vid    = document.getElementById('intro-video');
-            vid.src = 'gifts/preview video for SBM mafia(gift).mp4';
+            const introSources = [
+                'gifts/preview video for SBM mafia(gift).mp4',
+                'studio-build/gifts/preview video for SBM mafia(gift).mp4'
+            ];
+            let introSourceIndex = 0;
+            vid.src = introSources[introSourceIndex];
             function closeSplash() {
                 splash.classList.add('fading');
                 setTimeout(() => splash.remove(), 1000);
             }
             window.closeSplash = closeSplash;
             vid.onended = closeSplash;
-            vid.onerror = closeSplash;
+            vid.onerror = () => {
+                introSourceIndex += 1;
+                if (introSourceIndex < introSources.length) {
+                    vid.src = introSources[introSourceIndex];
+                    vid.play().catch(() => closeSplash());
+                    return;
+                }
+                closeSplash();
+            };
             // Auto-close after 30s max as safety fallback
             setTimeout(closeSplash, 30000);
         })();
@@ -2050,11 +2216,16 @@ End with one short elegant line that feels like a signature approval, insight, o
 
         // Sidebar logic
         const sidebar = document.querySelector('.sidebar');
-        document.getElementById('sidebar-toggle').onclick = () => {
-            sidebar.classList.toggle('open');
-            document.body.classList.toggle('sidebar-open');
-        };
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if (sidebar && sidebarToggle && !sidebarToggle.dataset.sidebarBound) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                document.body.classList.toggle('sidebar-open');
+            });
+            sidebarToggle.dataset.sidebarBound = '1';
+        }
         document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (btn.dataset.tabBound) return;
             btn.onclick = () => {
                 // Reset all tabs to Inactive (Gold BG, Brown Text)
                 document.querySelectorAll('.tab-btn').forEach(b => {
@@ -2072,6 +2243,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 document.getElementById(`${btn.dataset.tab}-tab`).classList.remove('hidden');
                 if (btn.dataset.tab === 'community') loadDirectory();
             };
+            btn.dataset.tabBound = '1';
         });
 
         document.querySelectorAll('.zodiac-card').forEach(card => {
@@ -3196,6 +3368,173 @@ End with one short elegant line that feels like a signature approval, insight, o
             // Refresh or retry
             location.reload();
         };
+
+        // AIAntonio dock: mirrors lyrics and reacts to beat so the right rail stays alive when sidebar is closed.
+        (function setupAIAntonioDock() {
+            const sidebar = document.querySelector('.sidebar');
+            const dock = document.getElementById('aiantonio-dock');
+            const avatar = document.getElementById('aiantonio-avatar');
+            const lyricLine = document.getElementById('aiantonio-lyric-line');
+            const flowBtn = document.getElementById('aiantonio-toggle-flow');
+            const mpcBtn = document.getElementById('aiantonio-mpc-link');
+            const mpcStatus = document.getElementById('aiantonio-mpc-status');
+            const beatAudio = document.getElementById('st-beat-audio');
+            const beatPlayBtn = document.getElementById('st-beat-play');
+            const beatStopBtn = document.getElementById('st-beat-stop');
+            const freestyleBtn = document.getElementById('st-freestyle-btn');
+            const bpmInput = document.getElementById('st-bpm');
+            const lyricInputs = [
+                document.getElementById('st-lyric-input'),
+                document.getElementById('chat-input'),
+                document.getElementById('copilot-lyrics-draft')
+            ].filter(Boolean);
+
+            if (!dock || !sidebar) return;
+
+            let manualFlow = false;
+            let lyricCursor = 0;
+            let midiAccess = null;
+            let midiBound = false;
+
+            const MK2_PAD_MAP = {
+                36: 'toggleFlow',
+                37: 'beatPlay',
+                38: 'beatStop',
+                39: 'freestyle'
+            };
+
+            let learnedKnobCc = null;
+
+            const firstNonEmpty = () => {
+                for (const input of lyricInputs) {
+                    if (input && input.value && input.value.trim()) return input.value.trim();
+                }
+                return '';
+            };
+
+            const setDockVisible = () => {
+                const open = sidebar.classList.contains('open');
+                dock.classList.toggle('dock-off', open);
+            };
+
+            const setFlow = (isFlowing) => {
+                dock.classList.toggle('flowing', isFlowing);
+                avatar.classList.toggle('dancing', isFlowing);
+                flowBtn.textContent = isFlowing ? 'Stop Flow' : 'Start Flow';
+            };
+
+            const triggerButton = (btn) => {
+                if (!btn) return;
+                btn.click();
+            };
+
+            const handleMk2Control = (status, data1, data2) => {
+                const messageType = status & 0xf0;
+                const isNoteOn = messageType === 0x90 && data2 > 0;
+                const isCc = messageType === 0xb0;
+
+                if (isNoteOn && MK2_PAD_MAP[data1]) {
+                    const action = MK2_PAD_MAP[data1];
+                    if (action === 'toggleFlow') {
+                        manualFlow = !manualFlow;
+                        syncFlowState();
+                    }
+                    if (action === 'beatPlay') triggerButton(beatPlayBtn);
+                    if (action === 'beatStop') triggerButton(beatStopBtn);
+                    if (action === 'freestyle') triggerButton(freestyleBtn);
+                    return;
+                }
+
+                if (isCc) {
+                    if (learnedKnobCc === null) {
+                        learnedKnobCc = data1;
+                        mpcStatus.textContent = `MPC knob learned on CC${learnedKnobCc}. Knob now controls BPM.`;
+                    }
+                    if (data1 === learnedKnobCc && bpmInput) {
+                        const bpm = Math.round(60 + (data2 / 127) * 120);
+                        bpmInput.value = String(bpm);
+                        bpmInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
+            };
+
+            const bindMidiInputs = () => {
+                if (!midiAccess) return;
+                const inputs = Array.from(midiAccess.inputs.values());
+                if (!inputs.length) return;
+
+                inputs.forEach((input) => {
+                    input.onmidimessage = (event) => {
+                        const [status, data1, data2] = event.data;
+                        handleMk2Control(status, data1, data2);
+                    };
+                });
+                midiBound = true;
+            };
+
+            const refreshLyricLine = () => {
+                const text = firstNonEmpty();
+                if (!text) {
+                    lyricLine.textContent = 'Drop lyrics in Storytime and press Play Beat.';
+                    lyricCursor = 0;
+                    return;
+                }
+                const words = text.split(/\s+/).filter(Boolean);
+                const windowSize = 8;
+                if (lyricCursor >= words.length) lyricCursor = 0;
+                lyricLine.textContent = words.slice(lyricCursor, lyricCursor + windowSize).join(' ');
+                lyricCursor += Math.max(2, Math.floor(windowSize / 2));
+            };
+
+            setDockVisible();
+            const sidebarObserver = new MutationObserver(setDockVisible);
+            sidebarObserver.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+
+            lyricInputs.forEach((input) => input.addEventListener('input', refreshLyricLine));
+            setInterval(refreshLyricLine, 1400);
+            refreshLyricLine();
+
+            const syncFlowState = () => {
+                const beatFlow = !!(beatAudio && !beatAudio.paused);
+                setFlow(manualFlow || beatFlow);
+            };
+
+            flowBtn.addEventListener('click', () => {
+                manualFlow = !manualFlow;
+                syncFlowState();
+            });
+
+            if (beatAudio) {
+                beatAudio.addEventListener('play', syncFlowState);
+                beatAudio.addEventListener('pause', syncFlowState);
+                beatAudio.addEventListener('ended', syncFlowState);
+            }
+
+            mpcBtn.addEventListener('click', async () => {
+                if (!('requestMIDIAccess' in navigator)) {
+                    mpcStatus.textContent = 'Web MIDI is not available in this browser. Use Chrome/Edge and enable MIDI.';
+                    return;
+                }
+                try {
+                    midiAccess = await navigator.requestMIDIAccess();
+                    const inputs = Array.from(midiAccess.inputs.values());
+                    if (!inputs.length) {
+                        mpcStatus.textContent = 'No MIDI devices detected. Connect MPC hardware/software bridge and retry.';
+                        return;
+                    }
+                    bindMidiInputs();
+                    const mk2Input = inputs.find((i) => /mpc studio mk2|mpc/i.test(i.name || ''));
+                    const profileLabel = mk2Input ? 'MPC Studio MK2 profile active' : 'Generic MPC profile active';
+                    mpcStatus.textContent = `${profileLabel}. Pads: 36 Flow, 37 Play, 38 Stop, 39 Freestyle. Twist your one knob to auto-learn BPM control.`;
+
+                    if (!midiBound) {
+                        mpcStatus.textContent = 'MPC detected, but MIDI binding failed. Reconnect controller and retry.';
+                    }
+                } catch (err) {
+                    mpcStatus.textContent = `MPC link failed: ${err.message}`;
+                }
+            });
+        })();
 
     </script>
 </body>
