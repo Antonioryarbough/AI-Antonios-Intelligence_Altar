@@ -821,24 +821,18 @@
             <!-- Studio Tab -->
             <div id="studio-tab" class="tab-pane hidden">
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
-                    <h2 class="text-xl font-bold mb-2 text-[#3e2723] flex items-center gap-2">🎬 Media Deck <span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded">LIVE</span></h2>
-                    <div class="border-2 border-[#3e2723] rounded-lg overflow-hidden bg-black mb-3">
-                        <video id="customPlayer" class="video-js vjs-default-skin vjs-fluid" controls preload="auto"></video>
+                    <h2 class="text-xl font-bold mb-2 text-[#3e2723] flex items-center gap-2">🎬 Live Media: Music Video Creator <span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded">LIVE</span></h2>
+                    <p class="text-[12px] text-[#5d4037] mb-3">Special productions from participants become music videos for the big screen. Submit your best performances for pay-per-view showcase. Only featured videos appear here. <b>Main video call remains for live performing and gifting.</b></p>
+                    <div class="border-2 border-[#3e2723] rounded-lg overflow-hidden bg-black mb-3 flex items-center justify-center min-h-[240px]" style="min-height:240px;">
+                        <span class="text-[#ffd700] text-lg font-bold text-center w-full">🎥 No featured music videos yet.<br>Submit your video to be featured!</span>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <button id="record-btn" class="bg-red-700 hover:bg-red-600 text-white border border-red-900 py-2 rounded text-sm font-bold shadow">⏺ REC</button>
-                        <button id="stop-record-btn" class="bg-gray-300 text-gray-600 py-2 rounded text-sm border border-gray-400" disabled>⏹ STOP</button>
+                    <div class="flex flex-col gap-2 mb-3">
+                        <button id="submit-music-video-btn" class="bg-[#ffd700] text-[#3e2723] text-xs font-black px-4 py-2 rounded hover:bg-[#ffca28] transition">Submit Your Music Video</button>
+                        <button id="pay-per-view-btn" class="bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black px-4 py-2 rounded hover:bg-[#4e342e] transition">View Pay-Per-View Events</button>
                     </div>
-                    
-                    <div id="recording-playback" class="hidden mb-3 p-3 bg-[#fdf6e3] rounded border border-[#3e2723]">
-                        <audio id="recording-player" controls class="w-full mb-2 h-8"></audio>
-                        <a id="save-recording-btn" class="block text-center text-xs text-[#3e2723] hover:text-[#5d4037] font-bold" download>💾 Download Master</a>
-                    </div>
-                    
-                    <div class="relative">
-                        <label class="block text-[10px] text-[#5d4037] font-bold uppercase mb-1">Load Instrumental / Video</label>
-                        <input type="file" id="media-upload" accept="video/*,audio/*" class="w-full text-xs text-[#3e2723] file:bg-[#3e2723] file:text-[#ffd700] file:border-0 file:rounded file:px-2 file:py-1 file:font-bold file:mr-2 cursor-pointer">
+                    <div class="relative mt-2">
+                        <label class="block text-[10px] text-[#5d4037] font-bold uppercase mb-1">Upload Music Video (MP4, MOV, max 500MB)</label>
+                        <input type="file" id="music-video-upload" accept="video/mp4,video/quicktime" class="w-full text-xs text-[#3e2723] file:bg-[#3e2723] file:text-[#ffd700] file:border-0 file:rounded file:px-2 file:py-1 file:font-bold file:mr-2 cursor-pointer">
                     </div>
                 </div>
             </div>
