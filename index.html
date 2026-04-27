@@ -152,7 +152,7 @@
         @keyframes giftFadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
         @keyframes giftFadeOut { from { opacity:1; } to { opacity:0; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar { -ms-overflow-style: none; }
 
         /* Keep chat send button compact even with global button styles from styles.css */
         #send-chat-btn {
@@ -631,7 +631,7 @@
 
     <!-- ===== SBM INTRO SPLASH ===== -->
     <div id="intro-splash" class="fixed inset-0 z-[500] bg-black flex items-center justify-center cursor-pointer" onclick="closeSplash()">
-        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline webkit-playsinline></video>
         <div class="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none">
             <p class="text-white/60 text-xs animate-pulse">Tap anywhere to skip</p>
         </div>
@@ -709,7 +709,7 @@
 
             <!-- Performer Video Area -->
             <div class="relative flex-1 bg-black rounded-xl overflow-hidden shadow-2xl border-4 border-[#3e2723] flex flex-col">
-                <video id="performerVideo" autoplay playsinline class="w-full h-full object-cover z-0"></video>
+                <video id="performerVideo" autoplay playsinline webkit-playsinline class="w-full h-full object-cover z-0"></video>
                 <div id="performer-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-[#d4af37] z-0 bg-[#1a120b]">
                     <div class="text-6xl mb-4">🎤</div>
                     <p class="font-mono uppercase tracking-widest text-[#8d6e63]">Select a Performer</p>
@@ -718,7 +718,7 @@
                 <button id="hangup-call-btn" class="hidden absolute top-3 right-3 z-30 bg-red-700 hover:bg-red-600 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg border border-red-900">📵 Hang Up</button>
 
                 <!-- LIVE OVERLAY: chat left, gifts right — sits over video, no solid bg -->
-                <div class="absolute inset-x-0 bottom-0 z-20 flex items-end gap-3 p-3 pointer-events-none" style="height:55%">
+                <div class="absolute inset-x-0 bottom-0 z-20 flex items-end gap-3 p-3 pointer-events-none height-55">
 
                     <!-- Chat column -->
                     <div class="flex flex-col flex-1 h-full pointer-events-auto">
@@ -892,7 +892,7 @@
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
                     <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">📹 Producer (Me)</h3>
                     <div class="relative">
-                        <video id="producerVideo" autoplay muted playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
+                        <video id="producerVideo" autoplay muted playsinline webkit-playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
                         <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1.5 py-0.5 font-bold truncate rounded-b" id="producer-name-label">Me</div>
                     </div>
                 </div>
@@ -1348,13 +1348,14 @@
                             name="underside-iframe-container"
                             frameborder="0"
                             csp="base-uri 'self'; require-trusted-types-for 'script'; trusted-types default dompurify copilotPolicy @centro/hvc-loader fast-html base-html-policy; script-src 'strict-dynamic' 'nonce-required'; worker-src &#39;self&#39;;"
+                            <!-- Note: iframe[csp] is not supported in Firefox/Safari. Fallbacks may be needed for full compatibility. -->
                             allow="clipboard-write;microphone;camera;clipboard-read;"
                             src="https://copilot.microsoft.com/?edgetab=1&amp;PC=EDBBAN&amp;form=EDGSNTP" class="hidden">
                     </iframe>
                     <textarea id="outerframe-text-capture"
                             aria-hidden="true"
                             autocomplete="off"
-                            style="opacity:0;pointer-events:none;position:absolute;"
+                            class="hidden-abs"
                             autofocus></textarea>
                     <div class="overlay" id="overlay"></div>
                     <div class="dialog" id="consent-dialog">
@@ -1363,7 +1364,7 @@
                                 <div class = "icons-container">
                                     <img class="icon profile-icon" src="assets/Baby Ray SBM.jpg" alt="Chat Icon" width="40" height="40">
                                     <div class="icon copilot-icon">
-                                        <img id="copilot-character-img" src="assets/AIAntonio.jpg" alt="Copilot" width="40" height="40" style="border-radius: 50%;">
+                                        <img id="copilot-character-img" src="assets/AIAntonio.jpg" alt="Copilot" width="40" height="40" class="rounded-full">
                                     </div>
                                 </div>
                                 <div class = "header-container">
@@ -1419,7 +1420,7 @@
     <div id="gift-overlay" class="fixed inset-0 z-[100] bg-black/95 hidden flex items-center justify-center flex-col">
         <h2 id="gift-sender" class="text-4xl font-bold text-[#ffd700] mb-6 animate-bounce drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">Someone sent a gift!</h2>
         <div class="relative p-1 bg-gradient-to-tr from-[#b4941f] via-[#ffd700] to-[#b4941f] rounded-xl shadow-2xl">
-            <video id="gift-video" class="max-w-md w-full rounded-lg" playsinline></video>
+            <video id="gift-video" class="max-w-md w-full rounded-lg" playsinline webkit-playsinline></video>
         </div>
         <button onclick="document.getElementById('gift-overlay').classList.add('hidden'); document.getElementById('gift-video').pause()" class="mt-8 px-8 py-3 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] rounded-full font-bold hover:bg-[#4e342e] transition shadow-lg">Close Gift</button>
     </div>
@@ -1480,7 +1481,7 @@
     <!-- Gift Video Overlay — plays over the big screen when a gift is sent/received -->
     <div id="gift-video-overlay" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/70 pointer-events-none">
         <div class="relative max-w-lg w-full mx-4">
-            <video id="gift-video-player" class="w-full rounded-2xl shadow-2xl border-4 border-[#ffd700]" autoplay muted playsinline></video>
+            <video id="gift-video-player" class="w-full rounded-2xl shadow-2xl border-4 border-[#ffd700]" autoplay muted playsinline webkit-playsinline></video>
             <div id="gift-video-label" class="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-bold drop-shadow-lg"></div>
         </div>
     </div>
@@ -1490,9 +1491,9 @@
         <div class="relative w-full max-w-sm mx-4" onclick="event.stopPropagation()">
             <p id="beat-preview-title" class="text-[#ffd700] font-black text-center mb-2 text-sm"></p>
             <div class="relative rounded-2xl overflow-hidden border-2 border-[#ffd700]">
-                <video id="beat-preview-video" class="w-full" autoplay playsinline></video>
+                <video id="beat-preview-video" class="w-full" autoplay playsinline webkit-playsinline></video>
                 <!-- Watermark overlay (bird video, looping, corner) -->
-                <video id="watermark-video" src="gifts/WATERMARK.mp4" class="absolute bottom-2 right-2 w-20 h-20 object-cover rounded-lg opacity-80 pointer-events-none" autoplay loop muted playsinline></video>
+                <video id="watermark-video" src="gifts/WATERMARK.mp4" class="absolute bottom-2 right-2 w-20 h-20 object-cover rounded-lg opacity-80 pointer-events-none" autoplay loop muted playsinline webkit-playsinline></video>
             </div>
             <button onclick="closeBeatPreview()" class="mt-3 w-full bg-[#ffd700] text-black font-black py-2 rounded-xl text-sm">✕ Close Preview</button>
         </div>
