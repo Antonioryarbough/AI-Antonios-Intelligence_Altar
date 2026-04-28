@@ -1,27 +1,11 @@
 {
   "hosting": {
-    "site": "studio-2fb13",
-    "public": ".",
+    "site": "raydent-16571",
+    "public": "Studio/public",
     "ignore": [
       "firebase.json",
-      "firebase.*.json",
       "**/.*",
-      "**/node_modules/**",
-      "functions/**",
-      "evaluation/**",
-      "peer-server/**",
-      "scripts/**",
-      "src/**",
-      "deploy.sh",
-      "*.config.js",
-      "package.json",
-      "get-pip.py"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      "**/node_modules/**"
     ]
   }
 }
