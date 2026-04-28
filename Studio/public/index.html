@@ -1689,6 +1689,57 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ── Pad Lighting Engine ─────────────────────────────────── */
+        #pad-lighting-section {
+            margin-top: 0;
+        }
+        #pad-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 72px);
+            gap: 10px;
+            justify-content: center;
+        }
+        .pad {
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .pad .pad-label {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.35);
+            line-height: 1;
+            pointer-events: none;
+            user-select: none;
+        }
+        .pad.active {
+            transform: scale(1.08);
+            box-shadow: 0 0 18px var(--pad-color, #fff), 0 0 6px var(--pad-color, #fff);
+            background: color-mix(in srgb, var(--pad-color, #fff) 18%, #1a1a2e 82%);
+            border-color: var(--pad-color, #fff);
+        }
+        .pad.active .pad-label {
+            color: rgba(255,255,255,0.65);
+        }
+        #pad-midi-status {
+            font-size: 0.7rem;
+            color: #888;
+            text-align: center;
+            margin-top: 6px;
+        }
+        #pad-midi-status.connected { color: #4ade80; }
+        #pad-midi-status.error { color: #f87171; }
+        /* ── End Pad Lighting Engine ─────────────────────────────── */
     </style>
 </head>
 <body>
@@ -1886,6 +1937,31 @@
                         <button type="submit">Send</button>
                         <button id="generate-rhyme-btn" type="button" class="hidden">Rhyme</button>
                     </form>
+                </div>
+
+                <!-- Pad Lighting Engine -->
+                <div id="pad-lighting-section" class="card">
+                    <h2 class="text-xl font-bold mb-1 text-center">🎛️ Pad Grid</h2>
+                    <p class="text-xs text-center text-gray-400 mb-3">Hit your MIDI controller pads — each lights up in its zodiac color.</p>
+                    <div id="pad-grid">
+                        <div class="pad" id="pad-0"><span class="pad-label">Aries</span></div>
+                        <div class="pad" id="pad-1"><span class="pad-label">Leo</span></div>
+                        <div class="pad" id="pad-2"><span class="pad-label">Sagitt.</span></div>
+                        <div class="pad" id="pad-3"><span class="pad-label">Ember</span></div>
+                        <div class="pad" id="pad-4"><span class="pad-label">Taurus</span></div>
+                        <div class="pad" id="pad-5"><span class="pad-label">Virgo</span></div>
+                        <div class="pad" id="pad-6"><span class="pad-label">Capric.</span></div>
+                        <div class="pad" id="pad-7"><span class="pad-label">Sand</span></div>
+                        <div class="pad" id="pad-8"><span class="pad-label">Gemini</span></div>
+                        <div class="pad" id="pad-9"><span class="pad-label">Libra</span></div>
+                        <div class="pad" id="pad-10"><span class="pad-label">Aquar.</span></div>
+                        <div class="pad" id="pad-11"><span class="pad-label">Mist</span></div>
+                        <div class="pad" id="pad-12"><span class="pad-label">Cancer</span></div>
+                        <div class="pad" id="pad-13"><span class="pad-label">Scorpio</span></div>
+                        <div class="pad" id="pad-14"><span class="pad-label">Pisces</span></div>
+                        <div class="pad" id="pad-15"><span class="pad-label">Water</span></div>
+                    </div>
+                    <p id="pad-midi-status">🎹 Waiting for MIDI controller…</p>
                 </div>
             </div>
 
@@ -6385,6 +6461,105 @@ In the school of rhyme, there's no way to lose.
             }
         });
     });
+
+    // ── Pad Lighting Engine ──────────────────────────────────────────
+    (function initPadLightingEngine() {
+        const PAD_COLORS = {
+            0:  "#FF2E2E",   // Aries Red
+            1:  "#FFB300",   // Leo Gold
+            2:  "#FF7A00",   // Sagittarius Orange
+            3:  "#FF4500",   // Fire Ember
+            4:  "#2E8B57",   // Taurus Forest Green
+            5:  "#808000",   // Virgo Olive
+            6:  "#6E6E6E",   // Capricorn Stone Gray
+            7:  "#C2B280",   // Earth Sand
+            8:  "#F4E04D",   // Gemini Yellow
+            9:  "#87CEEB",   // Libra Sky Blue
+            10: "#1E90FF",   // Aquarius Electric Blue
+            11: "#B0E0E6",   // Air Mist
+            12: "#F8F8FF",   // Cancer Pearl White
+            13: "#4B0082",   // Scorpio Deep Purple
+            14: "#00CED1",   // Pisces Aqua Blue
+            15: "#5FD1FF"    // Water Glow
+        };
+
+        const statusEl = document.getElementById('pad-midi-status');
+
+        function activatePad(index) {
+            const pad = document.getElementById(`pad-${index}`);
+            if (!pad) return;
+            const color = PAD_COLORS[index];
+            if (color) pad.style.setProperty('--pad-color', color);
+            pad.classList.add('active');
+        }
+
+        function deactivatePad(index) {
+            const pad = document.getElementById(`pad-${index}`);
+            if (!pad) return;
+            pad.classList.remove('active');
+        }
+
+        // Touch/click fallback so pads work on screen too
+        document.querySelectorAll('.pad').forEach(pad => {
+            const index = parseInt(pad.id.replace('pad-', ''), 10);
+            pad.addEventListener('pointerdown', () => activatePad(index));
+            pad.addEventListener('pointerup',   () => deactivatePad(index));
+            pad.addEventListener('pointerleave', () => deactivatePad(index));
+        });
+
+        // Web MIDI — maps incoming note numbers 0-15 directly;
+        // also remaps common controller offsets (36–51, 60–75) to pad 0-15
+        function noteToIndex(note) {
+            if (note >= 0  && note <= 15) return note;
+            if (note >= 36 && note <= 51) return note - 36;
+            if (note >= 60 && note <= 75) return note - 60;
+            return null;
+        }
+
+        if (!navigator.requestMIDIAccess) {
+            statusEl.textContent = '⚠️ Web MIDI not supported in this browser.';
+            statusEl.classList.add('error');
+            return;
+        }
+
+        navigator.requestMIDIAccess().then(midi => {
+            let inputCount = 0;
+
+            function attachInputs() {
+                inputCount = 0;
+                midi.inputs.forEach(input => {
+                    inputCount++;
+                    input.onmidimessage = (msg) => {
+                        const [status, note, velocity] = msg.data;
+                        const index = noteToIndex(note);
+                        if (index === null) return;
+
+                        const isNoteOn  = status === 144 && velocity > 0;
+                        const isNoteOff = status === 128 || (status === 144 && velocity === 0);
+
+                        if (isNoteOn)  activatePad(index);
+                        if (isNoteOff) deactivatePad(index);
+                    };
+                });
+
+                if (inputCount > 0) {
+                    statusEl.textContent = `🎹 MIDI connected (${inputCount} input${inputCount > 1 ? 's' : ''})`;
+                    statusEl.className = 'connected';
+                } else {
+                    statusEl.textContent = '🎹 No MIDI inputs detected — connect your controller and refresh.';
+                    statusEl.className = '';
+                }
+            }
+
+            attachInputs();
+            midi.onstatechange = attachInputs;
+
+        }).catch(err => {
+            statusEl.textContent = `⚠️ MIDI access denied: ${err.message}`;
+            statusEl.classList.add('error');
+        });
+    })();
+    // ── End Pad Lighting Engine ──────────────────────────────────────
     </script>
 </body>
 </html>
