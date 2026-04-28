@@ -1,0 +1,20 @@
+{
+  "id": "evt_1SYXg3IcMSxwbtZN6u7LhbiH",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "created": 1764359398,
+  "data": {
+    "object": {
+      "id": "cs_test_a1wldKTgtMbw2G6HXu9qAsjy6F7y5edjWmprEyzIbwRlsremrAVHqMc2UW",
+      "object": "checkout.session",
+      "metadata": {
+        "appId": "ai-enterprise-studio",
+        "giftId": "rose-bouquet",
+        "userId": "test_user_live"
+      },
+      "status": "complete"
+    }
+  },
+  "livemode": false,
+  "type": "checkout.session.completed"
+}

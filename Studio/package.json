@@ -1,0 +1,41 @@
+{
+  "name": "ai-enterprise-studio",
+  "version": "1.0.0",
+  "description": "AI Enterprise Studio - A fully functional multimedia collaboration platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:css\" \"npm run serve\"",
+    "deploy": "firebase deploy",
+    "serve": "firebase emulators:start --only hosting",
+    "serve:full": "firebase serve",
+    "init": "firebase init",
+    "dev:css": "npx tailwindcss -i ./src/tailwind.css -o ./public/styles.css --watch",
+    "build:css": "npx tailwindcss -i ./src/tailwind.css -o ./public/styles.css --minify",
+    "lint": "npx hint public/index.html",
+    "peer:server": "node peer-server/server.js"
+  },
+  "keywords": [
+    "webrtc",
+    "firebase",
+    "video-call",
+    "recording",
+    "chat"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@hint/formatter-stylish": "^3.1.36",
+    "@hint/parser-html": "^3.1.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.1",
+    "firebase-tools": "^13.0.0",
+    "hint": "^7.1.13",
+    "lodash": "^4.17.21",
+    "postcss": "^8.4.31",
+    "rimraf": "^6.1.2",
+    "tailwindcss": "^3.4.14"
+  },
+  "dependencies": {
+    "firebase": "^12.6.0"
+  },
+  "main": "postcss.config.js"
+}

@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.uid == 'Joiqo90r7wWQ920NFesvAGMroFJ2';
+    }
+
+    function isValidFiveDollarLabelTransaction() {
+      return request.resource.data.amount == 5
+        && request.resource.data.transactionType in ['reward', 'tip']
+        && request.resource.data.fromUserId == request.auth.uid
+        && request.resource.data.toUserId is string
+        && request.resource.data.toUserId.size() > 0;
+    }
+
+    // Label owner promotional budget must remain fixed when present.
+    function isFixedPromoBudget() {
+      return !request.resource.data.keys().hasAny(['labelBudget']) || request.resource.data.labelBudget == 100000;
+    }
+
+    // Profile doc gets a dedicated rule so labelBudget cannot be changed away from 100000.
+    match /artifacts/{appId}/users/{userId}/profile/main {
+      allow read, write: if isOwner(userId)
+        && isFixedPromoBudget();
+    }
+
+    // Allow authenticated users to read/write their own data
+    match /artifacts/{appId}/users/{userId}/{document=**} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Public data reads are available to authenticated users.
+    match /artifacts/{appId}/public/{document=**} {
+      allow read: if isAuthenticated();
+    }
+
+    // Per-user public profile card.
+    match /artifacts/{appId}/public/users/{userId} {
+      allow write: if isOwner(userId);
+    }
+
+    // Admin-only Zodiac Council management is mandatory.
+    match /artifacts/{appId}/public/data/zodiac_council/{signId} {
+      allow write: if isAdmin();
+    }
+
+    // Shared public collections used by the app.
+    match /artifacts/{appId}/public/data/messages/{docId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /artifacts/{appId}/public/data/chat_messages/{docId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /artifacts/{appId}/public/data/sent_gifts/{docId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /artifacts/{appId}/public/data/custom_gifts/{docId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /artifacts/{appId}/public/data/characters/{docId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /artifacts/{appId}/public/data/status/{docId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /artifacts/{appId}/public/data/directory/{userId} {
+      allow write: if isOwner(userId);
+    }
+
+    // Hub collections for client progression and promotional flows.
+    match /artifacts/{appId}/public/data/client_progress/{userId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /artifacts/{appId}/public/data/label_transactions/{docId} {
+      allow create: if isAuthenticated() && isValidFiveDollarLabelTransaction();
+      allow update, delete: if false;
+    }
+
+    match /artifacts/{appId}/public/data/label_deals/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /artifacts/{appId}/public/data/call_requests/{docId} {
+      allow write: if isAuthenticated();
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
