@@ -1,0 +1,32 @@
+{
+  "name": "ai-antonios-intelligence-altar",
+  "version": "1.0.0",
+  "description": "AI Antonio's Intelligence - Pisces-centered music coaching and creative platform",
+  "main": "index.html",
+  "scripts": {
+    "serve": "python3 -m http.server 8000 || python -m http.server 8000",
+    "dev": "npm run serve",
+    "test": "echo 'No tests configured yet' && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Antonioryarbough/AI-Antonios-Intelligence_Altar.git"
+  },
+  "keywords": [
+    "music",
+    "ai",
+    "coaching",
+    "pisces",
+    "creativity",
+    "rhyme",
+    "beat-production"
+  ],
+  "author": "Antonio Ryarbough",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Antonioryarbough/AI-Antonios-Intelligence_Altar/issues"
+  },
+  "homepage": "https://github.com/Antonioryarbough/AI-Antonios-Intelligence_Altar#readme",
+  "dependencies": {},
+  "devDependencies": {}
+}

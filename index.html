@@ -350,7 +350,7 @@
                             <button id="purchase-mp3-wav" class="bg-purple-600 hover:bg-purple-700">Buy Master MP3/WAV</button>
                             <button id="purchase-mp4" class="bg-pink-600 hover:bg-pink-700">Buy Master MP4 (Subscription)</button>
                         </div>
-                        <img id="raydiant-seal" src="GERTIFIED AI SBM SEAL.jpg" alt="AI Certified SBM Seal" class="w-24 h-24 mx-auto mt-4" />
+                        <img id="raydiant-seal" src="assets/sbm raydiant seal.PNG" alt="AI Certified SBM Seal" class="w-24 h-24 mx-auto mt-4" />
                     </div>
                 </div>
 
@@ -380,6 +380,9 @@
         <button id="close-message" class="mt-4 px-4 py-2 rounded-lg bg-purple-600">OK</button>
     </div>
 
+    <!-- Optional configuration file (not in git) -->
+    <script src="config.js" onerror="console.log('🌊 config.js not found - using environment variables or demo mode')"></script>
+
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -389,10 +392,25 @@
 
         setLogLevel('Debug');
 
-        // Global Firebase variables
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Configuration: Try to load from various sources
+        // 1. Try window.__env__ (set by environment variable injection)
+        // 2. Try legacy __firebase_config
+        // 3. Fall back to empty config (demo mode)
+        const envConfig = window.__env__ || {};
+        
+        const firebaseConfig = envConfig.firebaseConfig || 
+                              (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null) || 
+                              {};
+        
+        const appId = envConfig.appId || 
+                      (typeof __app_id !== 'undefined' ? __app_id : null) || 
+                      'default-app-id';
+        
+        const googleAiApiKey = envConfig.googleAiApiKey || '';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Check if we're in demo mode
+        const isDemoMode = !firebaseConfig.apiKey || !googleAiApiKey;
         
         let db, auth;
         let userId;
@@ -436,28 +454,48 @@
                 document.getElementById('message-box').style.display = 'none';
             });
             
+            // Show demo mode notification if not configured
+            if (isDemoMode) {
+                console.log('🌊 Running in DEMO MODE - Some features limited without API keys');
+                console.log('📖 See DEPLOYMENT.md for setup instructions');
+            }
+            
             // Initialize Firebase on page load
-            if (Object.keys(firebaseConfig).length) {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                onAuthStateChanged(auth, async (user) => {
-                    if (!user) {
-                        try {
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
+            if (Object.keys(firebaseConfig).length && firebaseConfig.apiKey) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    onAuthStateChanged(auth, async (user) => {
+                        if (!user) {
+                            try {
+                                if (initialAuthToken) {
+                                    await signInWithCustomToken(auth, initialAuthToken);
+                                } else {
                                 await signInAnonymously(auth);
                             }
                         } catch (error) {
                             console.error("Firebase Auth Error:", error);
+                            showMessage("Authentication issue. Some features may be limited. See console for details.");
                         }
                     }
                     userId = auth.currentUser?.uid || crypto.randomUUID();
                     if(userIdDisplay) userIdDisplay.textContent = userId;
                     setupRealtimeListeners();
                 });
+                } catch (error) {
+                    console.error("Firebase Initialization Error:", error);
+                    showMessage("Firebase initialization failed. Running in offline mode. See DEPLOYMENT.md for setup.");
+                    // Set a random userId for offline mode
+                    userId = crypto.randomUUID();
+                    if(userIdDisplay) userIdDisplay.textContent = userId;
+                }
+            } else {
+                // Demo mode - no Firebase
+                console.log('🌊 Firebase not configured. Running in demo mode.');
+                userId = crypto.randomUUID();
+                if(userIdDisplay) userIdDisplay.textContent = userId;
             }
 
             function setupRealtimeListeners() {
@@ -571,7 +609,14 @@
                         contents: [{ parts: [{ text: prompt }] }],
                     };
 
-                    const apiKey = "";
+                    const apiKey = googleAiApiKey;
+                    
+                    if (!apiKey) {
+                        const demoResponse = "🌊 Demo Mode: I'm Antonio's Intelligence! To get real AI-powered rhyme coaching, please set up your Google AI API key. See DEPLOYMENT.md for instructions. For now, trust your intuition and let your creativity flow like water!";
+                        displayMessage('AI Twin', demoResponse);
+                        return;
+                    }
+                    
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
                     let attempts = 0;
@@ -673,12 +718,20 @@
                 buttonElement.textContent = '...';
 
                 try {
+                    const apiKey = googleAiApiKey;
+                    
+                    if (!apiKey) {
+                        console.log('🌊 Demo Mode: TTS not available without API key');
+                        buttonElement.disabled = false;
+                        buttonElement.textContent = '🔊';
+                        return;
+                    }
+                    
                     const payload = {
                         contents: [{ parts: [{ text: `Say with a cool, encouraging tone: ${text}` }] }],
                         generationConfig: { responseModalities: ["AUDIO"] },
                         model: "gemini-2.5-flash-preview-tts"
                     };
-                    const apiKey = "";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
                     
                     const response = await fetch(apiUrl, {
@@ -770,8 +823,16 @@
                 const prompt = "A mystical, artistic avatar for a musician named 'Pisces Ghost'. A ghostly figure with elements of the Pisces zodiac sign (like two fish or water themes). Modern hip-hop, street art style. Ethereal, cool colors like purple, blue, and silver.";
 
                 try {
+                    const apiKey = googleAiApiKey;
+                    
+                    if (!apiKey) {
+                        showMessage("🌊 Demo Mode: Avatar generation requires Google AI API key. See DEPLOYMENT.md for setup instructions.");
+                        generateAvatarBtn.disabled = false;
+                        generateAvatarBtn.innerHTML = '✨ Generate New Look';
+                        return;
+                    }
+                    
                     const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1 } };
-                    const apiKey = ""; 
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
                     
                     const response = await fetch(apiUrl, {
@@ -828,6 +889,13 @@ document.getElementById('beat-upload').addEventListener('change', (e) => {
 });
 // ...existing code...       // ** Camera and BadDGirl approval functionality **
             function startCamera() {
+                // Check browser compatibility
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showMessage("🌊 Your browser doesn't support camera access. Please use a modern browser like Chrome, Firefox, or Safari.");
+                    console.error("WebRTC not supported in this browser");
+                    return;
+                }
+                
                 // Stop any existing stream before starting a new one
                 if (localStream) {
                     localStream.getTracks().forEach(track => track.stop());
@@ -871,6 +939,13 @@ document.getElementById('beat-upload').addEventListener('change', (e) => {
             
             // ** Recording functionality **
             recordBtn.addEventListener('click', async () => {
+                // Check MediaRecorder compatibility
+                if (!window.MediaRecorder) {
+                    showMessage("🌊 Your browser doesn't support audio recording. Please use a modern browser like Chrome, Firefox, or Safari.");
+                    console.error("MediaRecorder not supported in this browser");
+                    return;
+                }
+                
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
