@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from azure.ai.evaluation import evaluate
-from evaluation.evaluators import (
+from docs.evaluators import (
     WebhookSignatureEvaluator,
     GiftUnlockAccuracyEvaluator,
     FirestoreDataIntegrityEvaluator,
