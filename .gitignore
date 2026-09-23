@@ -27,3 +27,24 @@ firestore-debug.log*
 
 # OS
 Thumbs.db
+
+# Local build / deploy state (never commit)
+.next/
+*.tsbuildinfo
+.vercel/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Evaluation run output (input data test_data.jsonl stays tracked)
+evaluation/evaluation_results.json
+
+# Large media — hosted externally, not in git
+public/assets/*.mp4
+public/assets/*.MP4
+
+# macOS resource forks that slipped upstream (._* files)
+._*
+
+# Next build cache that slipped upstream
+*.sst
