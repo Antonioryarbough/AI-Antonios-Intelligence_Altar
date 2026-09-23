@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///Users/tonebone/Documents/AI-Antonios-Intelligence_Altar2/app/page.tsx"],"sourcesContent":["export default function HomePage() {\n  return (\n    <main className=\"flex flex-col items-center justify-center min-h-screen bg-black text-white\">\n      <h1 className=\"text-4xl font-bold mb-4\">Antonio's Intelligence Altar</h1>\n      <p className=\"text-lg mb-8\">Welcome! Debut your creation and explore the Pisces-centered creative coaching experience.</p>\n      <a href=\"/debut\" className=\"px-6 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition\">Go to Debut Page</a>\n    </main>\n  );\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,8OAAC;QAAK,WAAU;;0BACd,8OAAC;gBAAG,WAAU;0BAA0B;;;;;;0BACxC,8OAAC;gBAAE,WAAU;0BAAe;;;;;;0BAC5B,8OAAC;gBAAE,MAAK;gBAAS,WAAU;0BAA4E;;;;;;;;;;;;AAG7G"}}]
+}

@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antonio's Intelligence (AI) & Label Hub</title>
+  <style>
+    :root {
+      --bg-1: #f4eee6;
+      --bg-2: #f8f4ee;
+      --ink: #1a140f;
+      --panel: #fffaf3;
+      --line: #c8b8a0;
+      --accent: #14532d;
+      --accent-2: #78350f;
+      --warn: #9a3412;
+      --muted: #5f5548;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 10%, #d7f0dc 0%, rgba(215, 240, 220, 0) 25%),
+        radial-gradient(circle at 92% 14%, #f2d8bc 0%, rgba(242, 216, 188, 0) 22%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .hub {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--panel);
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 16px 30px rgba(26, 20, 15, 0.07);
+    }
+
+    .hero {
+      padding: 20px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 12px;
+    }
+
+    h1, h2 {
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: clamp(1.45rem, 2.2vw, 2rem);
+    }
+
+    .owner {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .status-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .status-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .status-value {
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .panel {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .row.triple {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 14px rgba(26, 20, 15, 0.09);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-accent {
+      background: var(--accent-2);
+      color: #fff;
+      border-color: var(--accent-2);
+    }
+
+    .message {
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      min-height: 46px;
+      color: var(--muted);
+    }
+
+    .message.warn {
+      color: var(--warn);
+      border-color: #e8c7ae;
+      background: #fff8f3;
+    }
+
+    .preview-wrap {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .preview-img {
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+      border-radius: 8px;
+      display: none;
+      border: 1px solid #e6dccf;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .align-end {
+      display: flex;
+      align-items: end;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .camera-area {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.2fr 1fr;
+      align-items: stretch;
+    }
+
+    .camera-feed {
+      border: 2px solid #b7c7b9;
+      border-radius: 14px;
+      background:
+        linear-gradient(160deg, rgba(20, 83, 45, 0.15), rgba(20, 83, 45, 0)),
+        repeating-linear-gradient(45deg, #f7fbf8, #f7fbf8 8px, #f0f7f2 8px, #f0f7f2 16px);
+      min-height: 220px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .camera-live {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f5132;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .camera-id {
+      display: inline-flex;
+      width: 70px;
+      height: 70px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: #14532d;
+      color: #fff;
+      font-size: 28px;
+      font-weight: 700;
+      border: 4px solid #d7eadf;
+    }
+
+    .camera-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .progress-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .camera-streams {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stream-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .stream-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .feed-list {
+      border: 1px solid #eadfce;
+      border-radius: 8px;
+      min-height: 120px;
+      max-height: 180px;
+      overflow: auto;
+      background: #fffdfa;
+      padding: 8px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .feed-item {
+      border: 1px solid #e8ddce;
+      border-radius: 8px;
+      padding: 7px 8px;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .compose-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .meter {
+      height: 14px;
+      border-radius: 999px;
+      background: #f2ebdf;
+      overflow: hidden;
+      border: 1px solid #deceb6;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #78350f, #14532d);
+      transition: width 180ms ease;
+    }
+
+    @media (max-width: 900px) {
+      .status-grid,
+      .row,
+      .row.triple {
+        grid-template-columns: 1fr;
+      }
+
+      body {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="hub">
+    <section class="hero">
+      <div class="kicker">Antonio's Intelligence (AI) & Label Hub</div>
+      <h1>Client Progression, Budget Management, and AI-Driven Mentorship</h1>
+      <div class="owner">LABEL OWNER (Antonio Roschelle Yarbough SR TTEE - Pisces)</div>
+      <div class="badges">
+        <span class="badge">Media Ready</span>
+        <span class="badge">Live Feeds</span>
+      </div>
+      <div class="status-grid">
+        <div class="status-card">
+          <div class="status-label">Label Owner</div>
+          <div class="status-value" id="ownerLabel">You</div>
+        </div>
+        <div class="status-card">
+          <div class="status-label">Client / Caller</div>
+          <div class="status-value" id="clientLabel">P</div>
+        </div>
+        <div class="status-card">
+          <div class="status-label">ID / Budget</div>
+          <div class="status-value" id="userIdText">Loading...</div>
+          <div class="status-value" id="budgetText">$100000.00</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>1. Label Actions & Client Tipping (Goal Progression)</h2>
+      <p>Target User ID (To call, reward, or view progression)</p>
+      <label>
+        Target User ID
+        <input id="targetUserId" type="text" placeholder="Paste Target User ID here" autocomplete="off">
+      </label>
+      <div class="row triple">
+        <button id="startCallBtn" class="btn-primary" type="button">Start Call</button>
+        <button id="rewardBtn" class="btn-accent" type="button">Send $5 Reward</button>
+        <button id="tipBtn" class="btn-accent" type="button">Send $5 Tip</button>
+      </div>
+      <div id="actionsMessage" class="message">Ready.</div>
+    </section>
+
+    <section class="panel">
+      <h2>Camera Area - Client Progress Layout</h2>
+      <p>Clients in this view start at $0 progression. At $100,000 they are rewarded to Zodiac Council as a PAI worker.</p>
+      <div class="camera-area">
+        <div class="camera-feed">
+          <div class="camera-live">Live Client Feed</div>
+          <div id="cameraClientBadge" class="camera-id">?</div>
+          <div class="camera-meta" id="cameraClientText">Load a target user to track progression and council status.</div>
+        </div>
+        <div class="progress-card">
+          <div class="status-label">Progress Goal</div>
+          <div class="status-value" id="progressBudgetText">$0.00 / $100000.00</div>
+          <div class="meter" aria-label="Client progression to council">
+            <div id="progressFill" class="meter-fill"></div>
+          </div>
+          <div class="small" id="progressPercentText">0.00% complete</div>
+          <div class="message" id="councilStatusMessage">No client loaded yet.</div>
+        </div>
+      </div>
+      <div class="camera-streams">
+        <div class="stream-card">
+          <div class="stream-title">Front Camera Gifting Feed</div>
+          <div id="cameraGiftingFeed" class="feed-list">
+            <div class="small">No gifting activity yet.</div>
+          </div>
+        </div>
+        <div class="stream-card">
+          <div class="stream-title">Front Camera Chat</div>
+          <div id="cameraChatFeed" class="feed-list">
+            <div class="small">No chat messages yet.</div>
+          </div>
+          <div class="compose-row">
+            <input id="cameraChatInput" type="text" placeholder="Type camera chat..." maxlength="220">
+            <button id="cameraChatSend" class="btn-primary" type="button">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2. Antonio's Intelligence (AI) - Zodiac Teacher System</h2>
+      <p>Leverage the AI Teacher system based on astrological compatibility.</p>
+      <div class="row">
+        <label>
+          Your Sign (Producer/Label Owner)
+          <input id="ownerSign" type="text" value="Pisces Poet & Big Fish (Fish)" readonly>
+        </label>
+        <label>
+          Target Performer's Birthday
+          <input id="birthday" type="date">
+        </label>
+      </div>
+      <div class="row">
+        <label>
+          Target Performer Sign
+          <input id="targetSign" type="text" value="N/A" readonly>
+        </label>
+        <div class="align-end">
+          <button id="feedbackBtn" class="btn-primary full-width" type="button">Get AI Feedback (Zodiac Teacher)</button>
+        </div>
+      </div>
+      <div id="zodiacMessage" class="message">Welcome! The AI Teacher system will become ready when the performer's sign is available.</div>
+    </section>
+
+    <section class="panel">
+      <h2>3. Local Asset Uploader (Producer & First Lady)</h2>
+      <div class="row">
+        <div class="preview-wrap">
+          <label>
+            Producer/Label Owner Image
+            <input id="producerFile" type="file" accept="image/*">
+          </label>
+          <img id="producerPreview" class="preview-img" alt="Producer image preview">
+          <div class="small" id="producerName">No file chosen</div>
+        </div>
+        <div class="preview-wrap">
+          <label>
+            First Lady Image
+            <input id="firstLadyFile" type="file" accept="image/*">
+          </label>
+          <img id="firstLadyPreview" class="preview-img" alt="First Lady image preview">
+          <div class="small" id="firstLadyName">No file chosen</div>
+        </div>
+      </div>
+      <div class="small">Local previews only. Files are not uploaded in this panel.</div>
+    </section>
+  </main>
+
+  <script src="./config.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { initializeFirestore, doc, getDoc, setDoc, addDoc, collection, getDocs, onSnapshot, query, orderBy, limit, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+    const cfg = window.STUDIO_CONFIG;
+    const actionsMessage = document.getElementById('actionsMessage');
+    const zodiacMessage = document.getElementById('zodiacMessage');
+    const targetUserIdInput = document.getElementById('targetUserId');
+    const userIdText = document.getElementById('userIdText');
+    const budgetText = document.getElementById('budgetText');
+    const birthdayInput = document.getElementById('birthday');
+    const targetSignInput = document.getElementById('targetSign');
+    const clientLabel = document.getElementById('clientLabel');
+    const cameraClientBadge = document.getElementById('cameraClientBadge');
+    const cameraClientText = document.getElementById('cameraClientText');
+    const progressBudgetText = document.getElementById('progressBudgetText');
+    const progressFill = document.getElementById('progressFill');
+    const progressPercentText = document.getElementById('progressPercentText');
+    const councilStatusMessage = document.getElementById('councilStatusMessage');
+    const cameraGiftingFeed = document.getElementById('cameraGiftingFeed');
+    const cameraChatFeed = document.getElementById('cameraChatFeed');
+    const cameraChatInput = document.getElementById('cameraChatInput');
+    const cameraChatSend = document.getElementById('cameraChatSend');
+
+    const DEFAULT_BUDGET = 100000;
+    const CLIENT_GOAL = 100000;
+    let auth;
+    let db;
+    let userId = null;
+    let labelBudget = DEFAULT_BUDGET;
+    let currentTargetId = '';
+    let currentClientProgress = 0;
+    let frontCameraGiftEvents = [];
+    let frontCameraChatEvents = [];
+
+    if (!cfg || !cfg.firebaseConfig || !cfg.appId) {
+      actionsMessage.textContent = 'Missing config.js values. Ensure STUDIO_CONFIG is available.';
+      actionsMessage.classList.add('warn');
+      throw new Error('Missing STUDIO_CONFIG from config.js');
+    }
+
+    const app = initializeApp(cfg.firebaseConfig);
+    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+    auth = getAuth(app);
+
+    function showActionMessage(message, isWarn = false) {
+      actionsMessage.textContent = message;
+      actionsMessage.classList.toggle('warn', Boolean(isWarn));
+    }
+
+    function showZodiacMessage(message, isWarn = false) {
+      zodiacMessage.textContent = message;
+      zodiacMessage.classList.toggle('warn', Boolean(isWarn));
+    }
+
+    function formatMoney(value) {
+      return `$${Number(value).toFixed(2)}`;
+    }
+
+    function setCouncilStatus(message, isWarn = false) {
+      councilStatusMessage.textContent = message;
+      councilStatusMessage.classList.toggle('warn', Boolean(isWarn));
+    }
+
+    function updateCameraLayout(targetUserId, progressionBudget, isPaiWorker) {
+      const safeTarget = targetUserId || '?';
+      const percent = Math.min((Number(progressionBudget || 0) / CLIENT_GOAL) * 100, 100);
+      const badge = safeTarget === '?' ? '?' : safeTarget.charAt(0).toUpperCase();
+
+      cameraClientBadge.textContent = badge;
+      cameraClientText.textContent = safeTarget === '?'
+        ? 'Load a target user to track progression and council status.'
+        : `Target ${safeTarget} progression is live in this camera area.`;
+
+      clientLabel.textContent = safeTarget;
+      progressBudgetText.textContent = `${formatMoney(progressionBudget || 0)} / ${formatMoney(CLIENT_GOAL)}`;
+      progressFill.style.width = `${percent.toFixed(2)}%`;
+      progressPercentText.textContent = `${percent.toFixed(2)}% complete`;
+
+      if (isPaiWorker) {
+        setCouncilStatus('Promoted: This client is already a Zodiac Council PAI worker.');
+      } else if (targetUserId) {
+        setCouncilStatus('Client active. Keep rewarding/tipping until the council threshold is reached.');
+      }
+
+      renderFrontCameraFeeds();
+    }
+
+    function formatShortTime(value) {
+      if (!value || !value.toDate) return '';
+      return value.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function renderFrontCameraFeeds() {
+      const targetId = currentTargetId.trim();
+
+      const gifts = frontCameraGiftEvents.filter((event) => {
+        return !targetId || event.toUserId === targetId;
+      }).slice(0, 20);
+
+      const chats = frontCameraChatEvents.filter((event) => {
+        return !targetId || !event.targetUserId || event.targetUserId === targetId;
+      }).slice(0, 20);
+
+      cameraGiftingFeed.innerHTML = '';
+      if (!gifts.length) {
+        cameraGiftingFeed.innerHTML = '<div class="small">No gifting activity yet.</div>';
+      } else {
+        gifts.forEach((event) => {
+          const item = document.createElement('div');
+          item.className = 'feed-item';
+          const eventType = event.transactionType === 'reward' ? 'Reward' : 'Tip';
+          const timestamp = formatShortTime(event.createdAt);
+          item.textContent = `${eventType} $${Number(event.amount || 0).toFixed(2)} to ${event.toUserId}${timestamp ? ` at ${timestamp}` : ''}`;
+          cameraGiftingFeed.appendChild(item);
+        });
+      }
+
+      cameraChatFeed.innerHTML = '';
+      if (!chats.length) {
+        cameraChatFeed.innerHTML = '<div class="small">No chat messages yet.</div>';
+      } else {
+        chats.forEach((event) => {
+          const item = document.createElement('div');
+          item.className = 'feed-item';
+          const sender = event.userId === userId ? 'You' : (event.userName || event.userId || 'User');
+          const timestamp = formatShortTime(event.timestamp);
+          item.textContent = `${sender}: ${event.text || ''}${timestamp ? ` (${timestamp})` : ''}`;
+          cameraChatFeed.appendChild(item);
+        });
+      }
+    }
+
+    function bindFrontCameraStreams() {
+      const txQuery = query(
+        collection(db, 'artifacts', cfg.appId, 'public', 'data', 'label_transactions'),
+        orderBy('createdAt', 'desc'),
+        limit(30)
+      );
+
+      onSnapshot(txQuery, (snapshot) => {
+        frontCameraGiftEvents = snapshot.docs.map((item) => item.data());
+        renderFrontCameraFeeds();
+      }, (error) => {
+        console.error(error);
+      });
+
+      const chatQuery = query(
+        collection(db, 'artifacts', cfg.appId, 'public', 'data', 'chat_messages'),
+        orderBy('timestamp', 'desc'),
+        limit(30)
+      );
+
+      onSnapshot(chatQuery, (snapshot) => {
+        frontCameraChatEvents = snapshot.docs.map((item) => item.data());
+        renderFrontCameraFeeds();
+      }, (error) => {
+        console.error(error);
+      });
+
+      cameraChatSend.addEventListener('click', async () => {
+        const text = cameraChatInput.value.trim();
+        if (!text) return;
+
+        try {
+          await addDoc(collection(db, 'artifacts', cfg.appId, 'public', 'data', 'chat_messages'), {
+            text,
+            userId,
+            userName: 'Label Owner',
+            targetUserId: currentTargetId || null,
+            scope: 'front_camera',
+            timestamp: serverTimestamp()
+          });
+          cameraChatInput.value = '';
+        } catch (error) {
+          console.error(error);
+          showActionMessage('Could not send front camera chat message.', true);
+        }
+      });
+
+      cameraChatInput.addEventListener('keydown', async (event) => {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        cameraChatSend.click();
+      });
+    }
+
+    function getRequiredTargetId() {
+      const targetUserId = targetUserIdInput.value.trim();
+      if (!targetUserId) {
+        showActionMessage('Please paste a target user ID first.', true);
+        return null;
+      }
+      return targetUserId;
+    }
+
+    function zodiacSignFromDate(dateStr) {
+      if (!dateStr) return null;
+
+      const date = new Date(dateStr + 'T12:00:00');
+      if (Number.isNaN(date.getTime())) return null;
+
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+
+      if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
+      if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
+      if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
+      if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
+      if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
+      if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
+      if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+      if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
+      if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
+      if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricorn';
+      if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
+      return 'Pisces';
+    }
+
+    function feedbackForSign(sign) {
+      const map = {
+        Aries: 'Coach with direct milestones and competitive targets. Keep sessions short and action-heavy.',
+        Taurus: 'Use stable routines, budget checkpoints, and practical rewards that reinforce consistency.',
+        Gemini: 'Use fast iteration, mixed media prompts, and conversational coaching to keep momentum.',
+        Cancer: 'Lead with trust and emotional safety. Pair critique with care and clear next steps.',
+        Leo: 'Give visible leadership moments, spotlight progress, and frame goals as legacy building.',
+        Virgo: 'Focus on systems, quality control, and measurable improvements week to week.',
+        Libra: 'Use collaboration goals, aesthetic polish, and balanced performance reviews.',
+        Scorpio: 'Push depth over volume. Use private strategic notes and focused transformation goals.',
+        Sagittarius: 'Set expansion goals, travel-ready workflows, and bold publishing timelines.',
+        Capricorn: 'Set quarterly targets, KPI dashboards, and disciplined execution blocks.',
+        Aquarius: 'Encourage innovation tracks, unconventional branding, and future-facing projects.',
+        Pisces: 'Use intuitive coaching, story-rich media direction, and creativity-protected schedules.'
+      };
+
+      return map[sign] || 'Build a coaching rhythm with consistent check-ins, budget targets, and personalized feedback.';
+    }
+
+    async function ensureBudget() {
+      const profileRef = doc(db, 'artifacts', cfg.appId, 'users', userId, 'profile', 'main');
+      const profileSnap = await getDoc(profileRef);
+
+      // Promotional rewards use a fixed campaign budget display and do not decrement.
+      labelBudget = DEFAULT_BUDGET;
+      await setDoc(profileRef, {
+        labelBudget: DEFAULT_BUDGET,
+        ownerLabel: 'Antonio Roschelle Yarbough SR TTEE',
+        ownerSign: 'Pisces'
+      }, { merge: true });
+
+      budgetText.textContent = formatMoney(labelBudget);
+    }
+
+    async function loadOrCreateClientProgress(targetUserId) {
+      const progressRef = doc(db, 'artifacts', cfg.appId, 'public', 'data', 'client_progress', targetUserId);
+      const progressSnap = await getDoc(progressRef);
+
+      if (!progressSnap.exists()) {
+        await setDoc(progressRef, {
+          userId: targetUserId,
+          progressionBudget: 0,
+          rewardsReceived: 0,
+          tipsReceived: 0,
+          isPaiWorker: false,
+          lastUpdated: serverTimestamp()
+        }, { merge: true });
+
+        currentTargetId = targetUserId;
+        currentClientProgress = 0;
+        updateCameraLayout(targetUserId, 0, false);
+        return { progressionBudget: 0, isPaiWorker: false };
+      }
+
+      const data = progressSnap.data() || {};
+      const progressionBudget = Number(data.progressionBudget || 0);
+      const isPaiWorker = Boolean(data.isPaiWorker);
+
+      currentTargetId = targetUserId;
+      currentClientProgress = progressionBudget;
+      updateCameraLayout(targetUserId, progressionBudget, isPaiWorker);
+
+      return data;
+    }
+
+    async function promoteToZodiacCouncil(targetUserId) {
+      const councilCollection = collection(db, 'artifacts', cfg.appId, 'public', 'data', 'zodiac_council');
+      const councilSnap = await getDocs(councilCollection);
+
+      let openSeat = null;
+      councilSnap.forEach((seatDoc) => {
+        if (openSeat) return;
+        const seat = seatDoc.data() || {};
+        if (!seat.assignedUserId) {
+          openSeat = { id: seatDoc.id, ref: doc(db, 'artifacts', cfg.appId, 'public', 'data', 'zodiac_council', seatDoc.id) };
+        }
+      });
+
+      if (!openSeat) {
+        setCouncilStatus('Goal reached, but no Zodiac Council seat is open yet.', true);
+        return false;
+      }
+
+      const progressRef = doc(db, 'artifacts', cfg.appId, 'public', 'data', 'client_progress', targetUserId);
+
+      await setDoc(openSeat.ref, {
+        assignedUserId: targetUserId,
+        role: 'PAI Worker',
+        promotedBy: userId,
+        promotedAt: serverTimestamp(),
+        source: 'ai-label-hub'
+      }, { merge: true });
+
+      await setDoc(progressRef, {
+        isPaiWorker: true,
+        councilSeatId: openSeat.id,
+        promotedAt: serverTimestamp(),
+        lastUpdated: serverTimestamp()
+      }, { merge: true });
+
+      setCouncilStatus(`Promotion complete. Assigned to Zodiac Council seat: ${openSeat.id}.`);
+      updateCameraLayout(targetUserId, currentClientProgress, true);
+      return true;
+    }
+
+    async function evaluateCouncilPromotion(targetUserId, progressionBudget, isPaiWorker) {
+      if (isPaiWorker) {
+        return false;
+      }
+
+      if (progressionBudget < CLIENT_GOAL) {
+        return false;
+      }
+
+      try {
+        return await promoteToZodiacCouncil(targetUserId);
+      } catch (error) {
+        console.error(error);
+        const code = String(error && error.code ? error.code : '');
+        if (code.includes('permission-denied')) {
+          setCouncilStatus('Goal reached. Promotion is admin-only and must be completed by the admin account.', true);
+          return false;
+        }
+
+        setCouncilStatus('Goal reached, but promotion failed. Please retry.', true);
+        return false;
+      }
+    }
+
+    async function updateBudgetAndLog(targetUserId, amount, transactionType) {
+      labelBudget = DEFAULT_BUDGET;
+      budgetText.textContent = formatMoney(labelBudget);
+
+      const actorProfileRef = doc(db, 'artifacts', cfg.appId, 'users', userId, 'profile', 'main');
+      const progressRef = doc(db, 'artifacts', cfg.appId, 'public', 'data', 'client_progress', targetUserId);
+      const txCollection = collection(db, 'artifacts', cfg.appId, 'public', 'data', 'label_transactions');
+
+      await setDoc(actorProfileRef, { labelBudget }, { merge: true });
+
+      const progressSnap = await getDoc(progressRef);
+      const progressData = progressSnap.exists() ? (progressSnap.data() || {}) : {};
+      const nextRewards = Number(progressData.rewardsReceived || 0) + (transactionType === 'reward' ? amount : 0);
+      const nextTips = Number(progressData.tipsReceived || 0) + (transactionType === 'tip' ? amount : 0);
+      const nextProgression = Number(progressData.progressionBudget || 0) + amount;
+      const alreadyPaiWorker = Boolean(progressData.isPaiWorker);
+
+      await setDoc(progressRef, {
+        userId: targetUserId,
+        rewardsReceived: nextRewards,
+        tipsReceived: nextTips,
+        progressionBudget: nextProgression,
+        isPaiWorker: alreadyPaiWorker,
+        lastUpdated: serverTimestamp()
+      }, { merge: true });
+
+      await addDoc(txCollection, {
+        transactionType,
+        amount,
+        fromUserId: userId,
+        toUserId: targetUserId,
+        createdAt: serverTimestamp()
+      });
+
+      currentTargetId = targetUserId;
+      currentClientProgress = nextProgression;
+      updateCameraLayout(targetUserId, nextProgression, alreadyPaiWorker);
+
+      const wasPromoted = await evaluateCouncilPromotion(targetUserId, nextProgression, alreadyPaiWorker);
+
+      showActionMessage(`${transactionType === 'reward' ? 'Reward' : 'Tip'} sent to ${targetUserId}. Promotional budget remains ${formatMoney(labelBudget)}.${wasPromoted ? ' Client promoted to Zodiac Council as PAI worker.' : ''}`);
+    }
+
+    async function createCallIntent(targetUserId) {
+      const callRequests = collection(db, 'artifacts', cfg.appId, 'public', 'data', 'call_requests');
+      await addDoc(callRequests, {
+        fromUserId: userId,
+        toUserId: targetUserId,
+        source: 'ai-label-hub',
+        status: 'requested',
+        createdAt: serverTimestamp()
+      });
+      showActionMessage(`Call request sent to ${targetUserId}.`);
+    }
+
+    function bindActionButtons() {
+      async function primeTargetFromInput() {
+        const targetUserId = targetUserIdInput.value.trim();
+        if (!targetUserId) return;
+
+        try {
+          const progressData = await loadOrCreateClientProgress(targetUserId);
+          await evaluateCouncilPromotion(targetUserId, Number(progressData.progressionBudget || 0), Boolean(progressData.isPaiWorker));
+        } catch (error) {
+          console.error(error);
+          setCouncilStatus('Failed to load target progression state.', true);
+        }
+      }
+
+      targetUserIdInput.addEventListener('change', primeTargetFromInput);
+      targetUserIdInput.addEventListener('blur', primeTargetFromInput);
+
+      document.getElementById('startCallBtn').addEventListener('click', async () => {
+        const targetUserId = getRequiredTargetId();
+        if (!targetUserId) return;
+
+        try {
+          if (currentTargetId !== targetUserId) {
+            await loadOrCreateClientProgress(targetUserId);
+          }
+          await createCallIntent(targetUserId);
+        } catch (error) {
+          console.error(error);
+          showActionMessage('Failed to create call request.', true);
+        }
+      });
+
+      document.getElementById('rewardBtn').addEventListener('click', async () => {
+        const targetUserId = getRequiredTargetId();
+        if (!targetUserId) return;
+
+        try {
+          if (currentTargetId !== targetUserId) {
+            await loadOrCreateClientProgress(targetUserId);
+          }
+          await updateBudgetAndLog(targetUserId, 5, 'reward');
+        } catch (error) {
+          console.error(error);
+          showActionMessage('Failed to send reward.', true);
+        }
+      });
+
+      document.getElementById('tipBtn').addEventListener('click', async () => {
+        const targetUserId = getRequiredTargetId();
+        if (!targetUserId) return;
+
+        try {
+          if (currentTargetId !== targetUserId) {
+            await loadOrCreateClientProgress(targetUserId);
+          }
+          await updateBudgetAndLog(targetUserId, 5, 'tip');
+        } catch (error) {
+          console.error(error);
+          showActionMessage('Failed to send tip.', true);
+        }
+      });
+    }
+
+    function bindZodiacTeacher() {
+      birthdayInput.addEventListener('change', () => {
+        const sign = zodiacSignFromDate(birthdayInput.value);
+        targetSignInput.value = sign || 'N/A';
+      });
+
+      document.getElementById('feedbackBtn').addEventListener('click', () => {
+        const sign = zodiacSignFromDate(birthdayInput.value);
+        if (!sign) {
+          showZodiacMessage('Welcome! The AI Teacher system will become ready when the performer\'s sign is available.', true);
+          return;
+        }
+
+        const feedback = feedbackForSign(sign);
+        showZodiacMessage(`Target Sign: ${sign}. AI Teacher Guidance: ${feedback}`);
+      });
+    }
+
+    function bindFilePreview(fileInputId, imageId, textId) {
+      const input = document.getElementById(fileInputId);
+      const image = document.getElementById(imageId);
+      const text = document.getElementById(textId);
+
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) {
+          text.textContent = 'No file chosen';
+          image.style.display = 'none';
+          image.removeAttribute('src');
+          return;
+        }
+
+        text.textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = () => {
+          image.src = String(reader.result || '');
+          image.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    bindActionButtons();
+    bindZodiacTeacher();
+    bindFilePreview('producerFile', 'producerPreview', 'producerName');
+    bindFilePreview('firstLadyFile', 'firstLadyPreview', 'firstLadyName');
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        try {
+          await signInAnonymously(auth);
+        } catch (error) {
+          console.error(error);
+          showActionMessage('Anonymous sign-in failed.', true);
+        }
+        return;
+      }
+
+      userId = user.uid;
+      userIdText.textContent = userId;
+
+      try {
+        await ensureBudget();
+        bindFrontCameraStreams();
+        showActionMessage('Connected. Hub is live.');
+      } catch (error) {
+        console.error(error);
+        showActionMessage('Connected, but failed to load budget.', true);
+      }
+    });
+  </script>
+</body>
+</html>
