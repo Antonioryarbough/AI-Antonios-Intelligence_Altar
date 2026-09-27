@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "builds": [
+    {
+      "src": "studio-build/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*[.][a-zA-Z0-9]+)",
+      "dest": "/studio-build/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/studio-build/index.html"
+    }
+  ]
+}
