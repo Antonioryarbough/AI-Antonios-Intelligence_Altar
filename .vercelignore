@@ -27,3 +27,5 @@ videochat-build
 *.MP4
 *.mp4
 *.webm
+app
+next.config.js
