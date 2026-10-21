@@ -844,10 +844,35 @@
                     </div>
                     <p class="text-[10px] text-[#8d6e63] text-center mt-2">Enable camera to appear here</p>
                 </div>
+
+                <!-- Current Performer -->
+                <div id="call-performer-block" class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mt-3 hidden">
+                    <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">🎤 Current Performer</h3>
+                    <div class="flex items-center gap-2 mb-2">
+                        <img id="current-performer-avatar" src="https://placehold.co/80x80/ffd700/3e2723?text=User" class="w-10 h-10 rounded-full border-2 border-[#3e2723] object-cover" alt="performer avatar">
+                        <div class="flex-1">
+                            <div id="current-performer-name" class="text-sm font-bold text-[#3e2723]">No performer</div>
+                            <div class="text-[9px] text-[#5d4037]">Status: <span id="call-status-text">Idle</span></div>
+                        </div>
+                    </div>
+                    <button id="hangup-call-btn-camera" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold text-xs py-1.5 rounded shadow">📵 Hang Up</button>
+                </div>
             </div>
-            
-            <!-- Studio Tab -->
-            <div id="studio-tab" class="tab-pane hidden"></div>
+
+            <!-- Studio Tab (Video) -->
+            <div id="studio-tab" class="tab-pane hidden">
+                <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
+                    <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">🎬 Main Stage</h3>
+                    <div class="relative aspect-video bg-black rounded border border-[#3e2723] overflow-hidden">
+                        <video id="stageVideoTab" autoplay playsinline class="w-full h-full object-cover" srcObject=""></video>
+                        <div id="stagePlaceholderTab" class="absolute inset-0 flex flex-col items-center justify-center text-[#d4af37] bg-[#1a120b]">
+                            <div class="text-6xl mb-4">🎤</div>
+                            <p class="font-mono uppercase tracking-widest text-[#8d6e63]">No performer on stage</p>
+                        </div>
+                        <button id="hangup-call-btn-tab" class="hidden absolute top-2 right-2 z-30 bg-red-700 hover:bg-red-600 text-white font-bold text-xs px-2 py-1 rounded-full shadow-lg border border-red-900">📵 Hang Up</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Community Tab -->
             <div id="community-tab" class="tab-pane hidden">
@@ -3162,6 +3187,42 @@ End with one short elegant line that feels like a signature approval, insight, o
             });
         })();
 
+        function syncCallUI(show, performerName, performerAvatar, onHangup) {
+            const stageVideo = document.getElementById('stageVideoTab');
+            const stagePlaceholder = document.getElementById('stagePlaceholderTab');
+            const hangupTab = document.getElementById('hangup-call-btn-tab');
+            const hangupCamera = document.getElementById('hangup-call-btn-camera');
+            const callBlock = document.getElementById('call-performer-block');
+            const performerNameEl = document.getElementById('current-performer-name');
+            const callStatusEl = document.getElementById('call-status-text');
+            const avatarEl = document.getElementById('current-performer-avatar');
+
+            if (show) {
+                // Sync video to studio tab (Video tab)
+                const mainVid = document.getElementById('performerVideo');
+                if (stageVideo && mainVid) stageVideo.srcObject = mainVid.srcObject;
+                if (stageVideo) stageVideo.classList.remove('hidden');
+                if (stagePlaceholder) stagePlaceholder.classList.add('hidden');
+
+                // Show hangup buttons in studio tab and cameras tab
+                if (hangupTab) { hangupTab.classList.remove('hidden'); if (onHangup) hangupTab.onclick = onHangup; }
+                if (hangupCamera) { hangupCamera.classList.remove('hidden'); if (onHangup) hangupCamera.onclick = onHangup; }
+
+                // Update call performer block in cameras tab
+                if (callBlock) callBlock.classList.remove('hidden');
+                if (performerNameEl) performerNameEl.textContent = performerName || 'Performer';
+                if (avatarEl && performerAvatar) avatarEl.src = performerAvatar;
+                if (callStatusEl) callStatusEl.textContent = 'ON AIR';
+            } else {
+                if (stageVideo) { stageVideo.srcObject = null; stageVideo.classList.add('hidden'); }
+                if (stagePlaceholder) stagePlaceholder.classList.remove('hidden');
+                if (hangupTab) { hangupTab.classList.add('hidden'); hangupTab.onclick = null; }
+                if (hangupCamera) { hangupCamera.classList.add('hidden'); hangupCamera.onclick = null; }
+                if (callBlock) callBlock.classList.add('hidden');
+                if (callStatusEl) callStatusEl.textContent = 'Idle';
+            }
+        }
+
         function setupCall(call) {
             activePerformerUid = call.peer; // Track who's on screen
             call.on('stream', remoteStream => {
@@ -3172,12 +3233,27 @@ End with one short elegant line that feels like a signature approval, insight, o
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('hangup-call-btn').classList.remove('hidden');
                 document.getElementById('gift-performer-label').textContent = `🎁 → ${call.peer || 'Performer'}`;
+
+                // Sync call state to studio tab (Video) and camera area
+                syncCallUI(true, call.peer, null, () => {
+                    call.close();
+                    vid.srcObject = null;
+                    vid.classList.add('hidden');
+                    document.getElementById('performer-placeholder').classList.remove('hidden');
+                    document.getElementById('hangup-call-btn').classList.add('hidden');
+                    syncCallUI(false);
+                    activePerformerUid = null;
+                    document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
+                    currentCall = null;
+                });
+
                 document.getElementById('hangup-call-btn').onclick = () => {
                     call.close();
                     vid.srcObject = null;
                     vid.classList.add('hidden');
                     document.getElementById('performer-placeholder').classList.remove('hidden');
                     document.getElementById('hangup-call-btn').classList.add('hidden');
+                    syncCallUI(false);
                     activePerformerUid = null;
                     document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     currentCall = null;
