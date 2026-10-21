@@ -50,6 +50,13 @@
             width: auto !important;
             flex: 0 0 auto;
         }
+        .sidebar .tab-btn:focus {
+            outline: none;
+        }
+        .sidebar .tab-btn:focus-visible {
+            outline: 2px solid #3e2723;
+            outline-offset: 2px;
+        }
         .sidebar .tabs-row::-webkit-scrollbar { height: 6px; }
         .sidebar .tabs-row::-webkit-scrollbar-thumb { background: #8d6e63; border-radius: 9999px; }
         .tab-pane { animation: fadeIn 0.3s ease-in-out; }
@@ -655,12 +662,21 @@
                     document.querySelectorAll('.tab-btn').forEach(function(b) {
                         b.classList.remove('active', 'bg-[#3e2723]', 'text-[#ffd700]');
                         b.classList.add('bg-[#d4af37]', 'text-[#3e2723]');
+                        // Reset admin tab special styling when inactive
+                        if (b.dataset.tab === 'admin') {
+                            b.classList.remove('border', 'border-[#ffd700]', 'hover:bg-[#4e342e]');
+                            b.classList.add('hover:bg-[#c5a028]');
+                        }
                     });
                     document.querySelectorAll('.tab-pane').forEach(function(p) {
                         p.classList.add('hidden');
                     });
                     btn.classList.add('active', 'bg-[#3e2723]', 'text-[#ffd700]');
                     btn.classList.remove('bg-[#d4af37]');
+                    // Restore admin tab special styling when active
+                    if (btn.dataset.tab === 'admin') {
+                        btn.classList.add('border', 'border-[#ffd700]', 'hover:bg-[#4e342e]');
+                    }
                     var pane = document.getElementById(btn.dataset.tab + '-tab');
                     if (pane) pane.classList.remove('hidden');
                 });
@@ -2233,6 +2249,11 @@ End with one short elegant line that feels like a signature approval, insight, o
                 document.querySelectorAll('.tab-btn').forEach(b => {
                     b.classList.remove('active', 'bg-[#3e2723]', 'text-[#ffd700]'); // Remove active brown
                     b.classList.add('bg-[#d4af37]', 'text-[#3e2723]'); // Add inactive gold
+                    // Reset admin tab special styling when inactive
+                    if (b.dataset.tab === 'admin') {
+                        b.classList.remove('border', 'border-[#ffd700]', 'hover:bg-[#4e342e]');
+                        b.classList.add('hover:bg-[#c5a028]');
+                    }
                 });
                 
                 // Hide all panes
@@ -2241,6 +2262,10 @@ End with one short elegant line that feels like a signature approval, insight, o
                 // Activate clicked tab (Brown BG, Gold Text)
                 btn.classList.add('active', 'bg-[#3e2723]', 'text-[#ffd700]');
                 btn.classList.remove('bg-[#d4af37]');
+                // Restore admin tab special styling when active
+                if (btn.dataset.tab === 'admin') {
+                    btn.classList.add('border', 'border-[#ffd700]', 'hover:bg-[#4e342e]');
+                }
                 
                 document.getElementById(`${btn.dataset.tab}-tab`).classList.remove('hidden');
                 if (btn.dataset.tab === 'community') loadDirectory();
