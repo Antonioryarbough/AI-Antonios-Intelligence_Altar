@@ -1659,6 +1659,8 @@
         const APP_ID = firebaseConfig.projectId;
         
         let userId = null;
+        let sessionId = null; // per-browser id; camera docs keyed by it so same-account multi-device sees each other
+        let presenceHeartbeat = null; // refreshes lastSeen so stale cameras expire
         let localStream = null;
         let peer = null;
         let currentCall = null; // Store active call for screen sharing
@@ -2219,6 +2221,13 @@ End with one short elegant line that feels like a signature approval, insight, o
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
+                // Stable per-browser session id (survives reloads). Camera presence is keyed by
+                // sessionId so each computer on the same account is its own camera tile.
+                sessionId = localStorage.getItem('studioCameraSessionId');
+                if (!sessionId) {
+                    sessionId = 'sid_' + Math.random().toString(36).slice(2, 8) + '_' + Date.now().toString(36);
+                    localStorage.setItem('studioCameraSessionId', sessionId);
+                }
                 authContainer.classList.add('hidden');
                 document.getElementById('profile-id').textContent = `@${getProfileDisplayName(user)}`;
                 document.getElementById('profile-name').textContent = getProfileDisplayName(user);
@@ -2241,6 +2250,8 @@ End with one short elegant line that feels like a signature approval, insight, o
                 setupGlobalListeners();
             } else {
                 userId = null;
+                sessionId = null;
+                if (presenceHeartbeat) { clearInterval(presenceHeartbeat); presenceHeartbeat = null; }
                 authContainer.classList.remove('hidden');
                 if(chatUnsub) chatUnsub();
                 if(giftsUnsub) giftsUnsub();
@@ -2945,8 +2956,9 @@ End with one short elegant line that feels like a signature approval, insight, o
             const name = document.getElementById('profile-name').textContent.trim();
             const avatar = document.getElementById('profile-avatar').src;
             const nameOk = name && name !== 'Guest User' && name.length > 0;
-            const avatarOk = avatar && !avatar.includes('placehold.co');
-            return nameOk && avatarOk;
+            // Only a name is required for camera publishing so signed-in users (incl. anonymous
+            // "Guest Artist"s) appear in each other's camera list even without a custom avatar.
+            return nameOk;
         }
 
         function showProfileGate(onComplete) {
@@ -3015,6 +3027,22 @@ End with one short elegant line that feels like a signature approval, insight, o
         }
 
         // --- VIDEO / PEER ---
+        // Publish (or refresh) this browser's live camera presence under a per-browser
+        // sessionId. Using sessionId (not userId) means multiple computers signed into the
+        // SAME account each get their own tile instead of overwriting/skipping each other.
+        function publishCameraPresence() {
+            if (!localStream || !userId || !sessionId || !peer?.id) return;
+            console.log('[Camera] Publishing with peerId:', peer.id, 'sessionId:', sessionId);
+            setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', sessionId), {
+                peerId: peer.id,
+                name: document.getElementById('profile-name').textContent,
+                imageUrl: document.getElementById('profile-avatar').src,
+                active: true,
+                timestamp: serverTimestamp(),
+                lastSeen: serverTimestamp()
+            }, { merge: true });
+        }
+
         async function startCamera() {
             if (!isProfileComplete()) {
                 showProfileGate(() => startCamera());
@@ -3026,17 +3054,14 @@ End with one short elegant line that feels like a signature approval, insight, o
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('enable-camera-btn').textContent = "Camera On";
                 document.getElementById('enable-camera-btn').classList.add('bg-green-800', 'text-green-100');
-                // Publish camera — peer.id may be ready now; if not, initPeer's 'open' handler will publish
-                if (userId && peer?.id) {
-                    console.log('[Camera] Publishing with peerId:', peer.id);
-                    setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', userId), {
-                        peerId: peer.id,
-                        name: document.getElementById('profile-name').textContent,
-                        imageUrl: document.getElementById('profile-avatar').src,
-                        active: true,
-                        timestamp: serverTimestamp()
-                    }, { merge: true });
-                } else {
+                // Publish this browser's presence (peer.id may not be ready yet; initPeer's
+                // 'open' handler will (re)publish via publishCameraPresence())
+                publishCameraPresence();
+                // Refresh lastSeen every 30s so a camera tile is pruned once the tab closes/stalls
+                if (!presenceHeartbeat) {
+                    presenceHeartbeat = setInterval(publishCameraPresence, 30000);
+                }
+                if (!(userId && peer?.id)) {
                     console.log('[Camera] Peer not ready yet — will publish when peer opens. userId:', userId, 'peer:', peer?.id);
                 }
             } catch(e) { alert("Camera failed: " + e.message); }
@@ -3088,15 +3113,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 if (cameraPeer) cameraPeer.textContent = id;
                 updatePresence({ peerId: id });
                 // If camera was already started before peer opened, publish now
-                if (localStream && userId) {
-                    setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', userId), {
-                        peerId: id,
-                        name: document.getElementById('profile-name').textContent,
-                        imageUrl: document.getElementById('profile-avatar').src,
-                        active: true,
-                        timestamp: serverTimestamp()
-                    }, { merge: true });
-                }
+                publishCameraPresence();
             });
             peer.on('disconnected', () => { try { peer.reconnect(); } catch(e) { console.error('Reconnect failed', e); } });
             peer.on('call', call => {
@@ -3272,8 +3289,17 @@ End with one short elegant line that feels like a signature approval, insight, o
                         return;
                     }
                     const d = change.doc.data();
-                    if (uid === userId) return; // skip self
+                    if (uid === sessionId) return; // skip self (per-browser session id)
                     if (!d.active || !d.peerId) {
+                        document.getElementById(`cam-tile-${uid}`)?.remove();
+                        return;
+                    }
+                    // Prune stale cameras (browser closed without cleanup) — mirrors raydent-16571.
+                    // lastSeen is refreshed by a 30s heartbeat; fall back to doc timestamp for
+                    // older docs that predate lastSeen (e.g. legacy uid-keyed entries).
+                    const freshnessMs = (d.lastSeen && d.lastSeen.toMillis ? d.lastSeen.toMillis()
+                        : (d.timestamp && d.timestamp.toMillis ? d.timestamp.toMillis() : 0));
+                    if (freshnessMs > 0 && Date.now() - freshnessMs > 5 * 60 * 1000) {
                         document.getElementById(`cam-tile-${uid}`)?.remove();
                         return;
                     }
@@ -3325,21 +3351,21 @@ End with one short elegant line that feels like a signature approval, insight, o
                     // Small tile preview
                     vid.srcObject = s;
                     vid.play().catch(() => {});
-                    // Big screen (main stage)
+                    // Central main stage
                     bigScreen.classList.remove('hidden');
                     bigScreen.srcObject = s;
                     bigScreen.play().catch(() => {});
                     document.getElementById('performer-placeholder').classList.add('hidden');
                     document.getElementById('hangup-call-btn').classList.remove('hidden');
-                    // Update gift overlay label
                     document.getElementById('gift-performer-label').textContent = `🎁 → ${data.name || 'Performer'}`;
-                    document.getElementById('hangup-call-btn').onclick = () => {
+                    const onHangup = () => {
                         call.close();
                         vid.srcObject = null;
                         bigScreen.srcObject = null;
                         bigScreen.classList.add('hidden');
                         document.getElementById('performer-placeholder').classList.remove('hidden');
                         document.getElementById('hangup-call-btn').classList.add('hidden');
+                        syncCallUI(false);
                         enterBtn.textContent = '🎮 Enter';
                         enterBtn.classList.remove('bg-red-700');
                         enterBtn.classList.add('bg-[#ffd700]', 'text-[#3e2723]');
@@ -3347,6 +3373,9 @@ End with one short elegant line that feels like a signature approval, insight, o
                         activePerformerUid = null;
                         document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     };
+                    // Sync the Video tab (Main Stage) + Cam-tab "Current Performer" panel
+                    syncCallUI(true, data.name, data.imageUrl, onHangup);
+                    document.getElementById('hangup-call-btn').onclick = onHangup;
                 });
                 enterBtn.textContent = '🔴 Live';
                 enterBtn.classList.remove('bg-[#ffd700]', 'text-[#3e2723]');
