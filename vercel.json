@@ -2,18 +2,18 @@
   "version": 3,
   "builds": [
     {
-      "src": "studio-build/**/*",
+      "src": "mainstage-build/**/*",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/(.*[.][a-zA-Z0-9]+)",
-      "dest": "/studio-build/$1"
+      "dest": "/mainstage-build/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/studio-build/index.html"
+      "dest": "/mainstage-build/index.html"
     }
   ]
 }

@@ -21,7 +21,6 @@ public
 src
 lobby
 rooms
-mainstage-build
 videochat-build
 *.mp3
 *.MP4
