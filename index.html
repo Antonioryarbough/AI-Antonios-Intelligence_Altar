@@ -2983,6 +2983,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                     setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', userId), {
                         peerId: peer.id,
                         name: document.getElementById('profile-name').textContent,
+                        imageUrl: document.getElementById('profile-avatar').src,
                         active: true,
                         timestamp: serverTimestamp()
                     }, { merge: true });
@@ -3042,6 +3043,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                     setDoc(doc(db, 'artifacts', 'studio-2fb13', 'public', 'data', 'cameras', userId), {
                         peerId: id,
                         name: document.getElementById('profile-name').textContent,
+                        imageUrl: document.getElementById('profile-avatar').src,
                         active: true,
                         timestamp: serverTimestamp()
                     }, { merge: true });
@@ -3189,8 +3191,11 @@ End with one short elegant line that feels like a signature approval, insight, o
                 tile.className = 'relative aspect-video bg-black rounded overflow-hidden border border-[#3e2723]';
                 tile.innerHTML = `
                     <video autoplay playsinline class="w-full h-full object-cover cursor-pointer"></video>
-                    <div class="absolute top-1 left-1 flex items-center gap-1 bg-green-700/80 text-white text-[9px] px-1 py-0.5 rounded-full">
-                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>ONLINE
+                    <div class="absolute top-1 left-1 flex items-center gap-1.5">
+                        <img src="${data.imageUrl || 'https://placehold.co/80x80/ffd700/3e2723?text=User'}" class="cam-avatar w-8 h-8 rounded-full border-2 border-[#3e2723] object-cover" alt="avatar" onerror="this.src='https://placehold.co/80x80/ffd700/3e2723?text=User'">
+                        <div class="flex items-center gap-0.5 bg-green-700/80 text-white text-[9px] px-1.5 py-0.5 rounded-full">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>ONLINE
+                        </div>
                     </div>
                     <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1 py-0.5 font-bold truncate">${data.name || 'Artist'}</div>
                     <button class="enter-btn absolute top-1 right-1 bg-[#ffd700] text-[#3e2723] text-[10px] px-1.5 py-0.5 rounded shadow font-bold">🎮 Enter</button>
@@ -3199,6 +3204,11 @@ End with one short elegant line that feels like a signature approval, insight, o
             }
             // Update peerId on tile in case it arrived late
             tile.dataset.peerId = data.peerId;
+            // Update avatar in case it changed
+            const avatarImg = tile.querySelector('.cam-avatar');
+            if (avatarImg && data.imageUrl) {
+                avatarImg.src = data.imageUrl;
+            }
 
             const vid = tile.querySelector('video');
             const enterBtn = tile.querySelector('.enter-btn');

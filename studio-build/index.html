@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<byRays1$
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -3268,7 +3269,6 @@ End with one short elegant line that feels like a signature approval, insight, o
         })();
 
         function setupCall(call) {
-            activePerformerUid = call.peer; // Track who's on screen
             call.on('stream', remoteStream => {
                 const vid = document.getElementById('performerVideo');
                 vid.srcObject = remoteStream;
@@ -3276,15 +3276,12 @@ End with one short elegant line that feels like a signature approval, insight, o
                 vid.classList.remove('hidden');
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('hangup-call-btn').classList.remove('hidden');
-                document.getElementById('gift-performer-label').textContent = `🎁 → ${call.peer || 'Performer'}`;
                 document.getElementById('hangup-call-btn').onclick = () => {
                     call.close();
                     vid.srcObject = null;
                     vid.classList.add('hidden');
                     document.getElementById('performer-placeholder').classList.remove('hidden');
                     document.getElementById('hangup-call-btn').classList.add('hidden');
-                    activePerformerUid = null;
-                    document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     currentCall = null;
                 };
             });
@@ -3347,7 +3344,6 @@ End with one short elegant line that feels like a signature approval, insight, o
                     vid.srcObject = s;
                     vid.play().catch(() => {});
                     // Big screen (main stage)
-                    bigScreen.classList.remove('hidden');
                     bigScreen.srcObject = s;
                     bigScreen.play().catch(() => {});
                     document.getElementById('performer-placeholder').classList.add('hidden');
