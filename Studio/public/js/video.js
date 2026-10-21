@@ -8,6 +8,7 @@ async function startCamera(elements) {
         console.log('🎥 Requesting camera and microphone access...');
         localStream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
+                facingMode: "user",
                 width: { ideal: 1920 }, 
                 height: { ideal: 1080 },
                 aspectRatio: { ideal: 16/9 }

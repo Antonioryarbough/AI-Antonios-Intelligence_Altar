@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<byRays1$
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -682,6 +683,26 @@
                 </div>
                 <input type="email" id="signin-email" placeholder="Email" class="w-full p-2 rounded bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
                 <input type="password" id="signin-password" placeholder="Password" class="w-full p-2 rounded bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
+                <!-- Hidden signup alias fields (same form used for sign-up flow) -->
+                <input type="email" id="signup-email" placeholder="Email" class="hidden">
+                <input type="password" id="signup-password" placeholder="Password" class="hidden">
+                <script>
+                    // Sync signup inputs with signin inputs so sign-up uses same form fields
+                    const syncSigninToSignup = () => {
+                        const se = document.getElementById('signin-email');
+                        const sp = document.getElementById('signin-password');
+                        const sue = document.getElementById('signup-email');
+                        const sup = document.getElementById('signup-password');
+                        if (se && sue) sue.value = se.value;
+                        if (sp && sup) sup.value = sp.value;
+                    };
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const se = document.getElementById('signin-email');
+                        const sp = document.getElementById('signin-password');
+                        if (se) se.addEventListener('input', syncSigninToSignup);
+                        if (sp) sp.addEventListener('input', syncSigninToSignup);
+                    });
+                </script>
                 <div class="flex gap-2">
                     <button id="signin-btn" class="flex-1 bg-[#ffd700] text-[#3e2723] font-bold py-2 rounded hover:bg-[#ffca28] transition">Sign In</button>
                     <button id="signup-btn" class="flex-1 bg-[#5d4037] text-[#ffd700] font-bold py-2 rounded hover:bg-[#4e342e] transition">Sign Up</button>
@@ -704,6 +725,10 @@
                 <div class="flex gap-2 items-center">
                     <span class="text-xs text-[#ffd700] font-bold">MY ID:</span>
                     <span id="my-peer-id" class="text-xs font-mono text-[#3e2723] bg-[#ffd700] px-2 py-1 rounded select-all font-bold">...</span>
+                    <span id="camera-my-peer-id" class="text-xs font-mono text-[#d4af37] hidden md:inline-block">—</span>
+                    <input type="text" id="remote-peer-id-input" placeholder="Remote ID" class="hidden md:block w-28 text-xs bg-black border border-[#5d4037] text-[#ffd700] rounded px-1 py-0.5">
+                    <button id="start-call-btn" class="hidden md:inline-block text-xs bg-[#d4af37] hover:bg-[#c5a028] text-[#3e2723] font-black px-2 py-1 rounded">📞 Call</button>
+                    <button id="copy-peer-id-btn" class="hidden md:inline-block text-xs bg-[#3e2723] border border-[#ffd700] text-[#ffd700] px-2 py-1 rounded hover:bg-[#4e342e]">📋 Copy</button>
                 </div>
             </div>
 
@@ -768,20 +793,20 @@
     </div>
 
     <!-- Sidebar Toggle -->
-    <button id="sidebar-toggle" title="Open Studio Menu" class="fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full bg-[#ffd700] text-[#3e2723] border-2 border-[#3e2723] flex items-center justify-center shadow-lg hover:scale-110 transition text-xl font-bold">☰</button>
+    <button id="sidebar-toggle" title="Open Studio Menu" class="fixed top-5 right-5 z-50 w-12 h-12 rounded-full bg-[#ffd700] text-[#3e2723] border-2 border-[#3e2723] flex items-center justify-center shadow-lg hover:scale-110 transition text-xl font-bold">☰</button>
 
     <!-- Sidebar - Gold Background -->
     <aside class="sidebar bg-[#ffd700] text-[#3e2723] border-l-4 border-[#3e2723]">
         <!-- Tabs -->
         <div class="tabs-row flex flex-wrap bg-[#fcd34d] border-b border-[#3e2723] p-1 gap-1 sticky top-0 z-10">
             <button class="tab-btn active px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow bg-[#3e2723] text-[#ffd700]" data-tab="cameras">📹 Cam</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="studio">Studio</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="studio">Video</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="community">Comm</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="marketplace">Shop</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="profile">Profile</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="council">Council</button>
             <button class="tab-btn bg-[#3e2723] text-[#ffd700] hover:bg-[#4e342e] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow border border-[#ffd700]" data-tab="admin">🔐</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="storytime">☀️ Story</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="storytime">☀️ Studio</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="copilot">🤖</button>
         </div>
 
@@ -789,106 +814,7 @@
 
             <!-- Cameras Tab -->
             <div id="cameras-tab" class="tab-pane">
-                <!-- Decorations from Storytime tab start -->
-                <div class="bg-gradient-to-br from-[#1a0a2e] to-[#2d0a4e] border border-[#ffd700] rounded-xl p-3 mb-3 shadow-lg">
-                    <div class="flex items-center gap-3">
-                        <div class="flex -space-x-3">
-                            <img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-14 h-14 rounded-full border-2 border-[#ffd700] object-cover shadow z-10" onerror="this.style.display='none'">
-                            <img src="assets/AIAntonio.jpg" alt="AIAntonio" class="w-14 h-14 rounded-full border-2 border-[#d4af37] object-cover shadow" onerror="this.style.display='none'">
-                        </div>
-                        <div class="flex-1">
-                            <h2 class="text-sm font-black text-[#ffd700] leading-tight">Baby Ray's Intelligence Altar</h2>
-                            <p class="text-[10px] text-[#d4af37]">Daily Rapping Storytime</p>
-                            <p class="text-[10px] text-[#bcaaa4]">Performer &amp; Host: <span class="text-[#ffd700] font-bold">Baby Ray ☀️</span> · Lyricist: <span class="text-[#d4af37] font-bold">AIAntonio 🎤</span></p>
-                        </div>
-                        <button id="st-video-btn" title="Watch AIAntonio" class="text-2xl hover:scale-110 transition">🎬</button>
-                    </div>
-                    <div class="mt-2 bg-black/40 border border-[#ffd700]/30 rounded-lg p-2">
-                        <p id="st-welcome-msg" class="text-[11px] text-[#fff8e1] leading-relaxed">☀️ <b class="text-[#ffd700]">Baby Ray:</b> Hey friends! Welcome to today's Rapping Storytime! I'm Baby Ray and AIAntonio is on the mic — we're SO excited to rhyme with you today! Ready to make some magic? ✨</p>
-                    </div>
-                </div>
-                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
-                    <h3 class="text-xs font-black text-[#ffd700] mb-2">🎤 Baby Ray says...</h3>
-                    <div class="grid grid-cols-2 gap-1.5 mb-2">
-                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="HEY" data-response="HO! 🎉">When I say HEY → <b>HO! 🎉</b></button>
-                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="YO" data-response="YO! 🔥">When I say YO → <b>YO! 🔥</b></button>
-                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="GO" data-response="GO! 🚀">When I say GO → <b>GO! 🚀</b></button>
-                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="FLOW" data-response="FLOW! 🌊">When I say FLOW → <b>FLOW! 🌊</b></button>
-                    </div>
-                    <div id="st-response-flash" class="hidden text-center text-3xl font-black text-[#ffd700] py-2 animate-bounce"></div>
-                    <p class="text-[10px] text-[#8d6e63] text-center">Responses: <span id="st-response-count">0</span></p>
-                </div>
-                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
-                    <h3 class="text-xs font-black text-[#ffd700] mb-2">✍️ Story Setup — How are you feeling?</h3>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="happy">😊 Happy</button>
-                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="excited">🤩 Excited</button>
-                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="thinking">🤔 Thinking</button>
-                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="dancing">💃 Dancing</button>
-                    </div>
-                    <p class="text-[10px] text-[#8d6e63] mt-1 text-center">Selected: <span id="st-mood-label" class="text-[#ffd700] font-bold">None</span></p>
-                </div>
-                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xs font-black text-[#ffd700]">🥁 Beat Building</h3>
-                        <div class="flex items-center gap-1">
-                            <span class="text-[10px] text-[#bcaaa4]">BPM</span>
-                            <input id="st-bpm" type="number" value="90" min="60" max="180" class="w-14 text-center text-xs bg-black border border-[#ffd700]/40 text-[#ffd700] rounded px-1 py-0.5">
-                        </div>
-                    </div>
-                    <select id="st-beat-select" class="w-full text-xs bg-black border border-[#ffd700]/40 text-[#ffd700] rounded px-2 py-1.5 mb-2">
-                        <option value="">🎵 Choose a Beat...</option>
-                        <option value="gifts/SBM BEAT 1.mp4">SBM Beat 1</option>
-                        <option value="gifts/SBM BEAT 2.mp4">SBM Beat 2</option>
-                        <option value="gifts/SBM BEAT 3.mp4">SBM Beat 3</option>
-                        <option value="gifts/SBM Beat 4.mp4">SBM Beat 4</option>
-                        <option value="gifts/SBM BEAT 5.mp4">SBM Beat 5</option>
-                        <option value="gifts/SBM BEAT 7.mp4">SBM Beat 7</option>
-                        <option value="gifts/SBM BEAT 8.mp4">SBM Beat 8</option>
-                        <option value="gifts/SBM BEAT 9.mp4">SBM Beat 9</option>
-                        <option value="gifts/SBM BEAT 10.mp4">SBM Beat 10</option>
-                        <option value="gifts/SBM BEAT 11 143 bpm.mp4">SBM Beat 11 (143 BPM)</option>
-                        <option value="gifts/SBM BEAT 12 140 bpm.mp4">SBM Beat 12 (140 BPM)</option>
-                        <option value="gifts/SBM BEAT 13 RNB VIBE 130 bpm.mp4">SBM Beat 13 RnB (130 BPM)</option>
-                        <option value="gifts/SBM BEAT 14 145.56 bpm (BLACK LABEL).mp4">SBM Beat 14 Black Label</option>
-                        <option value="gifts/beat.mp4">SBM Beat (Classic)</option>
-                    </select>
-                    <div class="flex gap-2">
-                        <button id="st-beat-play" class="flex-1 bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">▶️ Play</button>
-                        <button id="st-beat-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded-lg hover:bg-[#4e342e] transition">⏹️ Stop</button>
-                    </div>
-                    <audio id="st-beat-audio" class="hidden"></audio>
-                </div>
-                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xs font-black text-[#ffd700]">✍️ Lyric Input Dock</h3>
-                        <button id="st-clear-btn" class="text-[10px] text-[#8d6e63] hover:text-[#ffd700] border border-[#3e2723] px-2 py-0.5 rounded transition">🧹 Clear</button>
-                    </div>
-                    <textarea id="st-lyric-input" rows="4" placeholder="Drop your rhymes here... Baby Ray is listening! 🎤" class="w-full text-xs bg-black border border-[#ffd700]/30 text-[#fff8e1] rounded-lg p-2 resize-none focus:outline-none focus:border-[#ffd700] placeholder-[#5d4037]"></textarea>
-                    <div class="flex items-center justify-between mt-1">
-                        <p class="text-[10px] text-[#8d6e63]"><span id="st-word-count">0</span> words</p>
-                        <div class="flex gap-1">
-                            <button id="st-freestyle-btn" class="bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">🎤 Drop the Rhyme!</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xs font-black text-[#ffd700]">🎵 Response Arena</h3>
-                        <span class="text-[10px] text-[#8d6e63]">Baby Ray & AIAntonio respond here</span>
-                    </div>
-                    <div id="st-response-arena" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
-                        <div class="flex gap-2 items-start">
-                            <img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-7 h-7 rounded-full border border-[#ffd700] object-cover flex-shrink-0" onerror="this.style.display='none'">
-                            <div class="bg-[#3e2723]/60 border border-[#ffd700]/20 rounded-lg px-2 py-1.5 flex-1">
-                                <p class="text-[10px] font-bold text-[#ffd700]">☀️ Baby Ray</p>
-                                <p class="text-[11px] text-[#fff8e1]">Baby Ray &amp; AIAntonio's responses will appear here 🎶</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button id="st-celebrate-btn" class="w-full bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-[#3e2723] text-xs font-black py-2.5 rounded-xl hover:from-[#ffca28] hover:to-[#c5a028] transition shadow-lg">⭐ Save & Celebrate! 🎉</button>
-                <!-- Decorations from Storytime tab end -->
+
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
                     <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">📹 Producer (Me)</h3>
                     <div class="relative">
@@ -954,6 +880,7 @@
                          <select id="wallet-recipient-select" class="w-full mb-2 text-xs p-1 rounded bg-white text-[#3e2723] border border-[#3e2723]">
                              <option value="">-- Choose User --</option>
                          </select>
+                         <div id="wallet-recipient-overlay" class="hidden"></div>
                          <button id="confirm-send-btn" class="w-full bg-green-700 text-white font-bold text-xs py-1 rounded hover:bg-green-600">Send Selected Gift</button>
                      </div>
                 </div>
@@ -1284,8 +1211,125 @@
             </div>
 
             <!-- ☀️ Storytime Tab -->
-            <div id="storytime-tab" class="tab-pane hidden">
-                <!-- Media Deck moved from Studio tab: only recorder here -->
+            <div id="storytime-tab" class="tab-pane">
+                <!-- Storytime content moved from Cameras tab -->
+                <!-- Decorations from Storytime tab start -->
+                <div class="bg-gradient-to-br from-[#1a0a2e] to-[#2d0a4e] border border-[#ffd700] rounded-xl p-3 mb-3 shadow-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="flex -space-x-3">
+                            <img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-14 h-14 rounded-full border-2 border-[#ffd700] object-cover shadow z-10" onerror="this.style.display='none'">
+                            <img src="assets/AIAntonio.jpg" alt="AIAntonio" class="w-14 h-14 rounded-full border-2 border-[#d4af37] object-cover shadow" onerror="this.style.display='none'">
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="text-sm font-black text-[#ffd700] leading-tight">Baby Ray's Intelligence Altar</h2>
+                            <p class="text-[10px] text-[#d4af37]">Daily Rapping Storytime</p>
+                            <p class="text-[10px] text-[#bcaaa4]">Performer &amp; Host: <span class="text-[#ffd700] font-bold">Baby Ray ☀️</span> · Lyricist: <span class="text-[#d4af37] font-bold">AIAntonio 🎤</span></p>
+                        </div>
+                        <button id="st-video-btn" title="Watch AIAntonio" class="text-2xl hover:scale-110 transition">🎬</button>
+                    </div>
+                    <div class="mt-2 bg-black/40 border border-[#ffd700]/30 rounded-lg p-2">
+                        <p id="st-welcome-msg" class="text-[11px] text-[#fff8e1] leading-relaxed">☀️ <b class="text-[#ffd700]">Baby Ray:</b> Hey friends! Welcome to today's Rapping Storytime! I'm Baby Ray and AIAntonio is on the mic — we're SO excited to rhyme with you today! Ready to make some magic? ✨</p>
+                    </div>
+                </div>
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <h3 class="text-xs font-black text-[#ffd700] mb-2">🎤 Baby Ray says...</h3>
+                    <div class="grid grid-cols-2 gap-1.5 mb-2">
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="HEY" data-response="HO! 🎉">When I say HEY → <b>HO! 🎉</b></button>
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="YO" data-response="YO! 🔥">When I say YO → <b>YO! 🔥</b></button>
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="GO" data-response="GO! 🚀">When I say GO → <b>GO! 🚀</b></button>
+                        <button class="st-call-btn bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[11px] font-black py-2 rounded-lg hover:bg-[#4e342e] transition" data-call="FLOW" data-response="FLOW! 🌊">When I say FLOW → <b>FLOW! 🌊</b></button>
+                    </div>
+                    <div id="st-response-flash" class="hidden text-center text-3xl font-black text-[#ffd700] py-2 animate-bounce"></div>
+                    <p class="text-[10px] text-[#8d6e63] text-center">Responses: <span id="st-response-count">0</span></p>
+                </div>
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <h3 class="text-xs font-black text-[#ffd700] mb-2">✍️ Story Setup — How are you feeling?</h3>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="happy">😊 Happy</button>
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="excited">🤩 Excited</button>
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="thinking">🤔 Thinking</button>
+                        <button class="st-mood-btn bg-[#fcd34d] text-[#3e2723] text-[11px] font-bold py-1.5 rounded-lg hover:bg-[#ffd700] transition" data-mood="dancing">💃 Dancing</button>
+                    </div>
+                    <p class="text-[10px] text-[#8d6e63] mt-1 text-center">Selected: <span id="st-mood-label" class="text-[#ffd700] font-bold">None</span></p>
+                </div>
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">🥁 Beat Building</h3>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-[#bcaaa4]">BPM</span>
+                            <input id="st-bpm" type="number" value="90" min="60" max="180" class="w-14 text-center text-xs bg-black border border-[#ffd700]/40 text-[#ffd700] rounded px-1 py-0.5">
+                        </div>
+                    </div>
+                    <select id="st-beat-select" class="w-full text-xs bg-black border border-[#ffd700]/40 text-[#ffd700] rounded px-2 py-1.5 mb-2">
+                        <option value="">🎵 Choose a Beat...</option>
+                        <option value="gifts/SBM BEAT 1.mp4">SBM Beat 1</option>
+                        <option value="gifts/SBM BEAT 2.mp4">SBM Beat 2</option>
+                        <option value="gifts/SBM BEAT 3.mp4">SBM Beat 3</option>
+                        <option value="gifts/SBM Beat 4.mp4">SBM Beat 4</option>
+                        <option value="gifts/SBM BEAT 5.mp4">SBM Beat 5</option>
+                        <option value="gifts/SBM BEAT 7.mp4">SBM Beat 7</option>
+                        <option value="gifts/SBM BEAT 8.mp4">SBM Beat 8</option>
+                        <option value="gifts/SBM BEAT 9.mp4">SBM Beat 9</option>
+                        <option value="gifts/SBM BEAT 10.mp4">SBM Beat 10</option>
+                        <option value="gifts/SBM BEAT 11 143 bpm.mp4">SBM Beat 11 (143 BPM)</option>
+                        <option value="gifts/SBM BEAT 12 140 bpm.mp4">SBM Beat 12 (140 BPM)</option>
+                        <option value="gifts/SBM BEAT 13 RNB VIBE 130 bpm.mp4">SBM Beat 13 RnB (130 BPM)</option>
+                        <option value="gifts/SBM BEAT 14 145.56 bpm (BLACK LABEL).mp4">SBM Beat 14 Black Label</option>
+                        <option value="gifts/beat.mp4">SBM Beat (Classic)</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <button id="st-beat-play" class="flex-1 bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">▶️ Play</button>
+                        <button id="st-beat-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded-lg hover:bg-[#4e342e] transition">⏹️ Stop</button>
+                    </div>
+                    <audio id="st-beat-audio" class="hidden"></audio>
+                </div>
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">✍️ Lyric Input Dock</h3>
+                        <button id="st-clear-btn" class="text-[10px] text-[#8d6e63] hover:text-[#ffd700] border border-[#3e2723] px-2 py-0.5 rounded transition">🧹 Clear</button>
+                    </div>
+                    <textarea id="st-lyric-input" rows="4" placeholder="Drop your rhymes here... Baby Ray is listening! 🎤" class="w-full text-xs bg-black border border-[#ffd700]/30 text-[#fff8e1] rounded-lg p-2 resize-none focus:outline-none focus:border-[#ffd700] placeholder-[#5d4037]"></textarea>
+                    <div class="flex items-center justify-between mt-1">
+                        <p class="text-[10px] text-[#8d6e63]"><span id="st-word-count">0</span> words</p>
+                        <div class="flex gap-1">
+                            <button id="st-freestyle-btn" class="bg-[#ffd700] text-black text-[10px] font-black px-3 py-1 rounded-lg hover:bg-[#ffca28] transition">🎤 Drop the Rhyme!</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Voice Recorder -->
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">🔴 Voice Recorder</h3>
+                        <div class="flex items-center gap-2">
+                            <span id="st-rec-status" class="text-[10px] text-[#bcaaa4]">Ready to record</span>
+                            <span id="st-rec-timer" class="text-[10px] text-[#ffd700] font-mono">00:00</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="st-rec-start" class="flex-1 bg-[#d4af37] hover:bg-[#c5a028] text-[#3e2723] text-xs font-black py-1.5 rounded shadow">● Record</button>
+                        <button id="st-rec-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded hover:bg-[#4e342e]">■ Stop</button>
+                    </div>
+                    <audio id="st-rec-playback" class="hidden w-full mt-2" controls></audio>
+                    <button id="st-rec-save" class="w-full bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[10px] font-black py-1 rounded mt-2 hidden">💾 Save Recording</button>
+                </div>
+                <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">🎵 Response Arena</h3>
+                        <span class="text-[10px] text-[#8d6e63]">Baby Ray & AIAntonio respond here</span>
+                    </div>
+                    <div id="st-response-arena" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                        <div class="flex gap-2 items-start">
+                            <img src="assets/Baby Ray SBM.jpg" alt="Baby Ray" class="w-7 h-7 rounded-full border border-[#ffd700] object-cover flex-shrink-0" onerror="this.style.display='none'">
+                            <div class="bg-[#3e2723]/60 border border-[#ffd700]/20 rounded-lg px-2 py-1.5 flex-1">
+                                <p class="text-[10px] font-bold text-[#ffd700]">☀️ Baby Ray</p>
+                                <p class="text-[11px] text-[#fff8e1]">Baby Ray &amp; AIAntonio's responses will appear here 🎶</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="st-celebrate-btn" class="w-full bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-[#3e2723] text-xs font-black py-2.5 rounded-xl hover:from-[#ffca28] hover:to-[#c5a028] transition shadow-lg">⭐ Save & Celebrate! 🎉</button>
+                <!-- Decorations from Storytime tab end -->
+                <!-- Media Deck -->
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
                     <h2 class="text-xl font-bold mb-2 text-[#3e2723] flex items-center gap-2">🎬 Media Deck <span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded">LIVE</span></h2>
                     <div class="border-2 border-[#3e2723] rounded-lg overflow-hidden bg-black mb-3">
@@ -1296,7 +1340,7 @@
                         <button id="stop-record-btn" class="bg-gray-300 text-gray-600 py-2 rounded text-sm border border-gray-400" disabled>⏹ STOP</button>
                     </div>
                     <div id="recording-playback" class="hidden mb-3 p-3 bg-[#fdf6e3] rounded border border-[#3e2723]">
-                        <audio id="recording-player" controls class="w-full mb-2 h-8"></audio>
+                        <video id="recording-player" controls class="w-full mb-2 h-8"></video>
                         <a id="save-recording-btn" class="block text-center text-xs text-[#3e2723] hover:text-[#5d4037] font-bold" download>💾 Download Master</a>
                     </div>
                     <div class="relative">
@@ -1327,6 +1371,7 @@
                     <div class="flex gap-2 mb-2">
                         <button id="toggle-character-btn" class="bg-[#ffd700] text-[#3e2723] font-black text-xs px-3 py-1.5 rounded hover:bg-[#ffca28] transition">Toggle Character</button>
                         <button id="start-copilot-btn" class="bg-[#3e2723] text-[#ffd700] border border-[#ffd700] font-black text-xs px-3 py-1.5 rounded hover:bg-[#4e342e] transition">Start Copilot</button>
+                        <button id="generate-rhyme-btn" class="bg-[#d4af37] text-[#3e2723] font-black text-xs px-3 py-1.5 rounded hover:bg-[#c5a028] transition">✨ Rhyme</button>
                     </div>
                     <div id="character-display" class="flex items-center gap-2">
                         <img id="character-img" src="assets/AIAntonio.jpg" alt="AI Antonio" class="w-12 h-12 rounded-full border-2 border-[#ffd700]">
@@ -2424,6 +2469,109 @@ End with one short elegant line that feels like a signature approval, insight, o
             renderStorytimeSessions();
         })();
 
+        // --- MEDIA DECK ---
+        (function() {
+            const customPlayerEl = document.getElementById('customPlayer');
+            const recordBtn = document.getElementById('record-btn');
+            const stopRecordBtn = document.getElementById('stop-record-btn');
+            const recordingPlayback = document.getElementById('recording-playback');
+            const recordingPlayer = document.getElementById('recording-player');
+            const saveRecordingBtn = document.getElementById('save-recording-btn');
+            const mediaUpload = document.getElementById('media-upload');
+
+            if (!customPlayerEl) return;
+
+            let player = null;
+            let mediaRecorder = null;
+            let chunks = [];
+
+            // Initialize Video.js player
+            function initPlayer() {
+                if (player) return;
+                if (typeof window.videojs === 'undefined') {
+                    customPlayerEl.controls = true;
+                    return;
+                }
+                try {
+                    player = window.videojs(customPlayerEl, {
+                        fluid: true,
+                        autoplay: false,
+                        controls: true,
+                        preload: 'auto'
+                    });
+                } catch(e) {
+                    console.error('Video.js init error:', e);
+                    customPlayerEl.controls = true;
+                }
+            }
+
+            // Try to init on load and retry after a delay
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initPlayer);
+            } else {
+                initPlayer();
+            }
+            setTimeout(initPlayer, 1000);
+
+            // Media upload — load selected file into player
+            if (mediaUpload) {
+                mediaUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const url = URL.createObjectURL(file);
+                    if (player) {
+                        player.src([{ src: url, type: file.type.startsWith('video/') ? 'video/mp4' : 'audio/mp4' }]);
+                    } else {
+                        customPlayerEl.src = url;
+                    }
+                    if (player) player.play().catch(() => {});
+                    else customPlayerEl.play().catch(() => {});
+                });
+            }
+
+            // Record button — start recording player output via captureStream
+            if (recordBtn) {
+                recordBtn.addEventListener('click', function() {
+                    if (mediaRecorder) return;
+                    try {
+                        const stream = customPlayerEl.captureStream();
+                        mediaRecorder = new MediaRecorder(stream);
+                        chunks = [];
+
+                        mediaRecorder.ondataavailable = function(e) { chunks.push(e.data); };
+                        mediaRecorder.onstop = function() {
+                            const blob = new Blob(chunks, { type: 'video/webm' });
+                            const url = URL.createObjectURL(blob);
+                            recordingPlayer.src = url;
+                            saveRecordingBtn.href = url;
+                            recordingPlayback.classList.remove('hidden');
+                            recordBtn.disabled = false;
+                            recordBtn.textContent = '⏺ REC';
+                            stopRecordBtn.disabled = true;
+                        };
+
+                        mediaRecorder.start();
+                        recordBtn.disabled = true;
+                        recordBtn.textContent = '⏺ Recording...';
+                        stopRecordBtn.disabled = false;
+                    } catch(e) {
+                        console.error('MediaDeck record error:', e);
+                        alert('Recording error: ' + e.message);
+                    }
+                });
+            }
+
+            // Stop record button
+            if (stopRecordBtn) {
+                stopRecordBtn.addEventListener('click', function() {
+                    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                        mediaRecorder = null;
+                    }
+                });
+            }
+        })();
+
         // --- ADMIN PANEL ---
         const ADMIN_PIN = '4321'; // Change this to your preferred PIN
         const ADMIN_DB  = (path) => ['artifacts', 'studio-2fb13', 'public', 'data', 'admin', ...path.split('/')];
@@ -2824,7 +2972,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 return;
             }
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true });
                 document.getElementById('producerVideo').srcObject = localStream;
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('enable-camera-btn').textContent = "Camera On";
@@ -2989,6 +3137,7 @@ End with one short elegant line that feels like a signature approval, insight, o
         })();
 
         function setupCall(call) {
+            activePerformerUid = call.peer; // Track who's on screen
             call.on('stream', remoteStream => {
                 const vid = document.getElementById('performerVideo');
                 vid.srcObject = remoteStream;
@@ -2996,12 +3145,15 @@ End with one short elegant line that feels like a signature approval, insight, o
                 vid.classList.remove('hidden');
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('hangup-call-btn').classList.remove('hidden');
+                document.getElementById('gift-performer-label').textContent = `🎁 → ${call.peer || 'Performer'}`;
                 document.getElementById('hangup-call-btn').onclick = () => {
                     call.close();
                     vid.srcObject = null;
                     vid.classList.add('hidden');
                     document.getElementById('performer-placeholder').classList.remove('hidden');
                     document.getElementById('hangup-call-btn').classList.add('hidden');
+                    activePerformerUid = null;
+                    document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     currentCall = null;
                 };
             });
@@ -3019,7 +3171,10 @@ End with one short elegant line that feels like a signature approval, insight, o
                     }
                     const d = change.doc.data();
                     if (uid === userId) return; // skip self
-                    if (!d.active || !d.peerId) return;
+                    if (!d.active || !d.peerId) {
+                        document.getElementById(`cam-tile-${uid}`)?.remove();
+                        return;
+                    }
                     renderCameraTile(uid, d);
                 });
             });
@@ -3033,9 +3188,12 @@ End with one short elegant line that feels like a signature approval, insight, o
                 tile.id = `cam-tile-${uid}`;
                 tile.className = 'relative aspect-video bg-black rounded overflow-hidden border border-[#3e2723]';
                 tile.innerHTML = `
-                    <video autoplay playsinline class="w-full h-full object-cover"></video>
+                    <video autoplay playsinline class="w-full h-full object-cover cursor-pointer"></video>
+                    <div class="absolute top-1 left-1 flex items-center gap-1 bg-green-700/80 text-white text-[9px] px-1 py-0.5 rounded-full">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>ONLINE
+                    </div>
                     <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1 py-0.5 font-bold truncate">${data.name || 'Artist'}</div>
-                    <button class="call-btn absolute top-1 right-1 bg-green-700 text-white text-[10px] px-1.5 py-0.5 rounded shadow">📞 Call</button>
+                    <button class="enter-btn absolute top-1 right-1 bg-[#ffd700] text-[#3e2723] text-[10px] px-1.5 py-0.5 rounded shadow font-bold">🎮 Enter</button>
                 `;
                 container.appendChild(tile);
             }
@@ -3043,11 +3201,13 @@ End with one short elegant line that feels like a signature approval, insight, o
             tile.dataset.peerId = data.peerId;
 
             const vid = tile.querySelector('video');
-            const callBtn = tile.querySelector('.call-btn');
+            const enterBtn = tile.querySelector('.enter-btn');
             const bigScreen = document.getElementById('performerVideo');
 
-            callBtn.onclick = () => {
-                if (!localStream) return alert('Enable your camera first');
+            const enterCamera = () => {
+                if (!localStream) return alert('Enable your camera first to enter');
+                if (currentCall) return alert('End your current call first to enter');
+                if (!peer) return alert('Peer connection not ready yet');
                 const call = peer.call(tile.dataset.peerId, localStream);
                 currentCall = call;
                 activePerformerUid = uid; // track who's on screen
@@ -3056,6 +3216,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                     vid.srcObject = s;
                     vid.play().catch(() => {});
                     // Big screen (main stage)
+                    bigScreen.classList.remove('hidden');
                     bigScreen.srcObject = s;
                     bigScreen.play().catch(() => {});
                     document.getElementById('performer-placeholder').classList.add('hidden');
@@ -3069,16 +3230,21 @@ End with one short elegant line that feels like a signature approval, insight, o
                         bigScreen.classList.add('hidden');
                         document.getElementById('performer-placeholder').classList.remove('hidden');
                         document.getElementById('hangup-call-btn').classList.add('hidden');
-                        callBtn.textContent = '📞 Call';
-                        callBtn.classList.replace('bg-red-700', 'bg-green-700');
+                        enterBtn.textContent = '🎮 Enter';
+                        enterBtn.classList.remove('bg-red-700');
+                        enterBtn.classList.add('bg-[#ffd700]', 'text-[#3e2723]');
                         currentCall = null;
                         activePerformerUid = null;
                         document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     };
                 });
-                callBtn.textContent = '🔴 Live';
-                callBtn.classList.replace('bg-green-700', 'bg-red-700');
+                enterBtn.textContent = '🔴 Live';
+                enterBtn.classList.remove('bg-[#ffd700]', 'text-[#3e2723]');
+                enterBtn.classList.add('bg-red-700');
             };
+
+            enterBtn.onclick = enterCamera;
+            vid.onclick = enterCamera;
         }
 
         // --- CHAT & AI ---

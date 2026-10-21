@@ -437,7 +437,7 @@
         <!-- Tab Navigation (inside sidebar at top) -->
         <div id="floating-tabs" class="bg-black/80 backdrop-blur-sm py-2 px-2 border-b border-gray-700 sticky top-0 z-20 overflow-x-auto">
             <div class="flex w-full gap-0">
-                <button class="tab-btn active" data-tab="studio">Studio</button>
+                <button class="tab-btn active" data-tab="studio">Video</button>
                 <button class="tab-btn" data-tab="community">Community</button>
                 <button class="tab-btn" data-tab="marketplace">Gift</button>
                 <button class="tab-btn" data-tab="profile">Profile</button>
@@ -1773,7 +1773,8 @@ In the school of rhyme, there's no way to lose.
                     console.log('🎥 Requesting camera and microphone access...');
                     localStream = await navigator.mediaDevices.getUserMedia({ 
                         video: { 
-                            width: { ideal: 1920 }, 
+                                facingMode: "user",
+                        width: { ideal: 1920 }, 
                             height: { ideal: 1080 },
                             aspectRatio: { ideal: 16/9 }
                         }, 
@@ -1963,6 +1964,14 @@ In the school of rhyme, there's no way to lose.
                 const remotePeerId = elements.remotePeerIdInput.value.trim();
                 if (!remotePeerId) {
                     showMessage('Please enter a Peer ID to call');
+                    return;
+                }
+                if (!localStream) {
+                    showMessage('Enable your camera first to call');
+                    return;
+                }
+                if (!peer || peer.id === 'disconnected' || peer.id === null) {
+                    showMessage('Peer connection not ready yet');
                     return;
                 }
                 

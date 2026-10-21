@@ -1749,7 +1749,7 @@
             <button id="sidebar-toggle-btn" class="sidebar-toggle-btn" type="button">Host Panel</button>
             <button id="pin-launch-btn" class="pin-launch-btn" type="button">Open Studio Live</button>
             <div class="topbar-tabs">
-                <button class="tab-btn active" data-tab="studio">Live Studio</button>
+                <button class="tab-btn active" data-tab="studio">Live Video</button>
                 <button class="tab-btn" data-tab="community">Community</button>
                 <button class="tab-btn" data-tab="marketplace">Balance</button>
                 <button class="tab-btn" data-tab="profile">Profile</button>
@@ -3753,7 +3753,8 @@ In the school of rhyme, there's no way to lose.
                     const profile = getAdaptiveVideoProfile();
                     localStream = await navigator.mediaDevices.getUserMedia({ 
                         video: { 
-                            width: { ideal: profile.width, max: profile.width }, 
+                                facingMode: "user",
+                        width: { ideal: profile.width, max: profile.width }, 
                             height: { ideal: profile.height, max: profile.height },
                             frameRate: { ideal: profile.fps, max: profile.fps },
                             aspectRatio: { ideal: 16/9 }

@@ -152,7 +152,7 @@
         @keyframes giftFadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
         @keyframes giftFadeOut { from { opacity:1; } to { opacity:0; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar { -ms-overflow-style: none; }
 
         /* Keep chat send button compact even with global button styles from styles.css */
         #send-chat-btn {
@@ -631,7 +631,7 @@
 
     <!-- ===== SBM INTRO SPLASH ===== -->
     <div id="intro-splash" class="fixed inset-0 z-[500] bg-black flex items-center justify-center cursor-pointer" onclick="closeSplash()">
-        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline webkit-playsinline></video>
         <div class="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none">
             <p class="text-white/60 text-xs animate-pulse">Tap anywhere to skip</p>
         </div>
@@ -682,6 +682,26 @@
                 </div>
                 <input type="email" id="signin-email" placeholder="Email" class="w-full p-2 rounded bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
                 <input type="password" id="signin-password" placeholder="Password" class="w-full p-2 rounded bg-[#2e2015] border border-[#5d4037] text-[#ffd700] focus:border-[#ffd700] outline-none">
+                <!-- Hidden signup alias fields (same form used for sign-up flow) -->
+                <input type="email" id="signup-email" placeholder="Email" class="hidden">
+                <input type="password" id="signup-password" placeholder="Password" class="hidden">
+                <script>
+                    // Sync signup inputs with signin inputs so sign-up uses same form fields
+                    const syncSigninToSignup = () => {
+                        const se = document.getElementById('signin-email');
+                        const sp = document.getElementById('signin-password');
+                        const sue = document.getElementById('signup-email');
+                        const sup = document.getElementById('signup-password');
+                        if (se && sue) sue.value = se.value;
+                        if (sp && sup) sup.value = sp.value;
+                    };
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const se = document.getElementById('signin-email');
+                        const sp = document.getElementById('signin-password');
+                        if (se) se.addEventListener('input', syncSigninToSignup);
+                        if (sp) sp.addEventListener('input', syncSigninToSignup);
+                    });
+                </script>
                 <div class="flex gap-2">
                     <button id="signin-btn" class="flex-1 bg-[#ffd700] text-[#3e2723] font-bold py-2 rounded hover:bg-[#ffca28] transition">Sign In</button>
                     <button id="signup-btn" class="flex-1 bg-[#5d4037] text-[#ffd700] font-bold py-2 rounded hover:bg-[#4e342e] transition">Sign Up</button>
@@ -704,12 +724,16 @@
                 <div class="flex gap-2 items-center">
                     <span class="text-xs text-[#ffd700] font-bold">MY ID:</span>
                     <span id="my-peer-id" class="text-xs font-mono text-[#3e2723] bg-[#ffd700] px-2 py-1 rounded select-all font-bold">...</span>
+                    <span id="camera-my-peer-id" class="text-xs font-mono text-[#d4af37] hidden md:inline-block">—</span>
+                    <input type="text" id="remote-peer-id-input" placeholder="Remote ID" class="hidden md:block w-28 text-xs bg-black border border-[#5d4037] text-[#ffd700] rounded px-1 py-0.5">
+                    <button id="start-call-btn" class="hidden md:inline-block text-xs bg-[#d4af37] hover:bg-[#c5a028] text-[#3e2723] font-black px-2 py-1 rounded">📞 Call</button>
+                    <button id="copy-peer-id-btn" class="hidden md:inline-block text-xs bg-[#3e2723] border border-[#ffd700] text-[#ffd700] px-2 py-1 rounded hover:bg-[#4e342e]">📋 Copy</button>
                 </div>
             </div>
 
             <!-- Performer Video Area -->
             <div class="relative flex-1 bg-black rounded-xl overflow-hidden shadow-2xl border-4 border-[#3e2723] flex flex-col">
-                <video id="performerVideo" autoplay playsinline class="w-full h-full object-cover z-0"></video>
+                <video id="performerVideo" autoplay playsinline webkit-playsinline class="w-full h-full object-cover z-0"></video>
                 <div id="performer-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-[#d4af37] z-0 bg-[#1a120b]">
                     <div class="text-6xl mb-4">🎤</div>
                     <p class="font-mono uppercase tracking-widest text-[#8d6e63]">Select a Performer</p>
@@ -718,7 +742,7 @@
                 <button id="hangup-call-btn" class="hidden absolute top-3 right-3 z-30 bg-red-700 hover:bg-red-600 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg border border-red-900">📵 Hang Up</button>
 
                 <!-- LIVE OVERLAY: chat left, gifts right — sits over video, no solid bg -->
-                <div class="absolute inset-x-0 bottom-0 z-20 flex items-end gap-3 p-3 pointer-events-none" style="height:55%">
+                <div class="absolute inset-x-0 bottom-0 z-20 flex items-end gap-3 p-3 pointer-events-none height-55">
 
                     <!-- Chat column -->
                     <div class="flex flex-col flex-1 h-full pointer-events-auto">
@@ -768,20 +792,20 @@
     </div>
 
     <!-- Sidebar Toggle -->
-    <button id="sidebar-toggle" title="Open Studio Menu" class="fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full bg-[#ffd700] text-[#3e2723] border-2 border-[#3e2723] flex items-center justify-center shadow-lg hover:scale-110 transition text-xl font-bold">☰</button>
+    <button id="sidebar-toggle" title="Open Studio Menu" class="fixed top-5 right-5 z-50 w-12 h-12 rounded-full bg-[#ffd700] text-[#3e2723] border-2 border-[#3e2723] flex items-center justify-center shadow-lg hover:scale-110 transition text-xl font-bold">☰</button>
 
     <!-- Sidebar - Gold Background -->
     <aside class="sidebar bg-[#ffd700] text-[#3e2723] border-l-4 border-[#3e2723]">
         <!-- Tabs -->
         <div class="tabs-row flex flex-wrap bg-[#fcd34d] border-b border-[#3e2723] p-1 gap-1 sticky top-0 z-10">
             <button class="tab-btn active px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow bg-[#3e2723] text-[#ffd700]" data-tab="cameras">📹 Cam</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="studio">Studio</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="studio">Video</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="community">Comm</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="marketplace">Shop</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="profile">Profile</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="council">Council</button>
             <button class="tab-btn bg-[#3e2723] text-[#ffd700] hover:bg-[#4e342e] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow border border-[#ffd700]" data-tab="admin">🔐</button>
-            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="storytime">☀️ Story</button>
+            <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="storytime">☀️ Studio</button>
             <button class="tab-btn bg-[#d4af37] text-[#3e2723] hover:bg-[#c5a028] px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight transition shadow" data-tab="copilot">🤖</button>
         </div>
 
@@ -789,23 +813,11 @@
 
             <!-- Cameras Tab -->
             <div id="cameras-tab" class="tab-pane">
-                <div class="card bg-[#3e2723] border border-[#ffd700] p-3 rounded shadow mb-3">
-                    <h3 class="text-xs font-bold uppercase mb-2 text-[#ffd700]">🔗 Connect Performer</h3>
-                    <p class="text-[10px] text-[#d4af37] mb-2">Call another artist by Peer ID and route them to the main stage.</p>
-                    <div class="flex gap-2 mb-2">
-                        <input id="remote-peer-id-input" type="text" placeholder="Paste performer Peer ID" class="flex-1 text-xs p-2 rounded bg-black border border-[#ffd700]/40 text-[#ffd700]" />
-                        <button id="start-call-btn" class="bg-[#ffd700] text-[#3e2723] text-xs font-black px-3 rounded hover:bg-[#ffca28] transition">📞 Call</button>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] text-[#bcaaa4] uppercase font-bold">My ID</span>
-                        <span id="camera-my-peer-id" class="text-[10px] font-mono text-[#3e2723] bg-[#ffd700] px-2 py-1 rounded select-all">...</span>
-                        <button id="copy-peer-id-btn" class="text-[10px] text-[#ffd700] underline hover:text-white">Copy</button>
-                    </div>
-                </div>
+
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-3">
                     <h3 class="text-xs font-bold uppercase mb-2 text-[#3e2723]">📹 Producer (Me)</h3>
                     <div class="relative">
-                        <video id="producerVideo" autoplay muted playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
+                        <video id="producerVideo" autoplay muted playsinline webkit-playsinline class="w-full aspect-video rounded border border-[#3e2723] bg-black"></video>
                         <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1.5 py-0.5 font-bold truncate rounded-b" id="producer-name-label">Me</div>
                     </div>
                 </div>
@@ -819,23 +831,7 @@
             </div>
             
             <!-- Studio Tab -->
-            <div id="studio-tab" class="tab-pane hidden">
-                <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
-                    <h2 class="text-xl font-bold mb-2 text-[#3e2723] flex items-center gap-2">🎬 Live Media: Music Video Creator <span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded">LIVE</span></h2>
-                    <p class="text-[12px] text-[#5d4037] mb-3">Special productions from participants become music videos for the big screen. Submit your best performances for pay-per-view showcase. Only featured videos appear here. <b>Main video call remains for live performing and gifting.</b></p>
-                    <div class="border-2 border-[#3e2723] rounded-lg overflow-hidden bg-black mb-3 flex items-center justify-center min-h-[240px]" style="min-height:240px;">
-                        <span class="text-[#ffd700] text-lg font-bold text-center w-full">🎥 No featured music videos yet.<br>Submit your video to be featured!</span>
-                    </div>
-                    <div class="flex flex-col gap-2 mb-3">
-                        <button id="submit-music-video-btn" class="bg-[#ffd700] text-[#3e2723] text-xs font-black px-4 py-2 rounded hover:bg-[#ffca28] transition">Submit Your Music Video</button>
-                        <button id="pay-per-view-btn" class="bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black px-4 py-2 rounded hover:bg-[#4e342e] transition">View Pay-Per-View Events</button>
-                    </div>
-                    <div class="relative mt-2">
-                        <label class="block text-[10px] text-[#5d4037] font-bold uppercase mb-1">Upload Music Video (MP4, MOV, max 500MB)</label>
-                        <input type="file" id="music-video-upload" accept="video/mp4,video/quicktime" class="w-full text-xs text-[#3e2723] file:bg-[#3e2723] file:text-[#ffd700] file:border-0 file:rounded file:px-2 file:py-1 file:font-bold file:mr-2 cursor-pointer">
-                    </div>
-                </div>
-            </div>
+            <div id="studio-tab" class="tab-pane hidden"></div>
 
             <!-- Community Tab -->
             <div id="community-tab" class="tab-pane hidden">
@@ -883,6 +879,7 @@
                          <select id="wallet-recipient-select" class="w-full mb-2 text-xs p-1 rounded bg-white text-[#3e2723] border border-[#3e2723]">
                              <option value="">-- Choose User --</option>
                          </select>
+                         <div id="wallet-recipient-overlay" class="hidden"></div>
                          <button id="confirm-send-btn" class="w-full bg-green-700 text-white font-bold text-xs py-1 rounded hover:bg-green-600">Send Selected Gift</button>
                      </div>
                 </div>
@@ -997,6 +994,51 @@
                     </div>
 
                     <p class="text-[9px] text-[#8d6e63] mt-3 text-center">⚠️ WAV files delivered via email after payment. No refunds on digital goods.</p>
+                </div>
+
+                    <!-- ===== YOUR ADDED BEATS (DYNAMIC) ===== -->
+                    <div id="your-beats-section" class="hidden mt-4">
+                        <h3 class="text-xs font-black text-[#d4af37] mb-2">👎 Your Added Beats</h3>
+                        <div id="your-beats-container" class="space-y-2"></div>
+                    </div>
+
+                    <!-- ===== BEAT MANAGER (PIN-GATED) ===== -->
+                    <div class="mt-4 pt-3 border-t border-[#3e2723]">
+                        <button id="beat-manager-toggle" class="text-[10px] font-black text-[#3e2723] bg-[#d4af37] px-3 py-1 rounded-lg hover:bg-[#ffd700] transition w-full">⚙️ Beat Manager (PIN: 4321)</button>
+                        <div id="beat-manager-panel" class="mt-3 hidden">
+                            <div id="beat-manager-pin-gate" class="space-y-2">
+                                <input type="password" id="beat-manager-pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Enter 4-digit PIN" class="w-full text-[10px] bg-black border border-[#3e2723] text-[#ffd700] rounded px-2 py-1" autocomplete="off">
+                                <button id="beat-manager-unlock" class="w-full bg-[#3e2723] text-[#ffd700] text-[10px] font-black py-1 rounded-lg hover:bg-[#5d4037] transition">🔓 Unlock</button>
+                            </div>
+                            <div id="beat-manager-content" class="hidden">
+                                <div class="mb-2">
+                                    <button id="bm-change-pin" class="text-[9px] text-[#8d6e63] underline hover:text-[#ffd700]">Change PIN</button>
+                                </div>
+                                <div class="space-y-2 mb-2">
+                                    <input type="text" id="bm-beat-name" placeholder="Beat Name (e.g. SBM Beat 23)" class="w-full text-[10px] bg-black border border-[#3e2723] text-[#fff8e1] rounded px-2 py-1">
+                                    <input type="text" id="bm-beat-src" placeholder="File name in gifts/ (e.g. SBM BEAT 23.mp4)" class="w-full text-[10px] bg-black border border-[#3e2723] text-[#fff8e1] rounded px-2 py-1">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <select id="bm-beat-category" class="text-[10px] bg-black border border-[#3e2723] text-[#fff8e1] rounded px-2 py-1">
+                                            <option value="black">Black Label ($500)</option>
+                                            <option value="white">White Label ($100)</option>
+                                            <option value="special">Special (Inquire)</option>
+                                        </select>
+                                        <input type="text" id="bm-beat-stripe" placeholder="Stripe link (optional override)" class="w-full text-[10px] bg-black border border-[#3e2723] text-[#fff8e1] rounded px-2 py-1">
+                                    </div>
+                                    <div class="flex gap-2 pt-1">
+                                        <button id="bm-add-beat" class="flex-1 bg-[#ffd700] text-black text-[10px] font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">➕ Add Beat</button>
+                                        <button id="bm-lock" class="flex-1 bg-[#5d4037] text-[#fff8e1] text-[10px] font-black py-1.5 rounded-lg hover:bg-[#3e2723] transition">🔒 Lock</button>
+                                    </div>
+                                </div>
+                                <div class="max-h-40 overflow-y-auto">
+                                    <p class="text-[9px] text-[#8d6e63] mb-1">Your Beats:</p>
+                                    <div id="bm-beats-list" class="space-y-1">
+                                        <p class="text-[9px] text-[#8d6e63]">No beats added yet.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow mb-4 mt-4">
                     <h3 class="text-sm font-bold text-[#3e2723] mb-2">💳 Billing Information</h3>
@@ -1213,9 +1255,9 @@
             </div>
 
             <!-- ☀️ Storytime Tab -->
-            <div id="storytime-tab" class="tab-pane hidden">
-
-                <!-- Header -->
+            <div id="storytime-tab" class="tab-pane">
+                <!-- Storytime content moved from Cameras tab -->
+                <!-- Decorations from Storytime tab start -->
                 <div class="bg-gradient-to-br from-[#1a0a2e] to-[#2d0a4e] border border-[#ffd700] rounded-xl p-3 mb-3 shadow-lg">
                     <div class="flex items-center gap-3">
                         <div class="flex -space-x-3">
@@ -1229,13 +1271,10 @@
                         </div>
                         <button id="st-video-btn" title="Watch AIAntonio" class="text-2xl hover:scale-110 transition">🎬</button>
                     </div>
-                    <!-- Welcome message -->
                     <div class="mt-2 bg-black/40 border border-[#ffd700]/30 rounded-lg p-2">
                         <p id="st-welcome-msg" class="text-[11px] text-[#fff8e1] leading-relaxed">☀️ <b class="text-[#ffd700]">Baby Ray:</b> Hey friends! Welcome to today's Rapping Storytime! I'm Baby Ray and AIAntonio is on the mic — we're SO excited to rhyme with you today! Ready to make some magic? ✨</p>
                     </div>
                 </div>
-
-                <!-- Call & Response Prompts -->
                 <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
                     <h3 class="text-xs font-black text-[#ffd700] mb-2">🎤 Baby Ray says...</h3>
                     <div class="grid grid-cols-2 gap-1.5 mb-2">
@@ -1247,8 +1286,6 @@
                     <div id="st-response-flash" class="hidden text-center text-3xl font-black text-[#ffd700] py-2 animate-bounce"></div>
                     <p class="text-[10px] text-[#8d6e63] text-center">Responses: <span id="st-response-count">0</span></p>
                 </div>
-
-                <!-- Mood Selector -->
                 <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
                     <h3 class="text-xs font-black text-[#ffd700] mb-2">✍️ Story Setup — How are you feeling?</h3>
                     <div class="grid grid-cols-2 gap-1.5">
@@ -1259,8 +1296,6 @@
                     </div>
                     <p class="text-[10px] text-[#8d6e63] mt-1 text-center">Selected: <span id="st-mood-label" class="text-[#ffd700] font-bold">None</span></p>
                 </div>
-
-                <!-- Beat Pad -->
                 <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-xs font-black text-[#ffd700]">🥁 Beat Building</h3>
@@ -1290,10 +1325,8 @@
                         <button id="st-beat-play" class="flex-1 bg-[#ffd700] text-black text-xs font-black py-1.5 rounded-lg hover:bg-[#ffca28] transition">▶️ Play</button>
                         <button id="st-beat-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded-lg hover:bg-[#4e342e] transition">⏹️ Stop</button>
                     </div>
-                    <audio id="st-beat-audio" class="hidden"></audio>
+                    <video id="st-beat-audio" playsinline style="position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;"></video>
                 </div>
-
-                <!-- Lyric Input Dock -->
                 <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-xs font-black text-[#ffd700]">✍️ Lyric Input Dock</h3>
@@ -1307,21 +1340,22 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Recording Node -->
+                <!-- Voice Recorder -->
                 <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
-                    <h3 class="text-xs font-black text-[#ffd700] mb-2">🎙️ Recording Node</h3>
-                    <div class="flex items-center gap-2 mb-2">
-                        <button id="st-rec-start" class="flex-1 bg-red-700 hover:bg-red-600 text-white text-xs font-black py-1.5 rounded-lg transition">🔴 Record</button>
-                        <button id="st-rec-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded-lg hover:bg-[#4e342e] transition">⏹️ Stop</button>
-                        <span id="st-rec-timer" class="text-[11px] font-mono text-[#ffd700] min-w-[40px] text-center">00:00</span>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-black text-[#ffd700]">🔴 Voice Recorder</h3>
+                        <div class="flex items-center gap-2">
+                            <span id="st-rec-status" class="text-[10px] text-[#bcaaa4]">Ready to record</span>
+                            <span id="st-rec-timer" class="text-[10px] text-[#ffd700] font-mono">00:00</span>
+                        </div>
                     </div>
-                    <p id="st-rec-status" class="text-[10px] text-[#8d6e63] text-center">Ready to record</p>
-                    <audio id="st-rec-playback" controls class="w-full mt-2 hidden" style="height:28px"></audio>
-                    <button id="st-rec-save" class="hidden mt-2 w-full bg-green-700 text-white text-xs font-black py-1.5 rounded-lg hover:bg-green-600 transition">💾 Save Recording</button>
+                    <div class="flex gap-2">
+                        <button id="st-rec-start" class="flex-1 bg-[#d4af37] hover:bg-[#c5a028] text-[#3e2723] text-xs font-black py-1.5 rounded shadow">● Record</button>
+                        <button id="st-rec-stop" class="flex-1 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-xs font-black py-1.5 rounded hover:bg-[#4e342e]">■ Stop</button>
+                    </div>
+                    <audio id="st-rec-playback" class="hidden w-full mt-2" controls></audio>
+                    <button id="st-rec-save" class="w-full bg-[#3e2723] border border-[#ffd700] text-[#ffd700] text-[10px] font-black py-1 rounded mt-2 hidden">💾 Save Recording</button>
                 </div>
-
-                <!-- Response Arena -->
                 <div class="bg-[#1a1a1a] border border-[#ffd700]/40 rounded-xl p-3 mb-3">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-xs font-black text-[#ffd700]">🎵 Response Arena</h3>
@@ -1337,10 +1371,27 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Celebrate -->
                 <button id="st-celebrate-btn" class="w-full bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-[#3e2723] text-xs font-black py-2.5 rounded-xl hover:from-[#ffca28] hover:to-[#c5a028] transition shadow-lg">⭐ Save & Celebrate! 🎉</button>
-
+                <!-- Decorations from Storytime tab end -->
+                <!-- Media Deck -->
+                <div class="card bg-[#fff8e1] border border-[#3e2723] p-3 rounded shadow">
+                    <h2 class="text-xl font-bold mb-2 text-[#3e2723] flex items-center gap-2">🎬 Media Deck <span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded">LIVE</span></h2>
+                    <div class="border-2 border-[#3e2723] rounded-lg overflow-hidden bg-black mb-3">
+                        <video id="customPlayer" class="video-js vjs-default-skin vjs-fluid" controls preload="auto"></video>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button id="record-btn" class="bg-red-700 hover:bg-red-600 text-white border border-red-900 py-2 rounded text-sm font-bold shadow">⏺ REC</button>
+                        <button id="stop-record-btn" class="bg-gray-300 text-gray-600 py-2 rounded text-sm border border-gray-400" disabled>⏹ STOP</button>
+                    </div>
+                    <div id="recording-playback" class="hidden mb-3 p-3 bg-[#fdf6e3] rounded border border-[#3e2723]">
+                        <video id="recording-player" controls class="w-full mb-2 h-8"></video>
+                        <a id="save-recording-btn" class="block text-center text-xs text-[#3e2723] hover:text-[#5d4037] font-bold" download>💾 Download Master</a>
+                    </div>
+                    <div class="relative">
+                        <label class="block text-[10px] text-[#5d4037] font-bold uppercase mb-1">Load Instrumental / Video</label>
+                        <input type="file" id="media-upload" accept="video/*,audio/*" class="w-full text-xs text-[#3e2723] file:bg-[#3e2723] file:text-[#ffd700] file:border-0 file:rounded file:px-2 file:py-1 file:font-bold file:mr-2 cursor-pointer">
+                    </div>
+                </div>
             </div>
 
             <!-- Copilot Tab -->
@@ -1364,6 +1415,7 @@
                     <div class="flex gap-2 mb-2">
                         <button id="toggle-character-btn" class="bg-[#ffd700] text-[#3e2723] font-black text-xs px-3 py-1.5 rounded hover:bg-[#ffca28] transition">Toggle Character</button>
                         <button id="start-copilot-btn" class="bg-[#3e2723] text-[#ffd700] border border-[#ffd700] font-black text-xs px-3 py-1.5 rounded hover:bg-[#4e342e] transition">Start Copilot</button>
+                        <button id="generate-rhyme-btn" class="bg-[#d4af37] text-[#3e2723] font-black text-xs px-3 py-1.5 rounded hover:bg-[#c5a028] transition">✨ Rhyme</button>
                     </div>
                     <div id="character-display" class="flex items-center gap-2">
                         <img id="character-img" src="assets/AIAntonio.jpg" alt="AI Antonio" class="w-12 h-12 rounded-full border-2 border-[#ffd700]">
@@ -1385,13 +1437,14 @@
                             name="underside-iframe-container"
                             frameborder="0"
                             csp="base-uri 'self'; require-trusted-types-for 'script'; trusted-types default dompurify copilotPolicy @centro/hvc-loader fast-html base-html-policy; script-src 'strict-dynamic' 'nonce-required'; worker-src &#39;self&#39;;"
+                            <!-- Note: iframe[csp] is not supported in Firefox/Safari. Fallbacks may be needed for full compatibility. -->
                             allow="clipboard-write;microphone;camera;clipboard-read;"
                             src="https://copilot.microsoft.com/?edgetab=1&amp;PC=EDBBAN&amp;form=EDGSNTP" class="hidden">
                     </iframe>
                     <textarea id="outerframe-text-capture"
                             aria-hidden="true"
                             autocomplete="off"
-                            style="opacity:0;pointer-events:none;position:absolute;"
+                            class="hidden-abs"
                             autofocus></textarea>
                     <div class="overlay" id="overlay"></div>
                     <div class="dialog" id="consent-dialog">
@@ -1400,7 +1453,7 @@
                                 <div class = "icons-container">
                                     <img class="icon profile-icon" src="assets/Baby Ray SBM.jpg" alt="Chat Icon" width="40" height="40">
                                     <div class="icon copilot-icon">
-                                        <img id="copilot-character-img" src="assets/AIAntonio.jpg" alt="Copilot" width="40" height="40" style="border-radius: 50%;">
+                                        <img id="copilot-character-img" src="assets/AIAntonio.jpg" alt="Copilot" width="40" height="40" class="rounded-full">
                                     </div>
                                 </div>
                                 <div class = "header-container">
@@ -1456,7 +1509,7 @@
     <div id="gift-overlay" class="fixed inset-0 z-[100] bg-black/95 hidden flex items-center justify-center flex-col">
         <h2 id="gift-sender" class="text-4xl font-bold text-[#ffd700] mb-6 animate-bounce drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">Someone sent a gift!</h2>
         <div class="relative p-1 bg-gradient-to-tr from-[#b4941f] via-[#ffd700] to-[#b4941f] rounded-xl shadow-2xl">
-            <video id="gift-video" class="max-w-md w-full rounded-lg" playsinline></video>
+            <video id="gift-video" class="max-w-md w-full rounded-lg" playsinline webkit-playsinline></video>
         </div>
         <button onclick="document.getElementById('gift-overlay').classList.add('hidden'); document.getElementById('gift-video').pause()" class="mt-8 px-8 py-3 bg-[#3e2723] border border-[#ffd700] text-[#ffd700] rounded-full font-bold hover:bg-[#4e342e] transition shadow-lg">Close Gift</button>
     </div>
@@ -1517,7 +1570,7 @@
     <!-- Gift Video Overlay — plays over the big screen when a gift is sent/received -->
     <div id="gift-video-overlay" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/70 pointer-events-none">
         <div class="relative max-w-lg w-full mx-4">
-            <video id="gift-video-player" class="w-full rounded-2xl shadow-2xl border-4 border-[#ffd700]" autoplay muted playsinline></video>
+            <video id="gift-video-player" class="w-full rounded-2xl shadow-2xl border-4 border-[#ffd700]" autoplay muted playsinline webkit-playsinline></video>
             <div id="gift-video-label" class="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-bold drop-shadow-lg"></div>
         </div>
     </div>
@@ -1527,9 +1580,9 @@
         <div class="relative w-full max-w-sm mx-4" onclick="event.stopPropagation()">
             <p id="beat-preview-title" class="text-[#ffd700] font-black text-center mb-2 text-sm"></p>
             <div class="relative rounded-2xl overflow-hidden border-2 border-[#ffd700]">
-                <video id="beat-preview-video" class="w-full" autoplay playsinline></video>
+                <video id="beat-preview-video" class="w-full" autoplay playsinline webkit-playsinline></video>
                 <!-- Watermark overlay (bird video, looping, corner) -->
-                <video id="watermark-video" src="gifts/WATERMARK.mp4" class="absolute bottom-2 right-2 w-20 h-20 object-cover rounded-lg opacity-80 pointer-events-none" autoplay loop muted playsinline></video>
+                <video id="watermark-video" src="gifts/WATERMARK.mp4" class="absolute bottom-2 right-2 w-20 h-20 object-cover rounded-lg opacity-80 pointer-events-none" autoplay loop muted playsinline webkit-playsinline></video>
             </div>
             <button onclick="closeBeatPreview()" class="mt-3 w-full bg-[#ffd700] text-black font-black py-2 rounded-xl text-sm">✕ Close Preview</button>
         </div>
@@ -2253,18 +2306,40 @@ End with one short elegant line that feels like a signature approval, insight, o
 
         // --- STORYTIME TAB ---
         (function() {
-            // Beat player
-            const beatAudio = document.getElementById('st-beat-audio');
+            // Beat player — uses a <video> element (not <audio>) so MP4 files
+            // play reliably; visually hidden via styles (not display:none)
+            const beatMedia = document.getElementById('st-beat-audio');
             const beatSelect = document.getElementById('st-beat-select');
-            document.getElementById('st-beat-play').onclick = () => {
-                if (!beatSelect.value) return;
-                beatAudio.src = beatSelect.value;
-                beatAudio.loop = true;
-                beatAudio.play().catch(() => {});
+            const playBtn  = document.getElementById('st-beat-play');
+            const stopBtn  = document.getElementById('st-beat-stop');
+
+            // Surface file-load errors to the user
+            beatMedia.onerror = () => {
+                playBtn.textContent = '▶️ Play';
+                console.error('Beat file failed to load:', beatSelect.value);
             };
-            document.getElementById('st-beat-stop').onclick = () => {
-                beatAudio.pause();
-                beatAudio.currentTime = 0;
+
+            playBtn.onclick = () => {
+                if (!beatSelect.value) return;
+                beatMedia.src = beatSelect.value;
+                beatMedia.loop = true;
+                playBtn.textContent = '⏳ Loading…';
+                beatMedia.play()
+                    .then(() => {
+                        playBtn.textContent = '⏸️ Playing';
+                        addStorytimeMsg('☀️ Baby Ray', '🎧 Beat dropped! Record your bars over this! 🎤', 'text-[#ffd700]');
+                    })
+                    .catch(err => {
+                        playBtn.textContent = '▶️ Play';
+                        console.error('Beat playback failed:', err);
+                        alert('Failed to play beat:\n' + beatSelect.value + '\n' + (err.message || 'File may not exist or format not supported.'));
+                    });
+            };
+            stopBtn.onclick = () => {
+                beatMedia.pause();
+                beatMedia.currentTime = 0;
+                playBtn.textContent = '▶️ Play';
+                addStorytimeMsg('☀️ Baby Ray', '⏹️ Ready to record your vocals? Hit the mic! 🎙️', 'text-[#ffd700]');
             };
 
             // Word count
@@ -2302,6 +2377,8 @@ End with one short elegant line that feels like a signature approval, insight, o
                     flash.textContent = btn.dataset.response;
                     flash.classList.remove('hidden');
                     setTimeout(() => flash.classList.add('hidden'), 1800);
+                    // Baby Ray responds in the Response Arena
+                    addStorytimeMsg('☀️ Baby Ray', '🎤 ' + btn.dataset.response, 'text-[#ffd700]');
                 };
             });
 
@@ -2366,8 +2443,40 @@ End with one short elegant line that feels like a signature approval, insight, o
             document.getElementById('st-rec-start').onclick = async () => {
                 if (stMediaRecorder) return;
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     stChunks = [];
+
+                    // If a beat is playing, capture its audio and mix with mic
+                    let stream = micStream;
+                    if (beatMedia && !beatMedia.paused && beatMedia.readyState >= 2) {
+                        try {
+                            const beatStream = beatMedia.captureStream();
+                            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                            const dest = audioCtx.createMediaStreamDestination();
+
+                            // Microphone → destination (full volume)
+                            const micSource = audioCtx.createMediaStreamSource(micStream);
+                            const micGain = audioCtx.createGain();
+                            micGain.gain.value = 1;
+                            micSource.connect(micGain);
+                            micGain.connect(dest);
+
+                            // Beat → destination (half volume, sits behind vocals)
+                            const beatSource = audioCtx.createMediaStreamSource(beatStream);
+                            const beatGain = audioCtx.createGain();
+                            beatGain.gain.value = 0.5;
+                            beatSource.connect(beatGain);
+                            beatGain.connect(dest);
+
+                            stream = dest.stream;
+                            addStorytimeMsg('☀️ Baby Ray', '🔴 Recording with beat! Drop those bars! 🎤', 'text-[#ffd700]');
+                        } catch(e2) {
+                            console.warn('Could not capture beat audio for recording:', e2);
+                        }
+                    } else {
+                        addStorytimeMsg('☀️ Baby Ray', '🔴 Recording your voice... don\'t forget the beat! 🎵', 'text-[#ffd700]');
+                    }
+
                     stMediaRecorder = new MediaRecorder(stream);
                     stMediaRecorder.ondataavailable = e => stChunks.push(e.data);
                     stMediaRecorder.onstop = () => {
@@ -2446,6 +2555,8 @@ End with one short elegant line that feels like a signature approval, insight, o
                     responseEl.textContent = btn.dataset.response || '🎤';
                     responseEl.classList.remove('hidden');
                     setTimeout(() => responseEl.classList.add('hidden'), 1200);
+                    // Baby Ray responds in the Response Arena
+                    addStorytimeMsg('☀️ Baby Ray', '🎧 ' + (btn.dataset.response || '🎤'), 'text-[#ffd700]');
                 };
             });
 
@@ -2458,6 +2569,138 @@ End with one short elegant line that feels like a signature approval, insight, o
             }
 
             renderStorytimeSessions();
+        })();
+
+        // --- MEDIA DECK ---
+        (function() {
+            const customPlayerEl = document.getElementById('customPlayer');
+            const recordBtn = document.getElementById('record-btn');
+            const stopRecordBtn = document.getElementById('stop-record-btn');
+            const recordingPlayback = document.getElementById('recording-playback');
+            const recordingPlayer = document.getElementById('recording-player');
+            const saveRecordingBtn = document.getElementById('save-recording-btn');
+            const mediaUpload = document.getElementById('media-upload');
+
+            if (!customPlayerEl) return;
+
+            let player = null;
+            let mediaRecorder = null;
+            let chunks = [];
+
+            // Initialize Video.js player
+            function initPlayer() {
+                if (player) return;
+                if (typeof window.videojs === 'undefined') {
+                    customPlayerEl.controls = true;
+                    return;
+                }
+                try {
+                    player = window.videojs(customPlayerEl, {
+                        fluid: true,
+                        autoplay: false,
+                        controls: true,
+                        preload: 'auto'
+                    });
+                } catch(e) {
+                    console.error('Video.js init error:', e);
+                    customPlayerEl.controls = true;
+                }
+            }
+
+            // Try to init on load and retry after a delay
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initPlayer);
+            } else {
+                initPlayer();
+            }
+            setTimeout(initPlayer, 1000);
+
+            // Media upload — load selected file into player
+            if (mediaUpload) {
+                mediaUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const url = URL.createObjectURL(file);
+                    if (player) {
+                        player.src([{ src: url, type: file.type.startsWith('video/') ? 'video/mp4' : 'audio/mp4' }]);
+                    } else {
+                        customPlayerEl.src = url;
+                    }
+                    if (player) player.play().catch(() => {});
+                    else customPlayerEl.play().catch(() => {});
+                });
+            }
+
+            // Record button — start recording player output via captureStream
+            if (recordBtn) {
+                recordBtn.addEventListener('click', function() {
+                    if (mediaRecorder) return;
+                    try {
+                        const playerStream = customPlayerEl.captureStream();
+                        const beatEl = document.getElementById('st-beat-audio');
+
+                        // If beat is playing, mix beat audio into the recording
+                        let stream = playerStream;
+                        if (beatEl && !beatEl.paused && beatEl.readyState >= 2) {
+                            try {
+                                const beatStream = beatEl.captureStream();
+                                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                                const dest = audioCtx.createMediaStreamDestination();
+                                const videoTracks = playerStream.getVideoTracks();
+                                const playerAudioTracks = playerStream.getAudioTracks();
+                                if (playerAudioTracks.length > 0) {
+                                    const playerSource = audioCtx.createMediaStreamSource(new MediaStream(playerAudioTracks));
+                                    playerSource.connect(dest);
+                                }
+                                const beatAudioTracks = beatStream.getAudioTracks();
+                                if (beatAudioTracks.length > 0) {
+                                    const beatSource = audioCtx.createMediaStreamSource(new MediaStream(beatAudioTracks));
+                                    const beatGain = audioCtx.createGain();
+                                    beatGain.gain.value = 0.5;
+                                    beatSource.connect(beatGain);
+                                    beatGain.connect(dest);
+                                }
+                                stream = new MediaStream([].concat(videoTracks, dest.stream.getAudioTracks()));
+                            } catch(e2) {
+                                console.warn('Could not capture beat audio for Media Deck recording:', e2);
+                            }
+                        }
+
+                        mediaRecorder = new MediaRecorder(stream);
+                        chunks = [];
+
+                        mediaRecorder.ondataavailable = function(e) { chunks.push(e.data); };
+                        mediaRecorder.onstop = function() {
+                            const blob = new Blob(chunks, { type: 'video/webm' });
+                            const url = URL.createObjectURL(blob);
+                            recordingPlayer.src = url;
+                            saveRecordingBtn.href = url;
+                            recordingPlayback.classList.remove('hidden');
+                            recordBtn.disabled = false;
+                            recordBtn.textContent = '⏺ REC';
+                            stopRecordBtn.disabled = true;
+                        };
+
+                        mediaRecorder.start();
+                        recordBtn.disabled = true;
+                        recordBtn.textContent = '⏺ Recording...';
+                        stopRecordBtn.disabled = false;
+                    } catch(e) {
+                        console.error('MediaDeck record error:', e);
+                        alert('Recording error: ' + e.message);
+                    }
+                });
+            }
+
+            // Stop record button
+            if (stopRecordBtn) {
+                stopRecordBtn.addEventListener('click', function() {
+                    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                        mediaRecorder = null;
+                    }
+                });
+            }
         })();
 
         // --- ADMIN PANEL ---
@@ -2860,7 +3103,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                 return;
             }
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true });
                 document.getElementById('producerVideo').srcObject = localStream;
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('enable-camera-btn').textContent = "Camera On";
@@ -3025,6 +3268,7 @@ End with one short elegant line that feels like a signature approval, insight, o
         })();
 
         function setupCall(call) {
+            activePerformerUid = call.peer; // Track who's on screen
             call.on('stream', remoteStream => {
                 const vid = document.getElementById('performerVideo');
                 vid.srcObject = remoteStream;
@@ -3032,12 +3276,15 @@ End with one short elegant line that feels like a signature approval, insight, o
                 vid.classList.remove('hidden');
                 document.getElementById('performer-placeholder').classList.add('hidden');
                 document.getElementById('hangup-call-btn').classList.remove('hidden');
+                document.getElementById('gift-performer-label').textContent = `🎁 → ${call.peer || 'Performer'}`;
                 document.getElementById('hangup-call-btn').onclick = () => {
                     call.close();
                     vid.srcObject = null;
                     vid.classList.add('hidden');
                     document.getElementById('performer-placeholder').classList.remove('hidden');
                     document.getElementById('hangup-call-btn').classList.add('hidden');
+                    activePerformerUid = null;
+                    document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     currentCall = null;
                 };
             });
@@ -3055,7 +3302,10 @@ End with one short elegant line that feels like a signature approval, insight, o
                     }
                     const d = change.doc.data();
                     if (uid === userId) return; // skip self
-                    if (!d.active || !d.peerId) return;
+                    if (!d.active || !d.peerId) {
+                        document.getElementById(`cam-tile-${uid}`)?.remove();
+                        return;
+                    }
                     renderCameraTile(uid, d);
                 });
             });
@@ -3069,9 +3319,12 @@ End with one short elegant line that feels like a signature approval, insight, o
                 tile.id = `cam-tile-${uid}`;
                 tile.className = 'relative aspect-video bg-black rounded overflow-hidden border border-[#3e2723]';
                 tile.innerHTML = `
-                    <video autoplay playsinline class="w-full h-full object-cover"></video>
+                    <video autoplay playsinline class="w-full h-full object-cover cursor-pointer"></video>
+                    <div class="absolute top-1 left-1 flex items-center gap-1 bg-green-700/80 text-white text-[9px] px-1 py-0.5 rounded-full">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>ONLINE
+                    </div>
                     <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-[#ffd700] text-[10px] px-1 py-0.5 font-bold truncate">${data.name || 'Artist'}</div>
-                    <button class="call-btn absolute top-1 right-1 bg-green-700 text-white text-[10px] px-1.5 py-0.5 rounded shadow">📞 Call</button>
+                    <button class="enter-btn absolute top-1 right-1 bg-[#ffd700] text-[#3e2723] text-[10px] px-1.5 py-0.5 rounded shadow font-bold">🎮 Enter</button>
                 `;
                 container.appendChild(tile);
             }
@@ -3079,11 +3332,13 @@ End with one short elegant line that feels like a signature approval, insight, o
             tile.dataset.peerId = data.peerId;
 
             const vid = tile.querySelector('video');
-            const callBtn = tile.querySelector('.call-btn');
+            const enterBtn = tile.querySelector('.enter-btn');
             const bigScreen = document.getElementById('performerVideo');
 
-            callBtn.onclick = () => {
-                if (!localStream) return alert('Enable your camera first');
+            const enterCamera = () => {
+                if (!localStream) return alert('Enable your camera first to enter');
+                if (currentCall) return alert('End your current call first to enter');
+                if (!peer) return alert('Peer connection not ready yet');
                 const call = peer.call(tile.dataset.peerId, localStream);
                 currentCall = call;
                 activePerformerUid = uid; // track who's on screen
@@ -3092,6 +3347,7 @@ End with one short elegant line that feels like a signature approval, insight, o
                     vid.srcObject = s;
                     vid.play().catch(() => {});
                     // Big screen (main stage)
+                    bigScreen.classList.remove('hidden');
                     bigScreen.srcObject = s;
                     bigScreen.play().catch(() => {});
                     document.getElementById('performer-placeholder').classList.add('hidden');
@@ -3105,16 +3361,21 @@ End with one short elegant line that feels like a signature approval, insight, o
                         bigScreen.classList.add('hidden');
                         document.getElementById('performer-placeholder').classList.remove('hidden');
                         document.getElementById('hangup-call-btn').classList.add('hidden');
-                        callBtn.textContent = '📞 Call';
-                        callBtn.classList.replace('bg-red-700', 'bg-green-700');
+                        enterBtn.textContent = '🎮 Enter';
+                        enterBtn.classList.remove('bg-red-700');
+                        enterBtn.classList.add('bg-[#ffd700]', 'text-[#3e2723]');
                         currentCall = null;
                         activePerformerUid = null;
                         document.getElementById('gift-performer-label').textContent = '🎁 Send Gift';
                     };
                 });
-                callBtn.textContent = '🔴 Live';
-                callBtn.classList.replace('bg-green-700', 'bg-red-700');
+                enterBtn.textContent = '🔴 Live';
+                enterBtn.classList.remove('bg-[#ffd700]', 'text-[#3e2723]');
+                enterBtn.classList.add('bg-red-700');
             };
+
+            enterBtn.onclick = enterCamera;
+            vid.onclick = enterCamera;
         }
 
         // --- CHAT & AI ---
@@ -3531,5 +3792,6 @@ End with one short elegant line that feels like a signature approval, insight, o
         })();
 
     </script>
+<script src="beat_manager.js"></script>
 </body>
 </html>
