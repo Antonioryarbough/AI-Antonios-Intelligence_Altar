@@ -20,7 +20,7 @@ window.HUBS = Object.freeze([
   {
     id: 'mainstage',
     name: 'AI Antonios Intelligence (Front Page / Music Video Maker)',
-    url: 'https://YOUR-AI-ANTONIOS-INTELLIGENCE-PROJECT.vercel.app', // <-- your Vercel deployment URL
+    url: 'https://ai-antonios-intelligence.vercel.com', // original homepage
     platform: 'vercel',
     firebaseProject: 'studio-9757662699-74931',
     source: 'public/index.html',
