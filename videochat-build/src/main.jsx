@@ -106,6 +106,18 @@ function LobbyScene() {
     status: "offline"
   };
 
+  // WebRTC/WebSocket state — consolidated from all 3 studio repos
+  const rtc = window.BabyRayRTCReact?.useWebRTC?.(roomId, "Lobby Artist") || {
+    peerId: null, peerStatus: "disconnected", callStatus: "Not connected",
+    localStream: null, remoteStream: null, hasLocalStream: false,
+    hasRemoteStream: false, isCalling: false, isMuted: false, isCameraOn: false,
+    isDesktopSharing: false, isAudioMixing: false, remotePeerId: null,
+    peers: [], error: null, ready: false,
+    startCamera: () => {}, startCall: () => {}, hangupCall: () => {},
+    startDesktopShare: () => {}, stopDesktopShare: () => {}, toggleMute: () => {},
+    shareInvite: () => {}, retryPeer: () => {}
+  };
+
   const activePersona = getPersona(activeKey);
   const activeAvatar = getAvatarPair(activeKey);
   const talkTimerRef = useRef(null);
@@ -455,6 +467,12 @@ function LobbyScene() {
           </pre>
         </div>
       </div>
+
+      {/* WebRTC video calling — consolidated from all 3 studio repos */}
+      <VideoCallSection rtc={rtc} />
+
+      {/* Graduation path to other studios */}
+      <GraduationSection />
     </div>
   );
 }

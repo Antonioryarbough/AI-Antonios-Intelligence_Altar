@@ -51,3 +51,4 @@ public/assets/*.MP4
 
 # Next build cache that slipped upstream
 *.sst
+.vercel

@@ -10,6 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <!-- PeerJS for WebRTC video calling (v1.5.4 — latest CDN build) -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -466,6 +468,313 @@
         min-height: 240px;
       }
     }
+
+    /* ── WebRTC Video Call ── */
+    .video-call-panel {
+      background: rgba(17, 17, 17, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      margin-top: 20px;
+    }
+
+    .video-call-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .video-call-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin: 0;
+    }
+
+    .peer-id-badge {
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid var(--line);
+      color: var(--cream);
+      padding: 4px 10px;
+      border-radius: 6px;
+      word-break: break-all;
+      max-width: 200px;
+      text-align: right;
+    }
+
+    .call-status {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .video-tiles {
+      position: relative;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .video-main {
+      flex: 1;
+      min-height: 320px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .video-main video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .video-pip {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 140px;
+      height: 100px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .video-pip video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-pip .pip-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--cream);
+      font-size: 10px;
+      padding: 2px 6px;
+      text-align: center;
+    }
+
+    .call-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .call-btn {
+      flex: 1;
+      min-width: 90px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--cream);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .call-btn:hover {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: var(--muted);
+    }
+
+    .call-btn:active {
+      transform: scale(0.96);
+    }
+
+    .call-btn.active {
+      background: linear-gradient(180deg, #70411d, #4f2d13);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .call-btn.danger {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: rgba(220, 38, 38, 0.4);
+      color: #fca5a5;
+    }
+
+    .call-btn.danger:hover {
+      background: rgba(220, 38, 38, 0.35);
+    }
+
+    /* ── Peer Directory ── */
+    .peer-directory {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .peer-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      max-width: 180px;
+    }
+
+    .peer-card:hover {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: var(--muted);
+    }
+
+    .peer-card .peer-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+      flex-shrink: 0;
+    }
+
+    .peer-card .peer-name {
+      color: var(--cream);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .peer-card .peer-id-short {
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .peer-empty {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 12px 0;
+    }
+
+    .peer-id-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--cream);
+      border-radius: 8px;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.18s ease;
+    }
+
+    .peer-id-input:focus {
+      border-color: var(--gold);
+    }
+
+    .rtc-error {
+      margin-top: 12px;
+      padding: 10px;
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      border-radius: 8px;
+      color: #fca5a5;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ── Graduation Ceremony ── */
+    .graduation-section {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(0, 224, 255, 0.1));
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .graduation-section h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin: 0 0 8px 0;
+    }
+
+    .graduation-section p {
+      color: var(--cream);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 16px 0;
+    }
+
+    .graduation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .graduation-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      border: 2px solid var(--gold);
+      background: rgba(17, 17, 17, 0.92);
+      color: var(--cream);
+      border-radius: 14px;
+      padding: 16px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .graduation-btn:hover {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: #f3cf73;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+    }
+
+    .graduation-btn .grad-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -474,9 +783,13 @@
   <script src="./src/ai/browserPersonaClient.js"></script>
   <script src="./src/chat/lobbyChatBridge.js"></script>
   <script src="./src/chat/browserChatBindings.js"></script>
+  <script src="./src/rtc/peerManager.js"></script>
+  <script src="./src/rtc/rtcReactBridge.js"></script>
   <script src="./src/scoring/scoreEngine.js"></script>
   <script src="./src/rooms/roomThemes.js"></script>
   <script type="text/babel" src="./src/components/CouncilDock.jsx"></script>
+  <script type="text/babel" src="./src/components/VideoCallSection.jsx"></script>
+  <script type="text/babel" src="./src/components/GraduationSection.jsx"></script>
   <script type="text/babel" src="./src/main.jsx"></script>
 </body>
 </html>
