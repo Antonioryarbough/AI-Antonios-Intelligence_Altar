@@ -10,7 +10,7 @@ routing booth*).
 
 | Studio | URL | Project (alias) | Platform | Status | Deploy |
 |---|---|---|---|---|---|
-| **Front page / Music Video Maker** ("AI Antonios Intelligence") | `https://ai-antonios-intelligence.vercel.com` | `studio-9757662699-74931` (mainstage) | **Vercel** | ✅ live | `npx vercel --prod` |
+| **Front page / Music Video Maker** ("AI Antonios Intelligence") | `https://ai-antonios-intelligence.vercel.app` | `studio-9757662699-74931` (mainstage) | **Vercel** | ✅ live | `npx vercel --prod` |
 | BabyRay Studio — Camera / Scene tabs | `https://studio-2fb13.web.app` | `studio-2fb13` (alias `studio`) | Firebase Hosting | ✅ live | `npm run deploy:studio` |
 | Community | `https://raydent-16571.web.app` | `raydent-16571` (alias `default`) | Firebase Hosting | ✅ live | `firebase deploy --only hosting --config firebase.json` |
 | Video Chat / Lobby | `https://lobby-raydent.web.app` | `raydent-16571` (alias `lobby`) | Firebase Hosting | ✅ live | `npm run deploy:lobby` |
