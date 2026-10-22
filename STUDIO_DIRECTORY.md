@@ -76,3 +76,38 @@ instead of hard-coded hrefs), add `"hubs.config.js:hubs.config.js"` to the
   the front page belongs on Vercel (`mainstage`).
 - Anonymous auth + Firestore (test mode) must be enabled in each Firebase
   console project's settings.
+
+## 🎥 Lobby WebRTC — consolidated from all 3 studio repos
+
+The lobby (`https://lobby-raydent.web.app`) is now a full **music production
+school** with video calling. All WebRTC features from the mainstage and Studio
+apps have been consolidated into a single engine:
+
+| Feature | Origin | Implementation |
+|---|---|---|
+| PeerJS init + 15 s timeout + auto-reconnect | mainstage `public/index.html` | `src/rtc/peerManager.js → init()` |
+| getUserMedia (1920×1080 camera + mic) | mainstage | `src/rtc/peerManager.js → startCamera()` |
+| Audio mixing via Web Audio API | `Studio/public/index.html` | `src/rtc/peerManager.js → setupAudioMixer()` |
+| Desktop sharing (`getDisplayMedia` + stream composition) | `Studio/public/index.html` | `src/rtc/peerManager.js → startDesktopShare()` |
+| Track replacement (`RTCRtpSender.replaceTrack`) | `Studio/public/index.html` | `src/rtc/peerManager.js → replaceOutgoingVideoTrack()` |
+| Adaptive video profiles (visibility-aware) | `Studio/public/index.html` | `src/rtc/peerManager.js → getAdaptiveVideoProfile()` |
+| Incoming / outgoing calls, hangup | mainstage | `src/rtc/peerManager.js → handleCallEvents()`, `startCall()`, `hangupCall()` |
+| Firestore directory presence + heartbeat | mainstage | `src/rtc/peerManager.js → updatePublicPresence()`, `subscribeDirectory()` |
+| Share invite (clipboard / `navigator.share`) | mainstage | `src/rtc/peerManager.js → shareInvite()` |
+| React bridge (hooks) | — | `src/rtc/rtcReactBridge.js → useWebRTC()` |
+| Video UI component | — | `src/components/VideoCallSection.jsx` |
+| Graduation path to other studios | — | `src/components/GraduationSection.jsx` |
+
+### Architecture
+- **Engine**: `src/rtc/peerManager.js` — plain IIFE browser global
+  (`window.BabyRayRTC`). No React dependency. Owns the PeerJS instance,
+  MediaStreams, Web Audio context, and Firestore presence.
+- **React bridge**: `src/rtc/rtcReactBridge.js` — IIFE that exposes
+  `window.BabyRayRTCReact.useWebRTC(roomId, displayName)`, a React hook
+  that subscribes to engine state changes and exposes actions.
+- **UI components**: `src/components/VideoCallSection.jsx` and
+  `src/components/GraduationSection.jsx` — Babel-compiled React components
+  (loaded via `<script type="text/babel">`), rendered inside `LobbyScene`.
+- **Build**: The `lobby-react` build profile in `scripts/build-target.mjs`
+  copies the entire `src/` directory to the build output, so all new RTC
+  files are included automatically on `npm run build:videochat`.
