@@ -67,7 +67,7 @@ window.HUBS = Object.freeze([
     build: 'npm run build:videochat',
     deploy: 'npm run deploy:lobby',
     peerRoom: 'ai-enterprise-studio',
-    status: 'needs-site-plus-deploy'
+    status: 'live'
   },
   {
     id: 'frontpage',

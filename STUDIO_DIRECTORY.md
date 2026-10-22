@@ -12,7 +12,7 @@ routing booth*).
 | **Front page / Music Video Maker** ("AI Antonios Intelligence") | `https://<your-vercel-project>.vercel.app` | `studio-9757662699-74931` (mainstage) | **Vercel** | ✅ live (after Vercel deploy) | `npx vercel --prod` |
 | BabyRay Studio — Camera / Scene tabs | `https://studio-2fb13.web.app` | `studio-2fb13` (alias `studio`) | Firebase Hosting | ✅ live | `npm run deploy:studio` |
 | Community | `https://raydent-16571.web.app` | `raydent-16571` (alias `default`) | Firebase Hosting | ✅ live | `firebase deploy --only hosting --config firebase.json` |
-| Video Chat / Lobby | `https://lobby-raydent.web.app` | `raydent-16571` (alias `lobby`) | Firebase Hosting | ⚠️ mint URL below | `npm run deploy:lobby` |
+| Video Chat / Lobby | `https://lobby-raydent.web.app` | `raydent-16571` (alias `lobby`) | Firebase Hosting | ✅ live | `npm run deploy:lobby` |
 | `babyray-front` (alias `frontpage`) | — | `babyray-front` | — | ❌ orphaned (no config; the front page uses Vercel instead) | n/a |
 
 ## How the front page links the other apps
