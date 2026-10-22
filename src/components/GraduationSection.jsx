@@ -3,6 +3,7 @@
 //
 // After students complete their training at the Lobby Music Production School,
 // this component renders the graduation path to the other studios.
+// Theme: "Don't get killed… Get skilled"
 
 function GraduationSection() {
   const studios = [

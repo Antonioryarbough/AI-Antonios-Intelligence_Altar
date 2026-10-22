@@ -1,6 +1,7 @@
 // VideoCallSection — browser-global React component (no ES imports)
 // Loaded via <script type="text/babel"> before main.jsx
 // Depends on: window.BabyRayRTCReact (useWebRTC hook), React (UMD global)
+// Theme: "Don't get killed… Get skilled" — AI rap assistants as collaborators
 
 function VideoCallSection({ rtc }) {
   const [peerIdToCall, setPeerIdToCall] = React.useState("");

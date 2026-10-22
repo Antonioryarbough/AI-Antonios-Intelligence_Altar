@@ -1,4 +1,5 @@
 # 🎬 AI Antonios Intelligence — Central Studio Directory
+> **AI rap assistants — Don't get killed… Get skilled**
 
 One repo, **five** studios + a Vercel front page. This doc is the canonical
 "central directory" + the exact commands to mint each studio's URL so they can
